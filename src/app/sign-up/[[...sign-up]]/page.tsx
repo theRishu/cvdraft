@@ -1,8 +1,12 @@
+"use client";
 import { SignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { FileText, Sparkles, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function SignUpPage() {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
     return (
         <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
             {/* Left Side - Form */}
@@ -19,19 +23,21 @@ export default function SignUpPage() {
                         <p className="text-slate-500 mt-2 text-sm">Join thousands of professionals building better resumes.</p>
                     </div>
 
-                    <div className="flex justify-center md:justify-start">
-                        <SignUp
-                            appearance={{
-                                elements: {
-                                    formButtonPrimary: "bg-slate-900 hover:bg-black text-sm normal-case",
-                                    card: "shadow-none border-none p-0 w-full",
-                                    headerTitle: "hidden",
-                                    headerSubtitle: "hidden",
-                                    footerAction: "text-slate-500",
-                                    footerActionLink: "text-slate-900 hover:text-black font-medium"
-                                }
-                            }}
-                        />
+                    <div className="flex justify-center md:justify-start min-h-[400px]">
+                        {mounted && (
+                            <SignUp
+                                appearance={{
+                                    elements: {
+                                        formButtonPrimary: "bg-slate-900 hover:bg-black text-sm normal-case",
+                                        card: "shadow-none border-none p-0 w-full",
+                                        headerTitle: "hidden",
+                                        headerSubtitle: "hidden",
+                                        footerAction: "text-slate-500",
+                                        footerActionLink: "text-slate-900 hover:text-black font-medium"
+                                    }
+                                }}
+                            />
+                        )}
                     </div>
                 </div>
             </div>
