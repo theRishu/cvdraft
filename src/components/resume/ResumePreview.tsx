@@ -1,4 +1,5 @@
 import { IResume } from "@/models/Resume";
+import React, { useState, useEffect, useRef } from "react";
 import AtsTemplate from "./templates/AtsTemplate";
 import ModernTemplate from "./templates/ModernTemplate";
 import ProfessionalTemplate from "./templates/ProfessionalTemplate";
@@ -77,14 +78,16 @@ export default function ResumePreview({
         }
     };
 
-    return (
-        <div ref={contentRef} className="bg-white w-full h-full min-h-[297mm] shadow-sm">
-            {renderTemplate()}
+    // Match the CSS background-size (297mm + 20mm gap)
+    const pageLabels = [1, 2, 3, 4, 5];
 
-            {/* Watermark for Free Users (conditional logic later) */}
-            <div className="absolute bottom-2 right-4 opacity-50 text-[10px] text-slate-400 print:block hidden">
-                Created with {process.env.NEXT_PUBLIC_WEBSITE_NAME || "ResumeGPT"}
-            </div>
+
+    return (
+        <div
+            ref={contentRef}
+            className="resume-content-wrapper bg-white shadow-2xl relative w-[210mm] min-h-[297mm] print:shadow-none mx-auto print:mx-0 overflow-hidden"
+        >
+            {renderTemplate()}
         </div>
     );
 }

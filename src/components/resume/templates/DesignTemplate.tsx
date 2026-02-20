@@ -36,20 +36,20 @@ export default function DesignTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className="w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white text-slate-800 font-sans flex shadow-sm">
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-sans flex shadow-sm  bg-white print:p-0 print:w-full`}>
             {/* Left Sidebar */}
-            <div className="w-[35%] p-8 text-white flex flex-col" style={{ backgroundColor: themeColor }}>
-                <div className="mb-10">
-                    <h1 className="text-3xl font-bold leading-tight mb-2 break-words">
+            <div className="w-[35%] p-8 text-white flex flex-col print:shadow-none" style={{ backgroundColor: themeColor }}>
+                <div className="mb-10 print:shadow-none">
+                    <h1 className="text-3xl font-bold leading-tight mb-2 break-words print:shadow-none">
                         {fName}
                     </h1>
-                    <h2 className="text-lg font-medium opacity-90">{fTitle}</h2>
+                    <h2 className="text-lg font-medium opacity-90 print:shadow-none">{fTitle}</h2>
                 </div>
 
-                <div className="space-y-8 flex-1">
+                <div className="space-y-8 flex-1 print:shadow-none">
                     <section>
-                        <h3 className="text-lg font-bold border-b border-white/30 pb-2 mb-3">Contact</h3>
-                        <div className="space-y-2 text-sm font-light opacity-90">
+                        <h3 className="text-lg font-bold border-b border-white/30 pb-2 mb-3 print:shadow-none">Contact</h3>
+                        <div className="space-y-2 text-sm font-light opacity-90 print:shadow-none">
                             <p>{fEmail}</p>
                             <p>{fPhone}</p>
                             <p>{fLocation}</p>
@@ -58,23 +58,23 @@ export default function DesignTemplate({ data }: { data: any }) {
                     </section>
 
                     <section>
-                        <h3 className="text-lg font-bold border-b border-white/30 pb-2 mb-3">Education</h3>
-                        <div className="space-y-4">
+                        <h3 className="text-lg font-bold border-b border-white/30 pb-2 mb-3 print:shadow-none">Education</h3>
+                        <div className="space-y-4 print:shadow-none">
                             {displayEdu.map((edu: any, i: number) => (
                                 <div key={i}>
-                                    <h4 className="font-bold text-base leading-tight mb-1">{edu.degree}</h4>
-                                    <div className="text-sm font-light opacity-90">{edu.schoolName}</div>
-                                    <div className="text-xs opacity-75 mt-1">{edu.startDate} - {edu.endDate}</div>
+                                    <h4 className="font-bold text-base leading-tight mb-1 print:shadow-none">{edu.degree}</h4>
+                                    <div className="text-sm font-light opacity-90 print:shadow-none">{edu.schoolName}</div>
+                                    <div className="text-xs opacity-75 mt-1 print:shadow-none">{edu.startDate} - {edu.endDate}</div>
                                 </div>
                             ))}
                         </div>
                     </section>
 
                     <section>
-                        <h3 className="text-lg font-bold border-b border-white/30 pb-2 mb-3">Skills</h3>
-                        <div className="flex flex-wrap gap-2">
+                        <h3 className="text-lg font-bold border-b border-white/30 pb-2 mb-3 print:shadow-none">Skills</h3>
+                        <div className="flex flex-wrap gap-2 print:shadow-none">
                             {displaySkills.map((s: any, i: number) => (
-                                <span key={i} className="text-sm px-3 py-1 rounded-full bg-white/20 font-medium">
+                                <span key={i} className="text-sm px-3 py-1 rounded-full bg-white/20 font-medium print:shadow-none">
                                     {s.name}
                                 </span>
                             ))}
@@ -84,30 +84,30 @@ export default function DesignTemplate({ data }: { data: any }) {
             </div>
 
             {/* Right Content */}
-            <div className="w-[65%] p-8 flex flex-col">
-                <section className="mb-8">
-                    <h3 className="text-2xl font-bold mb-4" style={{ color: themeColor }}>About Me</h3>
-                    <p className="text-base leading-relaxed text-slate-600 font-medium">
+            <div className="w-[65%] p-8 flex flex-col print:shadow-none">
+                <section className="mb-8 print:shadow-none">
+                    <h3 className="text-2xl font-bold mb-4 print:shadow-none" style={{ color: themeColor }}>About Me</h3>
+                    <p className="text-base leading-relaxed text-slate-600 font-medium print:shadow-none">
                         {fSummary}
                     </p>
                 </section>
 
                 <section>
-                    <h3 className="text-2xl font-bold mb-6" style={{ color: themeColor }}>Experience</h3>
-                    <div className="space-y-8 text-slate-700">
+                    <h3 className="text-2xl font-bold mb-6 print:shadow-none" style={{ color: themeColor }}>Experience</h3>
+                    <div className="space-y-8 text-slate-700 print:shadow-none">
                         {displayExp.map((exp: any, i: number) => (
-                            <div key={i} className="relative pl-6 border-l-2" style={{ borderColor: `${themeColor}40` }}>
-                                <div className="absolute w-3 h-3 rounded-full -left-[7px] top-1" style={{ backgroundColor: themeColor }} />
-                                <div className="flex justify-between items-baseline mb-1">
-                                    <h4 className="text-lg font-bold leading-tight">{exp.jobTitle}</h4>
+                            <div key={i} className="relative pl-6 border-l-2 print:shadow-none" style={{ borderColor: `${themeColor}40` }}>
+                                <div className="absolute w-3 h-3 rounded-full -left-[7px] top-1 print:shadow-none" style={{ backgroundColor: themeColor }} />
+                                <div className="flex justify-between items-baseline mb-1 print:shadow-none">
+                                    <h4 className="text-lg font-bold leading-tight print:shadow-none">{exp.jobTitle}</h4>
                                 </div>
-                                <div className="flex justify-between items-baseline mb-3">
-                                    <div className="text-base font-bold" style={{ color: themeColor }}>{exp.companyName}</div>
-                                    <span className="text-sm font-semibold text-slate-500 whitespace-nowrap ml-2">
+                                <div className="flex justify-between items-baseline mb-3 print:shadow-none">
+                                    <div className="text-base font-bold print:shadow-none" style={{ color: themeColor }}>{exp.companyName}</div>
+                                    <span className="text-sm font-semibold text-slate-500 whitespace-nowrap ml-2 print:shadow-none">
                                         {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
                                     </span>
                                 </div>
-                                <ul className="list-disc list-outside ml-4 text-sm space-y-2 text-slate-600 leading-relaxed">
+                                <ul className="list-disc list-outside ml-4 text-sm space-y-2 text-slate-600 leading-relaxed print:shadow-none">
                                     {exp.description?.split('\n').map((line: string, j: number) => {
                                         const cleanLine = line.replace(/^[\s•\-\*]+\s*/, '');
                                         return cleanLine && <li key={j}>{cleanLine}</li>;

@@ -36,18 +36,18 @@ export default function DevTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className="w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white text-slate-800 font-mono p-8 shadow-sm flex flex-col">
-            <header className="mb-8 border-b-2 border-slate-200 pb-8">
-                <div className="flex justify-between items-center">
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-mono p-8 shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
+            <header className="mb-8 border-b-2 border-slate-200 pb-8 print:shadow-none">
+                <div className="flex justify-between items-center print:shadow-none">
                     <div>
-                        <h1 className="text-3xl font-bold mb-2">
+                        <h1 className="text-3xl font-bold mb-2 print:shadow-none">
                             <span style={{ color: themeColor }}>&lt;</span>
                             {fName}
                             <span style={{ color: themeColor }}>/&gt;</span>
                         </h1>
-                        <h2 className="text-xl text-slate-500">{fTitle}</h2>
+                        <h2 className="text-xl text-slate-500 print:shadow-none">{fTitle}</h2>
                     </div>
-                    <div className="text-right text-sm text-slate-600 space-y-1">
+                    <div className="text-right text-sm text-slate-600 space-y-1 print:shadow-none">
                         <p>{fEmail}</p>
                         <p>{fGithub}</p>
                         <p>{fLinkedin}</p>
@@ -56,25 +56,25 @@ export default function DevTemplate({ data }: { data: any }) {
                 </div>
             </header>
 
-            <div className="space-y-8 flex-1">
+            <div className="space-y-8 flex-1 print:shadow-none">
                 <section>
-                    <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-slate-600">
-                        <span className="w-4 h-4 rounded-sm" style={{ backgroundColor: themeColor }}></span>
+                    <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-slate-600 print:shadow-none">
+                        <span className="w-4 h-4 rounded-sm print:shadow-none" style={{ backgroundColor: themeColor }}></span>
                         Summary
                     </h3>
-                    <p className="text-sm leading-relaxed text-slate-700 bg-slate-50 p-4 border border-slate-100 rounded-md shadow-inner">
+                    <p className="text-sm leading-relaxed text-slate-700 bg-slate-50 p-4 border border-slate-100 rounded-md shadow-inner print:shadow-none">
                         {fSummary}
                     </p>
                 </section>
 
                 <section>
-                    <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-slate-600">
-                        <span className="w-4 h-4 rounded-sm" style={{ backgroundColor: themeColor }}></span>
+                    <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-slate-600 print:shadow-none">
+                        <span className="w-4 h-4 rounded-sm print:shadow-none" style={{ backgroundColor: themeColor }}></span>
                         Tech Stack
                     </h3>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 print:shadow-none">
                         {displaySkills.map((s: any, i: number) => (
-                            <span key={i} className="text-sm px-2 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded">
+                            <span key={i} className="text-sm px-2 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded print:shadow-none">
                                 {s.name}
                             </span>
                         ))}
@@ -82,30 +82,30 @@ export default function DevTemplate({ data }: { data: any }) {
                 </section>
 
                 <section>
-                    <h3 className="text-lg font-bold mb-5 flex items-center gap-2 text-slate-600">
-                        <span className="w-4 h-4 rounded-sm" style={{ backgroundColor: themeColor }}></span>
+                    <h3 className="text-lg font-bold mb-5 flex items-center gap-2 text-slate-600 print:shadow-none">
+                        <span className="w-4 h-4 rounded-sm print:shadow-none" style={{ backgroundColor: themeColor }}></span>
                         Experience
                     </h3>
-                    <div className="space-y-6">
+                    <div className="space-y-6 print:shadow-none">
                         {displayExp.map((exp: any, i: number) => (
-                            <div key={i} className="group">
-                                <div className="flex justify-between items-baseline mb-2">
+                            <div key={i} className="group print:shadow-none">
+                                <div className="flex justify-between items-baseline mb-2 print:shadow-none">
                                     <div>
-                                        <h4 className="text-lg font-bold text-slate-800 inline-block mr-2">{exp.jobTitle}</h4>
-                                        <span className="text-sm text-slate-500 font-medium px-2 py-0.5 rounded" style={{ backgroundColor: `${themeColor}20`, color: themeColor }}>
+                                        <h4 className="text-lg font-bold text-slate-800 inline-block mr-2 print:shadow-none">{exp.jobTitle}</h4>
+                                        <span className="text-sm text-slate-500 font-medium px-2 py-0.5 rounded print:shadow-none" style={{ backgroundColor: `${themeColor}20`, color: themeColor }}>
                                             @ {exp.companyName}
                                         </span>
                                     </div>
-                                    <span className="text-sm text-slate-400">
+                                    <span className="text-sm text-slate-400 print:shadow-none">
                                         {exp.startDate} — {exp.isCurrent ? 'Present' : exp.endDate}
                                     </span>
                                 </div>
-                                <ul className="list-none text-sm space-y-2 text-slate-700 ml-2">
+                                <ul className="list-none text-sm space-y-2 text-slate-700 ml-2 print:shadow-none">
                                     {exp.description?.split('\n').map((line: string, j: number) => {
                                         const cleanLine = line.replace(/^[\s•\-\*]+\s*/, '');
                                         return cleanLine && (
-                                            <li key={j} className="flex gap-2">
-                                                <span style={{ color: themeColor }} className="mt-0.5">→</span>
+                                            <li key={j} className="flex gap-2 print:shadow-none">
+                                                <span style={{ color: themeColor }} className="mt-0.5 print:shadow-none">→</span>
                                                 <span>{cleanLine}</span>
                                             </li>
                                         );
@@ -117,16 +117,16 @@ export default function DevTemplate({ data }: { data: any }) {
                 </section>
 
                 <section>
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-600">
-                        <span className="w-4 h-4 rounded-sm" style={{ backgroundColor: themeColor }}></span>
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-600 print:shadow-none">
+                        <span className="w-4 h-4 rounded-sm print:shadow-none" style={{ backgroundColor: themeColor }}></span>
                         Education
                     </h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4 print:shadow-none">
                         {displayEdu.map((edu: any, i: number) => (
-                            <div key={i} className="p-4 border border-slate-200 rounded-md bg-white">
-                                <h4 className="font-bold text-slate-800 text-sm mb-1">{edu.degree}</h4>
-                                <div className="text-slate-600 text-sm">{edu.schoolName}</div>
-                                <div className="text-xs text-slate-400 mt-2 font-semibold">
+                            <div key={i} className="p-4 border border-slate-200 rounded-md bg-white print:shadow-none">
+                                <h4 className="font-bold text-slate-800 text-sm mb-1 print:shadow-none">{edu.degree}</h4>
+                                <div className="text-slate-600 text-sm print:shadow-none">{edu.schoolName}</div>
+                                <div className="text-xs text-slate-400 mt-2 font-semibold print:shadow-none">
                                     {edu.startDate} — {edu.endDate}
                                 </div>
                             </div>

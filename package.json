@@ -3,16 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 8082",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 8082",
     "lint": "eslint"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.37.5",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
+    "@google/generative-ai": "^0.24.1",
     "clsx": "^2.1.1",
+    "html2pdf.js": "^0.14.0",
     "lucide-react": "^0.574.0",
     "mongoose": "^9.2.1",
     "next": "16.1.6",

@@ -35,43 +35,43 @@ export default function FinanceTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className="w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white text-slate-900 font-serif flex flex-col shadow-sm">
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-900 font-serif flex flex-col shadow-sm  bg-white print:p-0 print:w-full`}>
             {/* Top Bar */}
-            <div className="h-4 w-full" style={{ backgroundColor: themeColor }}></div>
+            <div className="h-4 w-full print:shadow-none" style={{ backgroundColor: themeColor }}></div>
 
-            <div className="p-8 space-y-10 flex-1">
-                <header className="flex justify-between items-center border-b-2 border-slate-200 pb-8">
+            <div className="p-8 space-y-10 flex-1 print:shadow-none">
+                <header className="flex justify-between items-center border-b-2 border-slate-200 pb-8 print:shadow-none">
                     <div>
-                        <h1 className="text-3xl font-bold mb-2 text-slate-800">{fName}</h1>
-                        <h2 className="text-xl font-medium text-slate-500">{fTitle}</h2>
+                        <h1 className="text-3xl font-bold mb-2 text-slate-800 print:shadow-none">{fName}</h1>
+                        <h2 className="text-xl font-medium text-slate-500 print:shadow-none">{fTitle}</h2>
                     </div>
-                    <div className="text-right text-sm font-sans text-slate-600 space-y-1">
+                    <div className="text-right text-sm font-sans text-slate-600 space-y-1 print:shadow-none">
                         <p>{fPhone}</p>
                         <p>{fEmail}</p>
                         <p>{fLocation}</p>
                     </div>
                 </header>
 
-                <div className="grid grid-cols-12 gap-8">
-                    <div className="col-span-8 flex flex-col gap-8">
+                <div className="grid grid-cols-12 gap-8 print:shadow-none">
+                    <div className="col-span-8 flex flex-col gap-8 print:shadow-none">
                         <section>
-                            <h3 className="text-2xl font-bold border-b border-slate-200 mb-4 pb-2" style={{ color: themeColor }}>Professional Profile</h3>
-                            <p className="text-base leading-relaxed text-slate-700 font-sans">{fSummary}</p>
+                            <h3 className="text-2xl font-bold border-b border-slate-200 mb-4 pb-2 print:shadow-none" style={{ color: themeColor }}>Professional Profile</h3>
+                            <p className="text-base leading-relaxed text-slate-700 font-sans print:shadow-none">{fSummary}</p>
                         </section>
 
                         <section>
-                            <h3 className="text-2xl font-bold border-b border-slate-200 mb-6 pb-2" style={{ color: themeColor }}>Experience</h3>
-                            <div className="space-y-8">
+                            <h3 className="text-2xl font-bold border-b border-slate-200 mb-6 pb-2 print:shadow-none" style={{ color: themeColor }}>Experience</h3>
+                            <div className="space-y-8 print:shadow-none">
                                 {displayExp.map((exp: any, i: number) => (
-                                    <div key={i} className="font-sans">
-                                        <div className="flex justify-between items-baseline mb-1">
-                                            <h4 className="text-xl font-bold text-slate-800">{exp.jobTitle}</h4>
-                                            <span className="text-sm font-semibold text-slate-500">
+                                    <div key={i} className="font-sans print:shadow-none">
+                                        <div className="flex justify-between items-baseline mb-1 print:shadow-none">
+                                            <h4 className="text-xl font-bold text-slate-800 print:shadow-none">{exp.jobTitle}</h4>
+                                            <span className="text-sm font-semibold text-slate-500 print:shadow-none">
                                                 {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
                                             </span>
                                         </div>
-                                        <div className="text-lg font-bold text-slate-600 mb-3">{exp.companyName}</div>
-                                        <ul className="list-disc list-outside ml-4 text-base space-y-2 text-slate-700">
+                                        <div className="text-lg font-bold text-slate-600 mb-3 print:shadow-none">{exp.companyName}</div>
+                                        <ul className="list-disc list-outside ml-4 text-base space-y-2 text-slate-700 print:shadow-none">
                                             {exp.description?.split('\n').map((line: string, j: number) => {
                                                 const cleanLine = line.replace(/^[\s•\-\*]+\s*/, '');
                                                 return cleanLine && <li key={j}>{cleanLine}</li>;
@@ -83,27 +83,27 @@ export default function FinanceTemplate({ data }: { data: any }) {
                         </section>
                     </div>
 
-                    <div className="col-span-4 flex flex-col gap-8">
+                    <div className="col-span-4 flex flex-col gap-8 print:shadow-none">
                         <section>
-                            <h3 className="text-xl font-bold border-b border-slate-200 mb-4 pb-2" style={{ color: themeColor }}>Expertise</h3>
-                            <ul className="font-sans flex flex-col gap-3">
+                            <h3 className="text-xl font-bold border-b border-slate-200 mb-4 pb-2 print:shadow-none" style={{ color: themeColor }}>Expertise</h3>
+                            <ul className="font-sans flex flex-col gap-3 print:shadow-none">
                                 {displaySkills.map((s: any, i: number) => (
-                                    <li key={i} className="flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: themeColor }}></div>
-                                        <span className="text-slate-700 font-medium">{s.name}</span>
+                                    <li key={i} className="flex items-center gap-3 print:shadow-none">
+                                        <div className="w-2 h-2 rounded-sm print:shadow-none" style={{ backgroundColor: themeColor }}></div>
+                                        <span className="text-slate-700 font-medium print:shadow-none">{s.name}</span>
                                     </li>
                                 ))}
                             </ul>
                         </section>
 
                         <section>
-                            <h3 className="text-xl font-bold border-b border-slate-200 mb-4 pb-2" style={{ color: themeColor }}>Education</h3>
-                            <div className="space-y-6 font-sans">
+                            <h3 className="text-xl font-bold border-b border-slate-200 mb-4 pb-2 print:shadow-none" style={{ color: themeColor }}>Education</h3>
+                            <div className="space-y-6 font-sans print:shadow-none">
                                 {displayEdu.map((edu: any, i: number) => (
                                     <div key={i}>
-                                        <h4 className="font-bold text-slate-800">{edu.degree}</h4>
-                                        <div className="text-slate-600 my-1">{edu.schoolName}</div>
-                                        <div className="text-sm font-medium text-slate-500 italic">
+                                        <h4 className="font-bold text-slate-800 print:shadow-none">{edu.degree}</h4>
+                                        <div className="text-slate-600 my-1 print:shadow-none">{edu.schoolName}</div>
+                                        <div className="text-sm font-medium text-slate-500 italic print:shadow-none">
                                             {edu.startDate} - {edu.endDate}
                                         </div>
                                     </div>

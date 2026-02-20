@@ -65,7 +65,7 @@ export async function PUT(
         const updatedResume = await Resume.findOneAndUpdate(
             { _id: id, userId },
             { $set: body },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!updatedResume) {

@@ -1,0 +1,26 @@
+[Unit]
+Description=Resume Next.js Application
+After=network.target
+
+[Service]
+Type=simple
+# Update the User and Group to the appropriate user on your Linux server
+User=ubuntu
+Group=ubuntu
+
+# Update WorkingDirectory to the absolute path of your project on the server
+WorkingDirectory=/var/www/Resume
+
+# Set the port to 8082 as requested
+Environment=PORT=8082
+Environment=NODE_ENV=production
+
+# Provide the absolute path to npm (run `which npm` on your server to find this)
+ExecStart=/usr/bin/npm run start
+
+# Automatically restart the service if it crashes
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

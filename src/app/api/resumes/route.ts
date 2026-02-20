@@ -59,61 +59,61 @@ export async function POST(req: Request) {
             // Default creation
             initialData = {
                 userId,
-                title: title || "SOC Analyst Resume",
+                title: title || "Software Engineer Resume",
                 templateId: templateId || "ats",
                 personalInfo: {
                     fullName: user.firstName + " " + user.lastName,
-                    email: "john.doe@example.com",
-                    jobTitle: "Cybersecurity Consultant",
+                    email: user.emailAddresses[0].emailAddress || "john.doe@example.com",
+                    title: "Senior Software Engineer",
                     phone: "+1 (555) 123-4567",
-                    location: "Noida, UP, India",
-                    summary: "Cybersecurity Consultant with 1 year of hands-on SOC experience, specializing in Security Operations, SIEM, and SOAR tools. Skilled in threat detection, log analysis, and incident response in 24x7 enterprise SOC environments. Experienced with CrowdStrike, Chronicle, XSOAR, and Microsoft 365 Defender, with a strong foundation in cloud security, EDR/XDR, and email security. Known for quick decision-making, confidentiality handling, and maintaining high security posture across enterprise systems."
+                    location: "San Francisco, CA",
+                    summary: "Senior Software Engineer with over 5 years of experience in building scalable web applications and distributed systems. Expert in React, Node.js, and TypeScript, with a strong focus on clean code, performance optimization, and user-centric design. Proven track record of delivering high-quality software solutions in fast-paced startup environments."
                 },
                 experience: [
                     {
                         id: crypto.randomUUID(),
-                        jobTitle: "SOC Analyst",
-                        companyName: "LTIMindtree",
-                        startDate: "Dec 2024",
+                        jobTitle: "Senior Software Engineer",
+                        companyName: "TechFlow Systems",
+                        startDate: "Jan 2021",
                         endDate: "Present",
-                        location: "Hyderabad, India",
+                        location: "San Francisco, CA",
                         isCurrent: true,
-                        description: "• Operated as a SOC Level 1 Analyst in a 24x7 monitoring environment.\n• Performed security monitoring, incident triage, and response using CrowdStrike, Chronicle, and Microsoft Defender.\n• Investigated phishing, malware, and ransomware alerts; executed incident response playbooks in XSOAR.\n• Maintained operational security by documenting incidents and reporting in ServiceNow.\n• Improved detection coverage by analyzing firewall, proxy, and endpoint logs.\n\nKey Skills Used: CrowdStrike | Chronicle | Microsoft Defender | XSOAR | ServiceNow | Threat Hunting | Incident Response | Log Analysis"
+                        description: "• Led the frontend development of a high-traffic e-commerce platform using React and Next.js, resulting in a 30% increase in conversion rates.\n• Architected and implemented a microservices-based backend using Node.js and GraphQL, improving system scalability and maintainability.\n• Mentored junior developers and conducted code reviews to ensure high-quality standards and best practices.\n• Optimized application performance, reducing page load times by 40% through code splitting and efficient data fetching strategies."
+                    },
+                    {
+                        id: crypto.randomUUID(),
+                        jobTitle: "Software Engineer",
+                        companyName: "Innovate Digital",
+                        startDate: "Jun 2018",
+                        endDate: "Dec 2020",
+                        location: "Austin, TX",
+                        isCurrent: false,
+                        description: "• Developed and maintained multiple client-facing web applications using JavaScript, HTML5, and CSS3.\n• Collaborated with UX/UI designers to translate complex requirements into intuitive and responsive user interfaces.\n• Integrated third-party APIs and services to enhance application functionality and user experience.\n• Participated in agile development processes, including sprint planning and daily stand-ups."
                     }
                 ],
                 education: [
                     {
                         id: crypto.randomUUID(),
-                        degree: "Bachelor of Technology in Computer Science",
-                        schoolName: "University of Technology",
-                        startDate: "Aug 2019",
-                        endDate: "May 2023"
-                    },
-                    {
-                        id: crypto.randomUUID(),
-                        degree: "High School Diploma (PCM)",
-                        schoolName: "Delhi Public School",
-                        startDate: "Apr 2017",
-                        endDate: "Mar 2019"
+                        degree: "Bachelor of Science in Computer Science",
+                        schoolName: "University of California, Berkeley",
+                        startDate: "Aug 2014",
+                        endDate: "May 2018"
                     }
                 ],
                 skills: [
-                    { id: crypto.randomUUID(), name: "SIEM: Google Chronicle, Next-Gen SIEM" },
-                    { id: crypto.randomUUID(), name: "EDR/XDR: CrowdStrike, Microsoft Defender" },
-                    { id: crypto.randomUUID(), name: "SOAR: Palo Alto Cortex XSOAR" },
-                    { id: crypto.randomUUID(), name: "Email Security: Microsoft O365 Security, Proofpoint (TAP/TRAP)" },
-                    { id: crypto.randomUUID(), name: "Cloud Security: Microsoft Azure Security Center" },
-                    { id: crypto.randomUUID(), name: "Threat Intelligence Tools: VirusTotal, MXToolBox, AbuseIPDB, Browserling" },
-                    { id: crypto.randomUUID(), name: "Ticketing/Case Mgmt: ServiceNow" },
-                    { id: crypto.randomUUID(), name: "Networking: TCP/IP, DNS, DHCP, Firewall, Proxy, WAF" }
+                    { id: crypto.randomUUID(), name: "Languages: JavaScript, TypeScript, Go, Python" },
+                    { id: crypto.randomUUID(), name: "Frontend: React, Next.js, Vue.js, Tailwind CSS" },
+                    { id: crypto.randomUUID(), name: "Backend: Node.js, Express, GraphQL, PostgreSQL" },
+                    { id: crypto.randomUUID(), name: "Cloud & DevOps: AWS, Docker, Kubernetes, CI/CD" },
+                    { id: crypto.randomUUID(), name: "Tools: Git, Jest, Storybook, Figma" }
                 ],
                 certifications: [
-                    { id: crypto.randomUUID(), name: "CompTIA Security+", issuer: "CompTIA", date: "Oct 2023" },
-                    { id: crypto.randomUUID(), name: "Certified Ethical Hacker (CEH)", issuer: "EC-Council", date: "Jan 2024" }
+                    { id: crypto.randomUUID(), name: "AWS Certified Solutions Architect", issuer: "Amazon Web Services", date: "Oct 2022" },
+                    { id: crypto.randomUUID(), name: "Professional Scrum Master I", issuer: "Scrum.org", date: "Jan 2021" }
                 ],
                 languages: [
-                    { id: crypto.randomUUID(), name: "English", level: "Fluent" },
-                    { id: crypto.randomUUID(), name: "Hindi", level: "Native" }
+                    { id: crypto.randomUUID(), name: "English", level: "Native" },
+                    { id: crypto.randomUUID(), name: "Spanish", level: "Fluent" }
                 ],
                 socialLinks: [
                     { id: crypto.randomUUID(), platform: "LinkedIn", url: "linkedin.com/in/johndoe" },
@@ -122,20 +122,20 @@ export async function POST(req: Request) {
                 projects: [
                     {
                         id: crypto.randomUUID(),
-                        title: "Automated Malware Analysis Sandbox",
-                        description: "Developed a Python-based sandbox environment using Cuckoo Sandbox to automatically detonate and analyze suspicious files. Integrated with VirusTotal API to generate comprehensive threat reports detailing behavior, registry changes, and network activity.",
-                        link: "github.com/johndoe/sandbox",
-                        startDate: "Jan 2023",
-                        endDate: "Apr 2023",
-                        technologies: ["Python", "Cuckoo Sandbox", "VirusTotal API", "VirtualBox"]
+                        title: "E-commerce Performance Dashboard",
+                        description: "Designed and developed a real-time analytics dashboard for monitoring e-commerce platform metrics. Built with React and D3.js, the dashboard provided interactive visualizations of sales trends, user behavior, and system health.",
+                        link: "github.com/johndoe/dashboard",
+                        startDate: "Mar 2023",
+                        endDate: "Jun 2023",
+                        technologies: ["React", "D3.js", "Node.js", "Redis"]
                     },
                     {
                         id: crypto.randomUUID(),
-                        title: "Custom IDS/IPS Implementation",
-                        description: "Deployed and configured Snort IDS on a local network to capture and analyze malicious packets. Wrote custom Snort rules to detect DDoS attempts, SQL injection, and unauthorized SSH brute-force attacks.",
-                        startDate: "Aug 2022",
-                        endDate: "Nov 2022",
-                        technologies: ["Snort", "Linux", "Networking", "Bash"]
+                        title: "Open Source UI Library",
+                        description: "Created and maintain a highly customizable UI component library for React applications. The library focused on accessibility and ease of use, gaining over 500 stars on GitHub and used by multiple production projects.",
+                        startDate: "Sep 2021",
+                        endDate: "Present",
+                        technologies: ["TypeScript", "React", "Rollup", "Storybook"]
                     }
                 ],
                 customSection: { id: "custom", title: "Activities", items: [] }

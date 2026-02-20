@@ -43,13 +43,13 @@ export default function ManagementTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className="w-full max-w-[210mm] min-h-[297mm] mx-auto bg-white text-slate-800 font-sans shadow-sm flex flex-col">
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-sans shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
             {/* Header Block */}
-            <header className="px-10 py-10 text-center" style={{ backgroundColor: themeColor, color: '#ffffff' }}>
-                <h1 className="text-3xl font-serif mb-2 text-white">{fName}</h1>
-                <div className="w-16 h-1 bg-white mx-auto mb-3 opacity-50"></div>
-                <h2 className="text-xl font-light mb-5 text-white">{fTitle}</h2>
-                <div className="flex flex-wrap justify-center gap-4 text-sm font-medium opacity-90 text-white">
+            <header className="px-10 py-10 text-center print:shadow-none" style={{ backgroundColor: themeColor, color: '#ffffff' }}>
+                <h1 className="text-3xl font-serif mb-2 text-white print:shadow-none">{fName}</h1>
+                <div className="w-16 h-1 bg-white mx-auto mb-3 opacity-50 print:shadow-none"></div>
+                <h2 className="text-xl font-light mb-5 text-white print:shadow-none">{fTitle}</h2>
+                <div className="flex flex-wrap justify-center gap-4 text-sm font-medium opacity-90 text-white print:shadow-none">
                     <p>{fEmail}</p>
                     <p>•</p>
                     <p>{fPhone}</p>
@@ -58,24 +58,24 @@ export default function ManagementTemplate({ data }: { data: any }) {
                 </div>
             </header>
 
-            <div className="p-8 flex-1 space-y-8">
-                <section className="text-center px-4">
-                    <p className="text-base leading-relaxed text-slate-600 italic">"{fSummary}"</p>
+            <div className="p-8 flex-1 space-y-8 print:shadow-none">
+                <section className="text-center px-4 print:shadow-none">
+                    <p className="text-base leading-relaxed text-slate-600 italic print:shadow-none">"{fSummary}"</p>
                 </section>
 
                 <section>
-                    <h3 className="text-2xl font-serif text-center mb-6" style={{ color: themeColor }}>Professional Journey</h3>
-                    <div className="space-y-8">
+                    <h3 className="text-2xl font-serif text-center mb-6 print:shadow-none" style={{ color: themeColor }}>Professional Journey</h3>
+                    <div className="space-y-8 print:shadow-none">
                         {displayExp.map((exp: any, i: number) => (
-                            <div key={i} className="border-b border-slate-200 pb-6 last:border-0 last:pb-0">
-                                <div className="flex justify-between items-center mb-1">
-                                    <h4 className="text-xl font-bold text-slate-900">{exp.jobTitle}</h4>
-                                    <span className="text-sm font-bold bg-slate-100 px-3 py-1 rounded-full text-slate-600 whitespace-nowrap ml-4">
+                            <div key={i} className="border-b border-slate-200 pb-6 last:border-0 last:pb-0 print:shadow-none">
+                                <div className="flex justify-between items-center mb-1 print:shadow-none">
+                                    <h4 className="text-xl font-bold text-slate-900 print:shadow-none">{exp.jobTitle}</h4>
+                                    <span className="text-sm font-bold bg-slate-100 px-3 py-1 rounded-full text-slate-600 whitespace-nowrap ml-4 print:shadow-none">
                                         {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
                                     </span>
                                 </div>
-                                <div className="text-lg text-slate-500 font-medium italic mb-3">{exp.companyName}</div>
-                                <ul className="list-disc list-outside ml-6 text-base space-y-1.5 text-slate-700">
+                                <div className="text-lg text-slate-500 font-medium italic mb-3 print:shadow-none">{exp.companyName}</div>
+                                <ul className="list-disc list-outside ml-6 text-base space-y-1.5 text-slate-700 print:shadow-none">
                                     {exp.description?.split('\n').map((line: string, j: number) => {
                                         const cleanLine = line.replace(/^[\s•\-\*]+\s*/, '');
                                         return cleanLine && <li key={j}>{cleanLine}</li>;
@@ -86,13 +86,13 @@ export default function ManagementTemplate({ data }: { data: any }) {
                     </div>
                 </section>
 
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-2 gap-8 print:shadow-none">
                     <section>
-                        <h3 className="text-xl font-serif mb-4 border-b border-slate-300 pb-2" style={{ color: themeColor }}>Areas of Expertise</h3>
-                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                        <h3 className="text-xl font-serif mb-4 border-b border-slate-300 pb-2 print:shadow-none" style={{ color: themeColor }}>Areas of Expertise</h3>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 print:shadow-none">
                             {displaySkills.map((s: any, i: number) => (
-                                <li key={i} className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: themeColor }}></div>
+                                <li key={i} className="text-sm font-medium text-slate-700 flex items-center gap-2 print:shadow-none">
+                                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 print:shadow-none" style={{ backgroundColor: themeColor }}></div>
                                     <span>{s.name}</span>
                                 </li>
                             ))}
@@ -100,13 +100,13 @@ export default function ManagementTemplate({ data }: { data: any }) {
                     </section>
 
                     <section>
-                        <h3 className="text-xl font-serif mb-4 border-b border-slate-300 pb-2" style={{ color: themeColor }}>Education</h3>
-                        <div className="space-y-4">
+                        <h3 className="text-xl font-serif mb-4 border-b border-slate-300 pb-2 print:shadow-none" style={{ color: themeColor }}>Education</h3>
+                        <div className="space-y-4 print:shadow-none">
                             {displayEdu.map((edu: any, i: number) => (
                                 <div key={i}>
-                                    <h4 className="font-bold text-slate-800 text-base">{edu.degree}</h4>
-                                    <div className="text-slate-600 text-sm">{edu.schoolName}</div>
-                                    <div className="text-xs text-slate-500 italic mt-1 font-medium">
+                                    <h4 className="font-bold text-slate-800 text-base print:shadow-none">{edu.degree}</h4>
+                                    <div className="text-slate-600 text-sm print:shadow-none">{edu.schoolName}</div>
+                                    <div className="text-xs text-slate-500 italic mt-1 font-medium print:shadow-none">
                                         {edu.startDate} - {edu.endDate}
                                     </div>
                                 </div>

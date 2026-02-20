@@ -45,48 +45,48 @@ export default function MarketingTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className="w-full max-w-[210mm] min-h-[297mm] mx-auto bg-[#fdfaf6] text-slate-800 font-sans p-8 shadow-sm flex flex-col">
-            <header className="flex flex-col items-center mb-10 text-center">
-                <div className="w-full flex justify-between items-start border-b-2 pb-6 mb-6" style={{ borderColor: themeColor }}>
-                    <div className="text-left w-1/3 text-sm space-y-1 font-medium text-slate-600">
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-[#fdfaf6] text-slate-800 font-sans p-8 shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
+            <header className="flex flex-col items-center mb-10 text-center print:shadow-none">
+                <div className="w-full flex justify-between items-start border-b-2 pb-6 mb-6 print:shadow-none" style={{ borderColor: themeColor }}>
+                    <div className="text-left w-1/3 text-sm space-y-1 font-medium text-slate-600 print:shadow-none">
                         <p>{fPhone}</p>
                         <p>{fEmail}</p>
                     </div>
-                    <div className="w-1/3">
-                        <h1 className="text-3xl font-bold text-[#1e1e1e] mb-2">{fName}</h1>
-                        <h2 className="text-lg font-semibold" style={{ color: themeColor }}>{fTitle}</h2>
+                    <div className="w-1/3 print:shadow-none">
+                        <h1 className="text-3xl font-bold text-[#1e1e1e] mb-2 print:shadow-none">{fName}</h1>
+                        <h2 className="text-lg font-semibold print:shadow-none" style={{ color: themeColor }}>{fTitle}</h2>
                     </div>
-                    <div className="text-right w-1/3 text-sm space-y-1 font-medium text-slate-600">
+                    <div className="text-right w-1/3 text-sm space-y-1 font-medium text-slate-600 print:shadow-none">
                         <p>{fLocation}</p>
                         <p>{fLinkedin}</p>
                     </div>
                 </div>
 
-                <div className="w-2/3">
-                    <p className="text-base text-slate-700 leading-relaxed font-medium">
+                <div className="w-2/3 print:shadow-none">
+                    <p className="text-base text-slate-700 leading-relaxed font-medium print:shadow-none">
                         {fSummary}
                     </p>
                 </div>
             </header>
 
-            <div className="grid grid-cols-12 gap-8 flex-1">
-                <div className="col-span-8 space-y-8">
+            <div className="grid grid-cols-12 gap-8 flex-1 print:shadow-none">
+                <div className="col-span-8 space-y-8 print:shadow-none">
                     <section>
-                        <h3 className="text-2xl font-bold mb-5 text-slate-900 border-l-4 pl-3" style={{ borderColor: themeColor }}>Experience</h3>
-                        <div className="space-y-6">
+                        <h3 className="text-2xl font-bold mb-5 text-slate-900 border-l-4 pl-3 print:shadow-none" style={{ borderColor: themeColor }}>Experience</h3>
+                        <div className="space-y-6 print:shadow-none">
                             {displayExp.map((exp: any, i: number) => (
-                                <div key={i} className="bg-white p-5 shadow-sm rounded border border-slate-100 relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: themeColor }}></div>
-                                    <div className="flex justify-between items-start mb-2">
+                                <div key={i} className="bg-white p-5 shadow-sm rounded border border-slate-100 relative  print:shadow-none">
+                                    <div className="absolute top-0 left-0 w-1 h-full print:shadow-none" style={{ backgroundColor: themeColor }}></div>
+                                    <div className="flex justify-between items-start mb-2 print:shadow-none">
                                         <div>
-                                            <h4 className="text-xl font-bold text-slate-800">{exp.jobTitle}</h4>
-                                            <div className="text-base font-semibold" style={{ color: themeColor }}>{exp.companyName}</div>
+                                            <h4 className="text-xl font-bold text-slate-800 print:shadow-none">{exp.jobTitle}</h4>
+                                            <div className="text-base font-semibold print:shadow-none" style={{ color: themeColor }}>{exp.companyName}</div>
                                         </div>
-                                        <div className="text-sm font-semibold bg-slate-50 text-slate-600 px-3 py-1 rounded-full border border-slate-200">
+                                        <div className="text-sm font-semibold bg-slate-50 text-slate-600 px-3 py-1 rounded-full border border-slate-200 print:shadow-none">
                                             {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
                                         </div>
                                     </div>
-                                    <ul className="list-disc list-outside ml-4 mt-3 text-sm space-y-1 text-slate-600">
+                                    <ul className="list-disc list-outside ml-4 mt-3 text-sm space-y-1 text-slate-600 print:shadow-none">
                                         {exp.description?.split('\n').map((line: string, j: number) => {
                                             const cleanLine = line.replace(/^[\s•\-\*]+\s*/, '');
                                             return cleanLine && <li key={j}>{cleanLine}</li>;
@@ -98,12 +98,12 @@ export default function MarketingTemplate({ data }: { data: any }) {
                     </section>
                 </div>
 
-                <div className="col-span-4 space-y-8">
+                <div className="col-span-4 space-y-8 print:shadow-none">
                     <section>
-                        <h3 className="text-xl font-bold mb-4 text-slate-900 border-l-4 pl-3" style={{ borderColor: themeColor }}>Skills</h3>
-                        <div className="flex flex-wrap gap-2">
+                        <h3 className="text-xl font-bold mb-4 text-slate-900 border-l-4 pl-3 print:shadow-none" style={{ borderColor: themeColor }}>Skills</h3>
+                        <div className="flex flex-wrap gap-2 print:shadow-none">
                             {displaySkills.map((s: any, i: number) => (
-                                <span key={i} className="px-3 py-1.5 bg-white border border-slate-200 shadow-sm text-sm font-medium text-slate-700 rounded transition-colors" style={{ ':hover': { backgroundColor: themeColor, color: 'white' } } as any}>
+                                <span key={i} className="px-3 py-1.5 bg-white border border-slate-200 shadow-sm text-sm font-medium text-slate-700 rounded transition-colors print:shadow-none" style={{ ':hover': { backgroundColor: themeColor, color: 'white' } } as any}>
                                     {s.name}
                                 </span>
                             ))}
@@ -111,13 +111,13 @@ export default function MarketingTemplate({ data }: { data: any }) {
                     </section>
 
                     <section>
-                        <h3 className="text-xl font-bold mb-4 text-slate-900 border-l-4 pl-3" style={{ borderColor: themeColor }}>Education</h3>
-                        <div className="space-y-4">
+                        <h3 className="text-xl font-bold mb-4 text-slate-900 border-l-4 pl-3 print:shadow-none" style={{ borderColor: themeColor }}>Education</h3>
+                        <div className="space-y-4 print:shadow-none">
                             {displayEdu.map((edu: any, i: number) => (
-                                <div key={i} className="bg-white p-4 shadow-sm rounded border border-slate-100">
-                                    <h4 className="font-bold text-slate-800">{edu.degree}</h4>
-                                    <div className="text-slate-600 text-sm mt-1">{edu.schoolName}</div>
-                                    <div className="text-xs font-semibold mt-2 text-slate-500">
+                                <div key={i} className="bg-white p-4 shadow-sm rounded border border-slate-100 print:shadow-none">
+                                    <h4 className="font-bold text-slate-800 print:shadow-none">{edu.degree}</h4>
+                                    <div className="text-slate-600 text-sm mt-1 print:shadow-none">{edu.schoolName}</div>
+                                    <div className="text-xs font-semibold mt-2 text-slate-500 print:shadow-none">
                                         {edu.startDate} - {edu.endDate}
                                     </div>
                                 </div>
