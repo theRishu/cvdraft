@@ -1,0 +1,22 @@
+[
+  {
+    "name": "JavaScript",
+    "level": "Expert"
+  },
+  {
+    "name": "Python",
+    "level": "Expert"
+  },
+  {
+    "name": "React",
+    "level": "Expert"
+  },
+  {
+    "name": "Node.js",
+    "level": "Professional"
+  },
+  {
+    "name": "SQL",
+    "level": "Intermediate"
+  }
+]
