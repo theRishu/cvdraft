@@ -25,7 +25,7 @@ export default function TechTemplate({ data }: { data: any }) {
     };
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} font-mono text-slate-800 bg-white   bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} font-mono text-slate-800 bg-white   bg-white print:p-0 print:w-full`}>
             <header className={`mb-8 border-b-2 border-slate-900 pb-6 print:shadow-none flex flex-col ${getAlign("personalInfo") === "center" ? "items-center text-center" : getAlign("personalInfo") === "right" ? "items-end text-right" : "items-start text-left"}`}>
                 <h1 className="text-3xl font-bold text-slate-900 mb-2 print:shadow-none">
                     <span style={{ color: themeColor }}>&gt;</span> {personalInfo?.fullName}

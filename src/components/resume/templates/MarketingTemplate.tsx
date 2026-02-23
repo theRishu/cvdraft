@@ -45,7 +45,7 @@ export default function MarketingTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-[#fdfaf6] text-slate-800 font-sans shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} w-full max-w-[210mm]  mx-auto bg-[#fdfaf6] text-slate-800 font-sans shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
             <header className="flex flex-col items-center mb-10 text-center print:shadow-none">
                 <div className="w-full flex justify-between items-start border-b-2 pb-6 mb-6 print:shadow-none" style={{ borderColor: themeColor }}>
                     <div className="text-left w-1/3 text-sm space-y-1 font-medium text-slate-600 print:shadow-none">

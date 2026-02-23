@@ -37,7 +37,7 @@ export default function StudentTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  bg-white text-slate-800 font-sans mx-auto border shadow-sm flex flex-col items-center  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} w-full max-w-[210mm]  bg-white text-slate-800 font-sans mx-auto border shadow-sm flex flex-col items-center  bg-white print:p-0 print:w-full`}>
             <header className="w-full text-center border-b-2 pb-6 mb-8 print:shadow-none" style={{ borderColor: themeColor }}>
                 <h1 className="text-3xl font-bold text-slate-900 mb-2 print:shadow-none">{fName}</h1>
                 <h2 className="text-xl font-medium mb-4 print:shadow-none" style={{ color: themeColor }}>{fTitle}</h2>

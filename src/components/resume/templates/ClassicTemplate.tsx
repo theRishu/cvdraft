@@ -6,7 +6,7 @@ export default function ClassicTemplate({ data }: { data: any }) {
     const { themeColor = "#000000" } = data;
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} font-serif text-black bg-white  leading-relaxed  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} font-serif text-black bg-white  leading-relaxed  bg-white print:p-0 print:w-full`}>
             <header className="text-center border-b pb-4 mb-6 print:shadow-none" style={{ borderColor: themeColor }}>
                 <h1 className="text-2xl font-bold  tracking-widest mb-2 print:shadow-none" style={{ color: themeColor }}>{personalInfo?.fullName}</h1>
                 <div className="text-sm space-y-1 print:shadow-none">

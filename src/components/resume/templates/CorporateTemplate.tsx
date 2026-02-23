@@ -20,7 +20,7 @@ export default function CorporateTemplate({ data }: { data: any }) {
     };
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} font-sans text-slate-900  bg-white flex flex-col  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} font-sans text-slate-900  bg-white flex flex-col  bg-white print:p-0 print:w-full`}>
             <header className={`bg-slate-100 border-b border-slate-200 flex-none print:shadow-none p-6`}>
                 <div className={`flex justify-between items-center print:shadow-none gap-6 ${getAlign("personalInfo") === "center" ? "flex-col text-center" : getAlign("personalInfo") === "right" ? "flex-row-reverse text-right" : "flex-row text-left"}`}>
                     <div>

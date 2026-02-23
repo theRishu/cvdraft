@@ -43,7 +43,7 @@ export default function ManagementTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-sans shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-sans shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
             {/* Header Block */}
             <header className="text-center print:shadow-none" style={{ backgroundColor: themeColor, color: '#ffffff' }}>
                 <h1 className="text-3xl font-serif mb-2 text-white print:shadow-none">{fName}</h1>

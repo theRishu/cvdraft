@@ -35,7 +35,7 @@ export default function LegalTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-[#f8fafc] text-slate-900 font-serif border-x-8 border-x-white shadow-inner flex flex-col  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} w-full max-w-[210mm]  mx-auto bg-[#f8fafc] text-slate-900 font-serif border-x-8 border-x-white shadow-inner flex flex-col  bg-white print:p-0 print:w-full`}>
             <div className="border-2 m-4 bg-white flex-1 flex flex-col print:shadow-none" style={{ borderColor: themeColor }}>
                 <header className="text-center border-b-2 pb-8 mb-8 print:shadow-none" style={{ borderColor: themeColor }}>
                     <h1 className="text-3xl font-bold mb-3 text-slate-800 print:shadow-none">{fName}</h1>

@@ -121,6 +121,50 @@
   .resume-font-scale-large span {
     font-size: 0.9rem;
   }
+
+  /* ── Header Size Overrides ── */
+  .resume-header-scale-small h1 {
+    font-size: 1.35rem;
+  }
+
+  .resume-header-scale-small h2 {
+    font-size: 0.85rem;
+  }
+
+  .resume-header-scale-medium h1 {
+    font-size: 1.5rem;
+  }
+
+  .resume-header-scale-medium h2 {
+    font-size: 0.92rem;
+  }
+
+  .resume-header-scale-large h1 {
+    font-size: 1.65rem;
+  }
+
+  .resume-header-scale-large h2 {
+    font-size: 1.05rem;
+  }
+
+  /* ── Heading (Subheading) Size Overrides ── */
+  .resume-heading-scale-small h3 {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .resume-heading-scale-medium h3 {
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .resume-heading-scale-large h3 {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 }
 
 /* Scrollbar */

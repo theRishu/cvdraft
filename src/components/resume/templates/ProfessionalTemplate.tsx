@@ -20,7 +20,7 @@ export default function ProfessionalTemplate({ data }: { data: any }) {
     };
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} font-serif text-slate-900 bg-white min-h-screen`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} font-serif text-slate-900 bg-white min-h-screen`}>
             <header className={`border-b border-slate-300 pb-8 mb-8 print:shadow-none flex flex-col ${getAlign("personalInfo") === "center" ? "items-center text-center" : getAlign("personalInfo") === "right" ? "items-end text-right" : "items-start text-left"}`}>
                 <h1 className="text-3xl font-bold mb-2 print:shadow-none" style={{ color: themeColor }}>{personalInfo?.fullName?.toUpperCase()}</h1>
                 <div className={`flex flex-wrap gap-4 text-sm italic text-slate-600 print:shadow-none ${getJustify("personalInfo")}`}>

@@ -41,7 +41,7 @@ export default function ExecutiveTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} font-sans text-slate-800 w-full max-w-[210mm]  mx-auto bg-slate-50 flex flex-col shadow-sm  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} font-sans text-slate-800 w-full max-w-[210mm]  mx-auto bg-slate-50 flex flex-col shadow-sm  bg-white print:p-0 print:w-full`}>
             <header className="border-b-2 pb-6 mb-6 print:shadow-none" style={{ borderColor: themeColor }}>
                 <div className="flex justify-between items-end print:shadow-none">
                     <div>

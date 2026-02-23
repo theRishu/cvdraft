@@ -20,7 +20,7 @@ export default function StartupTemplate({ data }: { data: any }) {
     };
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} font-sans  bg-white text-slate-900 flex flex-col  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} ${data?.headerSize ? "resume-header-scale-" + data.headerSize : "resume-header-scale-" + (data?.fontSize || "medium")} ${data?.headingSize ? "resume-heading-scale-" + data.headingSize : "resume-heading-scale-" + (data?.fontSize || "medium")} font-sans  bg-white text-slate-900 flex flex-col  bg-white print:p-0 print:w-full`}>
             {/* Header with vibrant accent */}
             <header className={`mb-8 relative flex-none print:shadow-none flex flex-col ${getAlign("personalInfo") === "center" ? "items-center text-center" : getAlign("personalInfo") === "right" ? "items-end text-right" : "items-start text-left"}`}>
                 <div className="absolute top-0 left-0 w-16 h-16 rounded-br-2xl -z-10 print:shadow-none opacity-50" style={{ backgroundColor: themeColor }}></div>

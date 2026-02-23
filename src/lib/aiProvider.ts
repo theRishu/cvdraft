@@ -1,6 +1,6 @@
 /**
  * Shared AI provider abstraction.
- * Supports: Google Gemini, OpenAI GPT, Anthropic Claude
+ * Supports: Google Gemini, OpenAI GPT
  */
 
 export type AIProvider = "gemini" | "openai";
