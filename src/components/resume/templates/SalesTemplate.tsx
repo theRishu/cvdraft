@@ -7,7 +7,7 @@ export default function SalesTemplate({ data }: { data: any }) {
     const fTitle = personalInfo?.jobTitle || 'Senior Sales Executive';
     const fPhone = personalInfo?.phone || '(800) 555-1234';
     const fEmail = personalInfo?.email || 'mark.sales@example.com';
-    const fLocation = personalInfo?.location || 'Miami, FL';
+    const fLocation = personalInfo?.address || 'Miami, FL';
     const fLinkedin = personalInfo?.linkedin || 'linkedin.com/in/marksales';
     const fSummary = personalInfo?.summary || 'Dynamic and results-driven Sales Professional with 8 years of successful B2B enterprise sales experience. Expert in territory management, lead generation, and closing multi-million dollar contracts. Consistently ranked in the top 5% of sales representatives nationwide.';
 
@@ -37,7 +37,7 @@ export default function SalesTemplate({ data }: { data: any }) {
 
     return (
         <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-900 font-sans flex flex-col shadow-sm  bg-white print:p-0 print:w-full`}>
-            <header className="p-8 border-b-8 shadow-sm flex items-center justify-between print:shadow-none" style={{ borderColor: themeColor }}>
+            <header className="border-b-8 shadow-sm flex items-center justify-between print:shadow-none" style={{ borderColor: themeColor }}>
                 <div className="flex-1 print:shadow-none">
                     <h1 className="text-3xl font-bold mb-2 text-slate-900 print:shadow-none">
                         {fName}
@@ -54,7 +54,7 @@ export default function SalesTemplate({ data }: { data: any }) {
                 </div>
             </header>
 
-            <div className="p-8 flex flex-col gap-8 flex-1 print:shadow-none">
+            <div className="flex flex-col gap-8 flex-1 print:shadow-none">
                 <section className="bg-slate-50 p-6 rounded border-l-4 shadow-sm print:shadow-none" style={{ borderColor: themeColor }}>
                     <h3 className="text-xl font-bold mb-2 text-slate-800 print:shadow-none">Executive Profile</h3>
                     <p className="text-base leading-relaxed text-slate-700 font-medium print:shadow-none">{fSummary}</p>

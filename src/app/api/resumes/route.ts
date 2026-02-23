@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         // The user says "normal user can create only 2 resume but in my protal i see 4 resume"
         // This confirms they want this limit enforced.
         if (!isPro && resumeCount >= 2) {
-            return new NextResponse("Free limit reached (Max 2 resumes). Upgrade to Pro to create more.", { status: 403 });
+            return new NextResponse("Free limit reached (2 resumes max). Upgrade to Pro for unlimited resumes.", { status: 403 });
         }
 
         const body = await req.json();
@@ -66,8 +66,8 @@ export async function POST(req: Request) {
                     email: user.emailAddresses[0].emailAddress || "john.doe@example.com",
                     title: "Senior Software Engineer",
                     phone: "+1 (555) 123-4567",
-                    location: "San Francisco, CA",
-                    summary: "Senior Software Engineer with over 5 years of experience in building scalable web applications and distributed systems. Expert in React, Node.js, and TypeScript, with a strong focus on clean code, performance optimization, and user-centric design. Proven track record of delivering high-quality software solutions in fast-paced startup environments."
+                    address: "123 Tech Lane, San Francisco, CA 94105",
+                    summary: "Senior Software Engineer with over 5 years of experience in building scalable web applications and distributed systems.\n\nExpert in React, Node.js, and TypeScript, with a strong focus on clean code, performance optimization, and user-centric design.\n\nProven track record of delivering high-quality software solutions in fast-paced startup environments."
                 },
                 experience: [
                     {
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
                         companyName: "TechFlow Systems",
                         startDate: "Jan 2021",
                         endDate: "Present",
-                        location: "San Francisco, CA",
+                        address: "San Francisco, CA",
                         isCurrent: true,
                         description: "• Led the frontend development of a high-traffic e-commerce platform using React and Next.js, resulting in a 30% increase in conversion rates.\n• Architected and implemented a microservices-based backend using Node.js and GraphQL, improving system scalability and maintainability.\n• Mentored junior developers and conducted code reviews to ensure high-quality standards and best practices.\n• Optimized application performance, reducing page load times by 40% through code splitting and efficient data fetching strategies."
                     },
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
                         companyName: "Innovate Digital",
                         startDate: "Jun 2018",
                         endDate: "Dec 2020",
-                        location: "Austin, TX",
+                        address: "Austin, TX",
                         isCurrent: false,
                         description: "• Developed and maintained multiple client-facing web applications using JavaScript, HTML5, and CSS3.\n• Collaborated with UX/UI designers to translate complex requirements into intuitive and responsive user interfaces.\n• Integrated third-party APIs and services to enhance application functionality and user experience.\n• Participated in agile development processes, including sprint planning and daily stand-ups."
                     }

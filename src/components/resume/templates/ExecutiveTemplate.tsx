@@ -8,7 +8,7 @@ export default function ExecutiveTemplate({ data }: { data: any }) {
     const fTitle = personalInfo?.jobTitle || 'Chief Executive Officer';
     const fPhone = personalInfo?.phone || '+1 555-0100';
     const fEmail = personalInfo?.email || 'john.doe@example.com';
-    const fLocation = personalInfo?.location || 'San Francisco, CA';
+    const fLocation = personalInfo?.address || 'San Francisco, CA';
     const fLinkedin = personalInfo?.linkedin || 'linkedin.com/in/johndoe';
     const fSummary = personalInfo?.summary || 'Visionary Executive with 15+ years of experience in driving business growth, leading cross-functional teams, and executing strategic initiatives. Proven track record of improving operational efficiency by 30% and scaling revenue from $5M to $50M within 3 years.';
 
@@ -41,7 +41,7 @@ export default function ExecutiveTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} p-8 font-sans text-slate-800 w-full max-w-[210mm]  mx-auto bg-slate-50 flex flex-col shadow-sm  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} font-sans text-slate-800 w-full max-w-[210mm]  mx-auto bg-slate-50 flex flex-col shadow-sm  bg-white print:p-0 print:w-full`}>
             <header className="border-b-2 pb-6 mb-6 print:shadow-none" style={{ borderColor: themeColor }}>
                 <div className="flex justify-between items-end print:shadow-none">
                     <div>

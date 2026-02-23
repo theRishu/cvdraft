@@ -7,7 +7,7 @@ export default function ManagementTemplate({ data }: { data: any }) {
     const fTitle = personalInfo?.jobTitle || 'General Manager';
     const fPhone = personalInfo?.phone || '+1 404 555 8899';
     const fEmail = personalInfo?.email || 'rvance.management@example.com';
-    const fLocation = personalInfo?.location || 'Atlanta, GA';
+    const fLocation = personalInfo?.address || 'Atlanta, GA';
     const fSummary = personalInfo?.summary || 'Results-oriented General Manager with over 10 years of experience turning around underperforming business units. Demonstrated excellence in building high-performance teams, streamlining operations, and consistently exceeding revenue goals. Skilled in budget administration, vendor negotiation, and talent development.';
 
     const displayExp = experience?.length > 0 ? experience : [
@@ -45,7 +45,7 @@ export default function ManagementTemplate({ data }: { data: any }) {
     return (
         <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-sans shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
             {/* Header Block */}
-            <header className="px-10 py-10 text-center print:shadow-none" style={{ backgroundColor: themeColor, color: '#ffffff' }}>
+            <header className="text-center print:shadow-none" style={{ backgroundColor: themeColor, color: '#ffffff' }}>
                 <h1 className="text-3xl font-serif mb-2 text-white print:shadow-none">{fName}</h1>
                 <div className="w-16 h-1 bg-white mx-auto mb-3 opacity-50 print:shadow-none"></div>
                 <h2 className="text-xl font-light mb-5 text-white print:shadow-none">{fTitle}</h2>
@@ -58,7 +58,7 @@ export default function ManagementTemplate({ data }: { data: any }) {
                 </div>
             </header>
 
-            <div className="p-8 flex-1 space-y-8 print:shadow-none">
+            <div className="flex-1 space-y-8 print:shadow-none">
                 <section className="text-center px-4 print:shadow-none">
                     <p className="text-base leading-relaxed text-slate-600 italic print:shadow-none">"{fSummary}"</p>
                 </section>

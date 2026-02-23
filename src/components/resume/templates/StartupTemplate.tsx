@@ -5,21 +5,36 @@ export default function StartupTemplate({ data }: { data: any }) {
 
     const { themeColor = "#4f46e5" } = data; // Indigo-600 default
 
+    const getAlign = (key: string) => {
+        return data.layout?.sectionAlignment?.[key] || data.layout?.textAlign || "left";
+    };
+
+    const getJustify = (key: string) => {
+        const align = getAlign(key);
+        return align === "center" ? "justify-center" : align === "right" ? "justify-end" : "justify-start";
+    };
+
+    const getItemsAlign = (key: string) => {
+        const align = getAlign(key);
+        return align === "center" ? "items-center text-center" : align === "right" ? "items-end text-right" : "items-start text-left";
+    };
+
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} p-8 font-sans  bg-white text-slate-900 flex flex-col  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} font-sans  bg-white text-slate-900 flex flex-col  bg-white print:p-0 print:w-full`}>
             {/* Header with vibrant accent */}
-            <header className="mb-8 relative flex-none print:shadow-none">
-                <div className="absolute top-0 left-0 w-16 h-16 rounded-br-2xl -z-10 -ml-8 -mt-8 print:shadow-none" style={{ backgroundColor: themeColor }}></div>
-                <div className="flex justify-between items-end print:shadow-none">
+            <header className={`mb-8 relative flex-none print:shadow-none flex flex-col ${getAlign("personalInfo") === "center" ? "items-center text-center" : getAlign("personalInfo") === "right" ? "items-end text-right" : "items-start text-left"}`}>
+                <div className="absolute top-0 left-0 w-16 h-16 rounded-br-2xl -z-10 print:shadow-none opacity-50" style={{ backgroundColor: themeColor }}></div>
+                <div className={`flex justify-between items-end print:shadow-none w-full ${getAlign("personalInfo") === "center" ? "flex-col items-center" : getAlign("personalInfo") === "right" ? "flex-row-reverse" : ""}`}>
                     <div>
                         <h1 className="text-3xl font-black text-slate-900 mb-1 print:shadow-none">{personalInfo?.fullName}</h1>
                         <p className="text-lg font-bold print:shadow-none" style={{ color: themeColor }}>{personalInfo?.title}</p>
                     </div>
-                    <div className="text-right space-y-1 text-sm font-medium text-slate-500 print:shadow-none">
-                        {personalInfo?.email && <div>{personalInfo.email}</div>}
+                    <div className={`space-y-1 text-sm font-medium text-slate-500 print:shadow-none ${getAlign("personalInfo") === "center" ? "text-center mt-4" : getAlign("personalInfo") === "right" ? "text-left" : "text-right"}`}>
+                        {personalInfo?.address && <div>{personalInfo.address}</div>}
                         {personalInfo?.phone && <div>{personalInfo.phone}</div>}
+                        {personalInfo?.email && <div>{personalInfo.email}</div>}
                         {socialLinks?.length > 0 && (
-                            <div className="flex justify-end gap-3 mt-2 print:shadow-none">
+                            <div className={`flex gap-3 mt-2 print:shadow-none ${getJustify("personalInfo")}`}>
                                 {socialLinks.map((link: any, i: number) => (
                                     <a key={i} href={link.url} className="text-indigo-600 hover:text-indigo-800 underline decoration-2 underline-offset-2 print:shadow-none">
                                         {link.platform}
@@ -34,38 +49,38 @@ export default function StartupTemplate({ data }: { data: any }) {
             <div className="grid grid-cols-3 gap-8 flex-1 print:shadow-none">
                 <div className="col-span-2 space-y-10 print:shadow-none">
                     {personalInfo?.summary && (
-                        <section>
-                            <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 print:shadow-none">
+                        <section className={getItemsAlign("summary")}>
+                            <h3 className={`text-2xl font-bold mb-4 flex items-center gap-2 print:shadow-none ${getJustify("summary")}`}>
                                 🚀 <span className="bg-indigo-50 px-2 rounded print:shadow-none">Mission</span>
                             </h3>
-                            <p className="text-lg leading-relaxed text-slate-700 print:shadow-none">
+                            <p className={`text-lg leading-relaxed text-slate-700 print:shadow-none ${getAlign("summary") === "center" ? "text-center" : getAlign("summary") === "right" ? "text-right" : ""}`}>
                                 {personalInfo.summary}
                             </p>
                         </section>
                     )}
 
                     {experience?.length > 0 && (
-                        <section className="h-full print:shadow-none">
-                            <h3 className="text-2xl font-bold mb-6 flex items-center gap-2 print:shadow-none">
+                        <section className={`h-full print:shadow-none ${getItemsAlign("experience")}`}>
+                            <h3 className={`text-2xl font-bold mb-6 flex items-center gap-2 print:shadow-none w-full ${getJustify("experience")}`}>
                                 ⚡ <span className="bg-indigo-50 px-2 rounded print:shadow-none">Impact</span>
                             </h3>
-                            <div className="space-y-8 border-l-4 border-indigo-100 pl-6 ml-2 h-full print:shadow-none">
+                            <div className={`space-y-8 border-l-4 border-indigo-100 pl-6 ml-2 h-full print:shadow-none w-full ${getItemsAlign("experience")}`}>
                                 {experience.map((exp: any, i: number) => (
-                                    <div key={i} className="relative print:shadow-none">
+                                    <div key={i} className={`relative w-full ${getItemsAlign("experience")}`}>
                                         <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full border-4 border-white print:shadow-none" style={{ backgroundColor: themeColor }}></div>
-                                        <div className="flex justify-between items-baseline mb-1 print:shadow-none">
+                                        <div className={`flex justify-between items-baseline mb-1 print:shadow-none w-full ${getAlign("experience") === "right" ? "flex-row-reverse" : ""}`}>
                                             <h4 className="text-xl font-bold text-slate-900 print:shadow-none">{exp.jobTitle}</h4>
                                             <span className="font-mono text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded print:shadow-none">
                                                 {exp.startDate} — {exp.isCurrent ? 'Now' : exp.endDate}
                                             </span>
                                         </div>
-                                        <div className="font-bold mb-3 print:shadow-none" style={{ color: themeColor }}>{exp.companyName}</div>
-                                        <ul className="space-y-2 text-slate-700 print:shadow-none">
+                                        <div className="font-bold mb-3 print:shadow-none w-full" style={{ color: themeColor }}>{exp.companyName}</div>
+                                        <ul className={`space-y-2 text-slate-700 print:shadow-none ${getAlign("experience") === "center" ? "flex flex-col items-center" : getAlign("experience") === "right" ? "flex flex-col items-end" : ""}`}>
                                             {exp.description?.split('\n').map((line: string, j: number) => {
                                                 const cleanLine = line.replace(/^[\s•\-\*]+\s*/, '');
                                                 return cleanLine && <li key={j} className="flex gap-2 print:shadow-none">
                                                     <span className="mt-1.5 text-[10px] print:shadow-none" style={{ color: themeColor }}>●</span>
-                                                    <span>{cleanLine}</span>
+                                                    <span className={getAlign("experience") === "center" ? "text-center" : getAlign("experience") === "right" ? "text-right" : ""}>{cleanLine}</span>
                                                 </li>
                                             })}
                                         </ul>

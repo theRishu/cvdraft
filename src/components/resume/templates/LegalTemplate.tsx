@@ -7,7 +7,7 @@ export default function LegalTemplate({ data }: { data: any }) {
     const fTitle = personalInfo?.jobTitle || 'Corporate Associate Attorney';
     const fPhone = personalInfo?.phone || '(212) 555-0198';
     const fEmail = personalInfo?.email || 'jharrison@legalfirm.com';
-    const fLocation = personalInfo?.location || 'New York, NY';
+    const fLocation = personalInfo?.address || 'New York, NY';
     const fSummary = personalInfo?.summary || 'Driven and meticulous Corporate Associate with 4 years of experience specializing in mergers and acquisitions, corporate governance, and securities law. Proven track record of drafting complex commercial agreements and advising public and private clients on regulatory compliance.';
 
     const displayExp = experience?.length > 0 ? experience : [
@@ -36,7 +36,7 @@ export default function LegalTemplate({ data }: { data: any }) {
 
     return (
         <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-[#f8fafc] text-slate-900 font-serif border-x-8 border-x-white shadow-inner flex flex-col  bg-white print:p-0 print:w-full`}>
-            <div className="p-8 border-2 m-4 bg-white flex-1 flex flex-col print:shadow-none" style={{ borderColor: themeColor }}>
+            <div className="border-2 m-4 bg-white flex-1 flex flex-col print:shadow-none" style={{ borderColor: themeColor }}>
                 <header className="text-center border-b-2 pb-8 mb-8 print:shadow-none" style={{ borderColor: themeColor }}>
                     <h1 className="text-3xl font-bold mb-3 text-slate-800 print:shadow-none">{fName}</h1>
                     <h2 className="text-xl font-semibold mb-4 text-slate-600 print:shadow-none">{fTitle}</h2>

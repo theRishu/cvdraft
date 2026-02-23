@@ -4,6 +4,8 @@ import connectToDatabase from "@/lib/db";
 import Resume from "@/models/Resume";
 import ResumeEditor from "@/components/resume/ResumeEditor";
 
+import User from "@/models/User";
+
 type Params = Promise<{ id: string }>;
 
 export default async function EditResumePage({ params }: { params: Params }) {
@@ -24,8 +26,15 @@ export default async function EditResumePage({ params }: { params: Params }) {
         redirect("/dashboard");
     }
 
+    const user = await User.findOne({ userId }).lean();
+    const userAiKeysData = {
+        gemini: !!user?.aiKeys?.gemini,
+        openai: !!user?.aiKeys?.openai,
+    };
+    const preferredProvider = user?.preferredProvider || "gemini";
+
     // Convert to serializable object
     const serializedResume = JSON.parse(JSON.stringify(resume));
 
-    return <ResumeEditor resume={serializedResume} userId={userId} />;
+    return <ResumeEditor resume={serializedResume} userId={userId} userAiKeysData={userAiKeysData} preferredProvider={preferredProvider} />;
 }

@@ -7,7 +7,7 @@ export default function MedicalTemplate({ data }: { data: any }) {
     const fTitle = personalInfo?.jobTitle || 'Attending Physician';
     const fPhone = personalInfo?.phone || '(555) 123-4567';
     const fEmail = personalInfo?.email || 'echen.md@example.com';
-    const fLocation = personalInfo?.location || 'Chicago, IL';
+    const fLocation = personalInfo?.address || 'Chicago, IL';
     const fSummary = personalInfo?.summary || 'Dedicated and compassionate Board-Certified Internal Medicine Physician with over 8 years of clinical experience. Proven expertise in diagnosing and treating complex medical conditions, providing preventative care, and managing chronic diseases. Committed to delivering patient-centered care and improving health outcomes.';
 
     const displayExp = experience?.length > 0 ? experience : [
@@ -50,7 +50,7 @@ export default function MedicalTemplate({ data }: { data: any }) {
 
     return (
         <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-sans border-t-8 shadow-sm  bg-white print:p-0 print:w-full`} style={{ borderTopColor: themeColor }}>
-            <div className="p-8 print:shadow-none">
+            <div className="print:shadow-none">
                 <header className="flex items-center gap-8 border-b-2 border-slate-100 pb-10 mb-10 print:shadow-none">
                     {/* Placeholder for Photo if requested later, using initial instead */}
                     <div className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-md flex-shrink-0 print:shadow-none" style={{ backgroundColor: themeColor }}>

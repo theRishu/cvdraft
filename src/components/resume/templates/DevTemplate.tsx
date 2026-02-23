@@ -8,7 +8,7 @@ export default function DevTemplate({ data }: { data: any }) {
     const fEmail = personalInfo?.email || 'linus.dev@example.com';
     const fGithub = personalInfo?.github || 'github.com/linus-codes';
     const fLinkedin = personalInfo?.linkedin || 'linkedin.com/in/linusfisher';
-    const fLocation = personalInfo?.location || 'Seattle, WA';
+    const fLocation = personalInfo?.address || 'Seattle, WA';
     const fSummary = personalInfo?.summary || 'Full Stack Engineer with a passion for designing and building highly scalable, distributed systems. 5 years of experience developing robust microservices in Go and Node.js, and crafting responsive frontends with React. Strong advocate for clean code principles, test-driven development, and CI/CD.';
 
     const displayExp = experience?.length > 0 ? experience : [
@@ -36,7 +36,7 @@ export default function DevTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-mono p-8 shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-mono shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
             <header className="mb-8 border-b-2 border-slate-200 pb-8 print:shadow-none">
                 <div className="flex justify-between items-center print:shadow-none">
                     <div>

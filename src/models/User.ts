@@ -6,6 +6,12 @@ export interface IUser extends Document {
     resumeCount: number;
     isPro: boolean;
     stripeCustomerId?: string;
+    aiKeys?: {
+        gemini?: string;
+        openai?: string;
+        anthropic?: string;
+    };
+    preferredProvider?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -16,9 +22,14 @@ const UserSchema = new Schema<IUser>({
     resumeCount: { type: Number, default: 0 },
     isPro: { type: Boolean, default: false },
     stripeCustomerId: { type: String },
+    aiKeys: {
+        gemini: { type: String },
+        openai: { type: String },
+        anthropic: { type: String },
+    },
+    preferredProvider: { type: String, enum: ['gemini', 'openai', 'anthropic'] },
 }, { timestamps: true });
 
-// Prevent model recompilation error in development
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
 export default User;

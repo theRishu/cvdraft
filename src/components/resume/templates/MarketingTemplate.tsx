@@ -8,7 +8,7 @@ export default function MarketingTemplate({ data }: { data: any }) {
     const fTitle = personalInfo?.jobTitle || 'Digital Marketing Manager';
     const fPhone = personalInfo?.phone || '+1 234 567 8900';
     const fEmail = personalInfo?.email || 'sarah.jenkins@example.com';
-    const fLocation = personalInfo?.location || 'New York, NY';
+    const fLocation = personalInfo?.address || 'New York, NY';
     const fLinkedin = personalInfo?.linkedin || 'linkedin.com/in/sarahjenkins';
     const fSummary = personalInfo?.summary || 'Results-driven Digital Marketing Manager with 7+ years of experience in leading comprehensive marketing campaigns. Proven track record of increasing brand awareness by 50% and driving a 30% growth in online sales through targeted social media and email strategies.';
 
@@ -45,7 +45,7 @@ export default function MarketingTemplate({ data }: { data: any }) {
     ];
 
     return (
-        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-[#fdfaf6] text-slate-800 font-sans p-8 shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
+        <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-[#fdfaf6] text-slate-800 font-sans shadow-sm flex flex-col  bg-white print:p-0 print:w-full`}>
             <header className="flex flex-col items-center mb-10 text-center print:shadow-none">
                 <div className="w-full flex justify-between items-start border-b-2 pb-6 mb-6 print:shadow-none" style={{ borderColor: themeColor }}>
                     <div className="text-left w-1/3 text-sm space-y-1 font-medium text-slate-600 print:shadow-none">

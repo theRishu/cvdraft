@@ -7,7 +7,7 @@ export default function DesignTemplate({ data }: { data: any }) {
     const fTitle = personalInfo?.jobTitle || 'Senior UI/UX Designer';
     const fPhone = personalInfo?.phone || '+1 (555) 432-1098';
     const fEmail = personalInfo?.email || 'elena.design@example.com';
-    const fLocation = personalInfo?.location || 'Austin, TX';
+    const fLocation = personalInfo?.address || 'Austin, TX';
     const fWebsite = personalInfo?.website || 'elenadesigns.portfolio.io';
     const fSummary = personalInfo?.summary || 'Passionate Senior UI/UX Designer with 6+ years of experience crafting intuitive, user-centered digital experiences for web and mobile platforms. Skilled in translating complex user flows into beautiful, accessible interfaces.';
 
@@ -38,7 +38,7 @@ export default function DesignTemplate({ data }: { data: any }) {
     return (
         <div className={`${data?.fontSize ? "resume-font-scale-" + data.fontSize : "resume-font-scale-medium"} w-full max-w-[210mm]  mx-auto bg-white text-slate-800 font-sans flex shadow-sm  bg-white print:p-0 print:w-full`}>
             {/* Left Sidebar */}
-            <div className="w-[35%] p-8 text-white flex flex-col print:shadow-none" style={{ backgroundColor: themeColor }}>
+            <div className="w-[35%] text-white flex flex-col print:shadow-none" style={{ backgroundColor: themeColor }}>
                 <div className="mb-10 print:shadow-none">
                     <h1 className="text-3xl font-bold leading-tight mb-2 break-words print:shadow-none">
                         {fName}
@@ -84,7 +84,7 @@ export default function DesignTemplate({ data }: { data: any }) {
             </div>
 
             {/* Right Content */}
-            <div className="w-[65%] p-8 flex flex-col print:shadow-none">
+            <div className="w-[65%] flex flex-col print:shadow-none">
                 <section className="mb-8 print:shadow-none">
                     <h3 className="text-2xl font-bold mb-4 print:shadow-none" style={{ color: themeColor }}>About Me</h3>
                     <p className="text-base leading-relaxed text-slate-600 font-medium print:shadow-none">

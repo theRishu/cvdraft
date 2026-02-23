@@ -1,201 +1,303 @@
-import React from 'react';
+import React from "react";
 
 export default function AtsTemplate({ data }: { data: any }) {
-    const { personalInfo, experience, education, skills, customSection, languages, certifications, projects } = data;
+    const {
+        personalInfo, experience, education, skills,
+        languages, certifications, projects, socialLinks, customSection,
+    } = data;
 
-    // Use themeColor for headings
-    const themeColor = data.themeColor || "#2563eb"; // A classic blue 
-    const fontSize = data.fontSize || 'medium';
+    const accent = data.themeColor || "#1e293b";
+    const fs = data.fontSize || "medium";
+    const sp = data.layout?.sectionSpacing || "normal";
 
-    // Tailwind sizing scales
-    const textScale = {
-        name: fontSize === 'small' ? 'text-2xl' : fontSize === 'large' ? 'text-4xl' : 'text-3xl',
-        heading: fontSize === 'small' ? 'text-sm' : fontSize === 'large' ? 'text-lg' : 'text-base',
-        subHeading: fontSize === 'small' ? 'text-[13px]' : fontSize === 'large' ? 'text-[17px]' : 'text-[15px]',
-        body: fontSize === 'small' ? 'text-xs' : fontSize === 'large' ? 'text-base' : 'text-sm',
+    const sz = {
+        name: fs === "small" ? "20px" : fs === "large" ? "28px" : "24px",
+        title: fs === "small" ? "13.3px" : fs === "large" ? "16px" : "14.7px",
+        section: fs === "small" ? "12px" : fs === "large" ? "14.7px" : "13.3px",
+        body: fs === "small" ? "12px" : fs === "large" ? "14.7px" : "13.3px",
+        sub: fs === "small" ? "10.5px" : fs === "large" ? "13.3px" : "12px",
     };
 
+    const spacing = {
+        section: sp === "compact" ? 4 : sp === "large" || sp === "spacious" ? 14 : 8,
+        item: sp === "compact" ? 4 : sp === "large" || sp === "spacious" ? 12 : 8,
+        line: sp === "compact" ? 1 : sp === "large" || sp === "spacious" ? 4 : 2,
+    };
+
+    const getAlign = (key: string) => {
+        return data.layout?.sectionAlignment?.[key] || data.layout?.textAlign || "left";
+    };
+
+    const sectionTitle = (label: string, sectionId?: string) => {
+        const align = sectionId ? getAlign(sectionId) : (data.layout?.textAlign || "left");
+        return (
+            <div style={{ marginBottom: 5, textAlign: align as any }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexDirection: align === "right" ? "row-reverse" : "row" }}>
+                    {align === "center" && <div style={{ flex: 1, height: 1.5, background: accent, opacity: 0.3 }} />}
+                    <span style={{
+                        fontSize: sz.section,
+                        fontWeight: 800,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase" as const,
+                        color: accent,
+                    }}>
+                        {label}
+                    </span>
+                    <div style={{ flex: 1, height: 1.5, background: accent, opacity: 0.3 }} />
+                </div>
+            </div>
+        );
+    };
+
+    const sep = (visible: boolean) =>
+        visible ? <div style={{ height: 0.5, background: "#e2e8f0", margin: "3px 0" }} /> : null;
+
     return (
-        <div className="p-6 sm:p-8 font-serif  bg-white text-slate-900 flex flex-col print:shadow-none">
-            {/* Header */}
-            <header className="mb-4 text-center print:shadow-none">
-                <h1 className={`${textScale.name} font-bold mb-2 text-slate-900 uppercase tracking-wide print:w-full`}>{personalInfo?.fullName}</h1>
-                <div className={`${textScale.body} text-slate-700 flex flex-wrap justify-center items-center gap-2`}>
-                    {personalInfo?.location && <span>📍 {personalInfo.location}</span>}
-                    {personalInfo?.location && (personalInfo?.email || personalInfo?.phone) && <span>|</span>}
-                    {personalInfo?.email && <span>✉️ {personalInfo.email}</span>}
-                    {personalInfo?.email && personalInfo?.phone && <span>|</span>}
-                    {personalInfo?.phone && <span>📞 {personalInfo.phone}</span>}
-                    {personalInfo?.phone && data.socialLinks?.length > 0 && <span>|</span>}
-                    {data.socialLinks?.map((link: any, i: number) => (
-                        <React.Fragment key={i}>
-                            <a href={link.url} className="hover:underline print:shadow-none">{link.url.replace(/^https?:\/\//, '')}</a>
-                            {i < data.socialLinks.length - 1 && <span>|</span>}
-                        </React.Fragment>
+        <div style={{
+            fontFamily: "inherit",
+            color: "#1a202c",
+            lineHeight: data.layout?.lineHeight || 1.35,
+            fontSize: sz.body,
+            background: "#fff",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+        }}>
+
+            {/* ── NAME / HEADER ── */}
+            <div style={{
+                marginBottom: spacing.section,
+
+                display: "flex",
+                flexDirection: "column",
+                alignItems: (getAlign("personalInfo") === "center") ? "center" : (getAlign("personalInfo") === "right") ? "flex-end" : "flex-start",
+                textAlign: getAlign("personalInfo") as any
+            }}>
+                <h1 style={{
+                    fontSize: sz.name,
+                    fontWeight: 900,
+                    letterSpacing: "-0.01em",
+                    color: "#0f172a",
+                    margin: 0,
+                    lineHeight: 1.1,
+                }}>
+                    {personalInfo?.fullName || "Your Name"}
+                </h1>
+
+                {personalInfo?.title && (
+                    <div style={{
+                        fontSize: sz.title,
+                        color: accent,
+                        fontWeight: 700,
+                        letterSpacing: "0.07em",
+                        textTransform: "uppercase",
+                        marginTop: 4,
+                    }}>
+                        {personalInfo.title}
+                    </div>
+                )}
+
+                {/* Contact row */}
+                <div style={{
+                    display: "flex",
+                    flexWrap: "wrap" as const,
+                    gap: "4px 16px",
+                    fontWeight: 300,
+                    fontSize: sz.body,
+                    color: "#475569",
+                    justifyContent: getAlign("personalInfo") === "center" ? "center" : getAlign("personalInfo") === "right" ? "flex-end" : "flex-start",
+                }}>
+                    {[
+                        personalInfo?.email,
+                        personalInfo?.phone,
+                        personalInfo?.address,
+                        ...(socialLinks?.map((l: any) => l.url?.replace(/^https?:\/\//, "")) || []),
+                    ].filter(Boolean).map((item: string, i: number) => (
+                        <span key={i} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            {i > 0 && <span style={{ color: "#cbd5e1", marginRight: 0 }}>·</span>}
+                            {item}
+                        </span>
                     ))}
                 </div>
-            </header>
 
-            <div className="flex-1 flex flex-col space-y-3 print:shadow-none">
-                {/* Profile Summary */}
-                {personalInfo?.summary && (
-                    <section>
-                        <h3 className={`${textScale.heading} font-bold border-b border-slate-200 pb-0.5 mb-1.5`} style={{ color: themeColor }}>
-                            Profile Summary
-                        </h3>
-                        <p className={`${textScale.body} text-slate-800 leading-snug text-left`}>
-                            {personalInfo.summary}
-                        </p>
-                    </section>
-                )}
-
-                {/* Technical Skills */}
-                {skills?.length > 0 && (
-                    <section>
-                        <h3 className={`${textScale.heading} font-bold border-b border-slate-200 pb-0.5 mb-1.5`} style={{ color: themeColor }}>
-                            Technical Skills
-                        </h3>
-                        <ul className={`${textScale.body} text-slate-800 list-disc list-inside`}>
-                            {skills.map((skill: any, i: number) => {
-                                const parts = skill.name.split(':');
-                                if (parts.length > 1) {
-                                    return (
-                                        <li key={i} className="leading-snug print:shadow-none">
-                                            <span className="font-bold print:shadow-none">{parts[0]}:</span>
-                                            {parts.slice(1).join(':')}
-                                        </li>
-                                    );
-                                }
-                                return <li key={i} className="leading-snug print:shadow-none">{skill.name}</li>;
-                            })}
-                        </ul>
-                    </section>
-                )}
-
-                {/* Professional Experience */}
-                {experience?.length > 0 && (
-                    <section>
-                        <h3 className={`${textScale.heading} font-bold border-b border-slate-200 pb-0.5 mb-1.5`} style={{ color: themeColor }}>
-                            Professional Experience
-                        </h3>
-                        <div className="space-y-3 print:shadow-none">
-                            {experience.map((exp: any, i: number) => (
-                                <div key={i}>
-                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline print:shadow-none">
-                                        <h4 className={`font-bold text-slate-900 ${textScale.subHeading}`} style={{ color: themeColor }}>
-                                            {exp.companyName}{exp.companyName && exp.jobTitle ? ' – ' : ''}{exp.jobTitle}
-                                        </h4>
-                                        <div className={`${textScale.body} text-slate-600 font-medium`}>
-                                            {exp.startDate} – {exp.isCurrent ? 'Present' : exp.endDate} {exp.location && `| ${exp.location}`}
-                                        </div>
-                                    </div>
-                                    <ul className={`${textScale.body} text-slate-800 list-disc pl-4 mt-1`}>
-                                        {exp.description?.split('\n').map((line: string, j: number) => {
-                                            const cleanLine = line.replace(/^[\s•\-\*]+\s*/, '');
-                                            return cleanLine && <li key={j} className="pl-1 leading-snug mb-0.5 print:shadow-none">{cleanLine}</li>;
-                                        })}
-                                    </ul>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-                {/* Projects */}
-                {projects?.length > 0 && (
-                    <section>
-                        <h3 className={`${textScale.heading} font-bold border-b border-slate-200 pb-0.5 mb-1.5`} style={{ color: themeColor }}>
-                            Projects
-                        </h3>
-                        <div className="space-y-2 print:shadow-none">
-                            {projects.map((project: any, i: number) => (
-                                <div key={i}>
-                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline print:shadow-none">
-                                        <h4 className={`font-bold text-slate-900 ${textScale.subHeading}`} style={{ color: themeColor }}>
-                                            {project.title}
-                                        </h4>
-                                        <span className={`${textScale.body} text-slate-700`}>
-                                            {project.startDate} – {project.endDate}
-                                        </span>
-                                    </div>
-                                    {project.link && (
-                                        <a href={project.link} target="_blank" rel="noopener noreferrer" className={`${textScale.body} text-blue-600 hover:underline inline-block`}>
-                                            {project.link}
-                                        </a>
-                                    )}
-                                    <p className={`${textScale.body} text-slate-800 leading-snug mt-0.5`}>
-                                        {project.description}
-                                    </p>
-                                    {project.technologies?.length > 0 && (
-                                        <div className={`${textScale.body} text-slate-700 mt-0.5`}>
-                                            <span className="font-bold print:shadow-none">Technologies:</span> {project.technologies.join(', ')}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-                {/* Education */}
-                {education?.length > 0 && (
-                    <section>
-                        <h3 className={`${textScale.heading} font-bold border-b border-slate-200 pb-0.5 mb-1.5`} style={{ color: themeColor }}>
-                            Education & Certifications
-                        </h3>
-                        <div className="space-y-2 print:shadow-none">
-                            {education.map((edu: any, i: number) => (
-                                <div key={i} className="flex justify-between items-baseline print:shadow-none">
-                                    <div>
-                                        <span className={`font-bold text-slate-900 ${textScale.subHeading}`} style={{ color: themeColor }}>
-                                            {edu.degree}
-                                        </span>
-                                        <span className={`${textScale.body} text-slate-700 ml-2`}>
-                                            {edu.schoolName}
-                                        </span>
-                                    </div>
-                                    <div className={`${textScale.body} text-slate-700`}>
-                                        {edu.startDate} – {edu.endDate}
-                                    </div>
-                                </div>
-                            ))}
-                            {certifications?.map((cert: any, i: number) => (
-                                <div key={`cert-${i}`} className="flex justify-between items-baseline print:shadow-none">
-                                    <div>
-                                        <span className={`font-bold text-slate-900 ${textScale.subHeading}`} style={{ color: themeColor }}>
-                                            {cert.name}
-                                        </span>
-                                        <span className={`${textScale.body} text-slate-700 ml-2`}>
-                                            {cert.issuer}
-                                        </span>
-                                    </div>
-                                    <div className={`${textScale.body} text-slate-700`}>
-                                        {cert.date}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-                {/* Languages */}
-                {languages?.length > 0 && (
-                    <section>
-                        <h3 className={`${textScale.heading} font-bold border-b border-slate-200 pb-0.5 mb-1.5`} style={{ color: themeColor }}>
-                            Languages
-                        </h3>
-                        <div className="flex flex-wrap gap-x-6 gap-y-1 print:shadow-none">
-                            {languages.map((lang: any, i: number) => (
-                                <div key={i} className={`${textScale.body} text-slate-800`}>
-                                    <span className="font-bold print:shadow-none">{lang.name}</span>
-                                    {lang.level && <span className="text-slate-600 print:shadow-none"> – {lang.level}</span>}
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )}
-
+                <div style={{ height: 2, background: accent, marginTop: 12, borderRadius: 2 }} />
             </div>
+
+            {/* ── SUMMARY ── */}
+            {personalInfo?.summary && (
+                <div style={{ marginBottom: spacing.section }} className="break-inside-avoid">
+                    {sectionTitle("Summary", "summary")}
+                    <p style={{ fontSize: sz.body, color: "#334155", lineHeight: 1.6, margin: 0, whiteSpace: "pre-wrap" }}>
+                        {personalInfo.summary}
+                    </p>
+                </div>
+            )}
+
+            {/* ── SKILLS ── */}
+            {skills?.length > 0 && (
+                <div style={{ marginBottom: spacing.section }} className="break-inside-avoid">
+                    {sectionTitle("Skills", "skills")}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "4px 0", justifyContent: getAlign("skills") === "center" ? "center" : getAlign("skills") === "right" ? "flex-end" : "flex-start" }}>
+                        {skills.map((s: any, i: number) => {
+                            const parts = (typeof s === "string" ? s : s.name).split(":");
+                            return (
+                                <div key={i} style={{ fontSize: sz.body, color: "#1e293b", display: "flex", alignItems: "center", gap: 6 }}>
+                                    <span style={{ width: 4, height: 4, borderRadius: "50%", background: accent, flexShrink: 0 }} />
+                                    {parts.length > 1
+                                        ? <><strong>{parts[0]}:</strong>{parts.slice(1).join(":")}</>
+                                        : (typeof s === "string" ? s : s.name)}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* ── EXPERIENCE ── */}
+            {experience?.length > 0 && (
+                <div style={{ marginBottom: spacing.section }}>
+                    {sectionTitle("Experience", "experience")}
+                    <div style={{ display: "flex", flexDirection: "column", gap: spacing.item }}>
+                        {experience.map((exp: any, i: number) => (
+                            <div key={i} className="break-inside-avoid">
+                                <div style={{ display: "flex", justifyContent: getAlign("experience") === "center" ? "center" : getAlign("experience") === "right" ? "flex-end" : "space-between", alignItems: "baseline", gap: 8, textAlign: getAlign("experience") as any }}>
+                                    <div>
+                                        <strong style={{ fontSize: sz.sub, color: "#0f172a" }}>{exp.jobTitle}</strong>
+                                        {exp.companyName && (
+                                            <span style={{ fontSize: sz.body, color: "#475569", marginLeft: 6 }}>
+                                                @ {exp.companyName}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span style={{ fontSize: sz.body, color: "#94a3b8", whiteSpace: "nowrap" as const, flexShrink: 0 }}>
+                                        {exp.startDate}{exp.startDate || exp.endDate ? " – " : ""}{exp.isCurrent ? "Present" : exp.endDate}
+                                    </span>
+                                </div>
+                                {exp.address && (
+                                    <div style={{ fontSize: sz.body, color: "#94a3b8", fontStyle: "italic", marginBottom: 2 }}>
+                                        {exp.address}
+                                    </div>
+                                )}
+                                <ul style={{ margin: `${spacing.line}px 0 0 0`, paddingLeft: 16, display: "flex", flexDirection: "column", gap: spacing.line }}>
+                                    {exp.description?.split("\n").map((line: string, j: number) => {
+                                        const clean = line.replace(/^[\s•\-\*]+\s*/, "");
+                                        return clean ? (
+                                            <li key={j} style={{ fontSize: sz.body, color: "#334155", lineHeight: 1.5 }}>
+                                                {clean}
+                                            </li>
+                                        ) : null;
+                                    })}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* ── PROJECTS ── */}
+            {projects?.length > 0 && (
+                <div style={{ marginBottom: spacing.section }}>
+                    {sectionTitle("Projects", "projects")}
+                    <div style={{ display: "flex", flexDirection: "column", gap: spacing.item }}>
+                        {projects.map((p: any, i: number) => (
+                            <div key={i} className="break-inside-avoid">
+                                <div style={{ display: "flex", justifyContent: getAlign("projects") === "center" ? "center" : getAlign("projects") === "right" ? "flex-end" : "space-between", alignItems: "baseline", gap: 8, textAlign: getAlign("projects") as any }}>
+                                    <strong style={{ fontSize: sz.sub, color: "#0f172a" }}>{p.title}</strong>
+                                    {(p.startDate || p.endDate) && (
+                                        <span style={{ fontSize: sz.body, color: "#94a3b8", whiteSpace: "nowrap" as const }}>
+                                            {p.startDate}{p.startDate || p.endDate ? " – " : ""}{p.endDate}
+                                        </span>
+                                    )}
+                                </div>
+                                {p.link && (
+                                    <div style={{ fontSize: sz.body, color: "#3b82f6", marginBottom: 2 }}>
+                                        {p.link.replace(/^https?:\/\//, "")}
+                                    </div>
+                                )}
+                                {p.description && (
+                                    <p style={{ margin: "2px 0 0", fontSize: sz.body, color: "#334155", lineHeight: 1.5 }}>
+                                        {p.description}
+                                    </p>
+                                )}
+                                {p.technologies?.length > 0 && (
+                                    <div style={{ fontSize: sz.body, color: "#64748b", marginTop: 2 }}>
+                                        <strong>Stack:</strong> {p.technologies.join(", ")}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* ── EDUCATION ── */}
+            {education?.length > 0 && (
+                <div style={{ marginBottom: spacing.section }}>
+                    {sectionTitle("Education", "education")}
+                    <div style={{ display: "flex", flexDirection: "column", gap: spacing.item }}>
+                        {education.map((e: any, i: number) => (
+                            <div key={i} className="break-inside-avoid" style={{ display: "flex", justifyContent: getAlign("education") === "center" ? "center" : getAlign("education") === "right" ? "flex-end" : "space-between", alignItems: "baseline", gap: 8, textAlign: getAlign("education") as any }}>
+                                <div>
+                                    <strong style={{ fontSize: sz.sub, color: "#0f172a" }}>{e.degree}</strong>
+                                    {e.fieldOfStudy && <span style={{ fontSize: sz.body, color: "#475569" }}> — {e.fieldOfStudy}</span>}
+                                    {e.schoolName && <span style={{ fontSize: sz.body, color: "#64748b" }}>, <em>{e.schoolName}</em></span>}
+                                </div>
+                                <span style={{ fontSize: sz.body, color: "#94a3b8", whiteSpace: "nowrap" as const }}>
+                                    {e.startDate}{e.startDate || e.endDate ? " – " : ""}{e.endDate}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* ── CERTIFICATIONS ── */}
+            {certifications?.length > 0 && (
+                <div style={{ marginBottom: spacing.section }} className="break-inside-avoid">
+                    {sectionTitle("Certifications", "certifications")}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        {certifications.map((c: any, i: number) => (
+                            <div key={i} style={{ display: "flex", justifyContent: getAlign("certifications") === "center" ? "center" : getAlign("certifications") === "right" ? "flex-end" : "space-between", alignItems: "baseline", textAlign: getAlign("certifications") as any }}>
+                                <div>
+                                    <strong style={{ fontSize: sz.sub, color: "#0f172a" }}>{c.name}</strong>
+                                    {c.issuer && <span style={{ fontSize: sz.body, color: "#64748b" }}> · {c.issuer}</span>}
+                                </div>
+                                {c.date && <span style={{ fontSize: sz.body, color: "#94a3b8" }}>{c.date}</span>}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* ── LANGUAGES ── */}
+            {languages?.length > 0 && (
+                <div style={{ marginBottom: spacing.section }} className="break-inside-avoid">
+                    {sectionTitle("Languages", "languages")}
+                    <div style={{ display: "flex", flexWrap: "wrap" as const, gap: "4px 20px", justifyContent: getAlign("languages") === "center" ? "center" : getAlign("languages") === "right" ? "flex-end" : "flex-start", textAlign: getAlign("languages") as any }}>
+                        {languages.map((l: any, i: number) => (
+                            <span key={i} style={{ fontSize: sz.body, color: "#334155" }}>
+                                <strong>{l.name}</strong>{l.level && <span style={{ color: "#94a3b8" }}> ({l.level})</span>}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* ── CUSTOM SECTION ── */}
+            {customSection?.items?.length > 0 && (
+                <div style={{ marginBottom: 8 }} className="break-inside-avoid">
+                    {sectionTitle(customSection.title || "Additional", "customSection")}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4, textAlign: getAlign("customSection") as any }}>
+                        {customSection.items.map((item: any, i: number) => (
+                            <div key={i}>
+                                {item.title && <strong style={{ fontSize: sz.sub, color: "#0f172a" }}>{item.title}</strong>}
+                                {item.description && <p style={{ margin: "2px 0 0", fontSize: sz.body, color: "#334155" }}>{item.description}</p>}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

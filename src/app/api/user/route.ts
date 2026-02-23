@@ -26,3 +26,27 @@ export async function GET(req: Request) {
         return new NextResponse("Internal Server Error", { status: 500 });
     }
 }
+
+export async function PATCH(req: Request) {
+    try {
+        const { userId } = await auth();
+        const body = await req.json();
+
+        if (!userId) {
+            return new NextResponse("Unauthorized", { status: 401 });
+        }
+
+        await connectToDatabase();
+
+        const user = await User.findOneAndUpdate(
+            { userId },
+            { $set: body },
+            { new: true, upsert: true }
+        );
+
+        return NextResponse.json(user);
+    } catch (error) {
+        console.error("[USER_PATCH]", error);
+        return new NextResponse("Internal Server Error", { status: 500 });
+    }
+}

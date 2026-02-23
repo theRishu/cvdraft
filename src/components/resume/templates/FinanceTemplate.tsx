@@ -7,7 +7,7 @@ export default function FinanceTemplate({ data }: { data: any }) {
     const fTitle = personalInfo?.jobTitle || 'Financial Analyst';
     const fPhone = personalInfo?.phone || '+1 415 555 0192';
     const fEmail = personalInfo?.email || 'a.wright@example.com';
-    const fLocation = personalInfo?.location || 'San Francisco, CA';
+    const fLocation = personalInfo?.address || 'San Francisco, CA';
     const fSummary = personalInfo?.summary || 'Detail-oriented Financial Analyst with 5 years of experience in corporate finance, financial modeling, and data analysis. Proven ability to identify cost-saving opportunities and improve financial reporting accuracy. Adept at creating complex Excel models to forecast revenue and expenses.';
 
     const displayExp = experience?.length > 0 ? experience : [
@@ -39,7 +39,7 @@ export default function FinanceTemplate({ data }: { data: any }) {
             {/* Top Bar */}
             <div className="h-4 w-full print:shadow-none" style={{ backgroundColor: themeColor }}></div>
 
-            <div className="p-8 space-y-10 flex-1 print:shadow-none">
+            <div className="space-y-10 flex-1 print:shadow-none">
                 <header className="flex justify-between items-center border-b-2 border-slate-200 pb-8 print:shadow-none">
                     <div>
                         <h1 className="text-3xl font-bold mb-2 text-slate-800 print:shadow-none">{fName}</h1>
