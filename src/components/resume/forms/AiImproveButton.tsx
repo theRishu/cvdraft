@@ -16,9 +16,7 @@ export default function AiImproveButton({
     const [loading, setLoading] = useState(false);
 
     const handleClick = async () => {
-        // We now expect the backend to look up keys from the DB
-        const provider = (typeof window !== "undefined" ? localStorage.getItem("preferred_ai_provider") : null) || "gemini";
-
+        // We now expect the backend to look up keys and preferred provider from the DB
         if (!currentContent || currentContent.trim().length < 5) {
             alert("Please write something first, then AI can improve it.");
             return;
@@ -30,7 +28,6 @@ export default function AiImproveButton({
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    provider,       // Preferred provider, backend will fallback sequentially if needed
                     section,
                     currentContent,
                     currentData: resumeData,

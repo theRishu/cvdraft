@@ -696,7 +696,6 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
                                         key={p.id}
                                         onClick={async () => {
                                             setActiveProvider(p.id as "gemini" | "openai");
-                                            localStorage.setItem("preferred_ai_provider", p.id);
                                             setShowProviderMenu(false);
                                             setAiStatus("idle");
                                             // Persist to database
