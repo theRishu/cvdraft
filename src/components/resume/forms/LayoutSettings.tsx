@@ -374,6 +374,44 @@ export default function LayoutSettings({ data, onChange }: LayoutSettingsProps) 
 
             <div className="h-px bg-stone-100" />
 
+            {/* ── Page Count ── */}
+            <div>
+                <div className="flex items-center gap-2 mb-3">
+                    <Layout className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" />
+                    <h4 className="text-xs sm:text-sm font-bold text-stone-800">Page Count</h4>
+                </div>
+                <div className="flex gap-2">
+                    {[
+                        { label: "1 Page", value: 1, desc: "Fit everything on one page" },
+                        { label: "2 Pages", value: 2, desc: "Allow up to two pages" },
+                        { label: "Auto", value: 0, desc: "As many pages as needed" },
+                    ].map(opt => {
+                        const current = data?.maxPages ?? 0;
+                        const active = current === opt.value;
+                        return (
+                            <button
+                                key={opt.value}
+                                onClick={() => set("maxPages", opt.value)}
+                                title={opt.desc}
+                                className={`flex-1 py-2 px-2 rounded-xl text-[11px] font-bold border-2 transition-all ${active
+                                        ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                                        : "border-stone-100 bg-white text-stone-500 hover:border-stone-300"
+                                    }`}
+                            >
+                                {opt.label}
+                            </button>
+                        );
+                    })}
+                </div>
+                {(data?.maxPages === 1) && (
+                    <p className="text-[10px] text-amber-600 font-medium mt-2 flex items-center gap-1">
+                        <span>⚠</span> Content beyond A4 height will be hidden. Reduce font size or margins if content is cut.
+                    </p>
+                )}
+            </div>
+
+            <div className="h-px bg-stone-100" />
+
             {/* ── Margins ── */}
             <div>
                 <div className="flex items-center gap-2 mb-3">

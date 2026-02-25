@@ -118,8 +118,9 @@ export default function ResumePreview({
             const elRect = el.getBoundingClientRect();
 
             // ── Step 1: Snapshot all candidate positions BEFORE any DOM mutation ──
+            const maxPages: number = data.layout?.maxPages ?? 0;
             const candidates = Array.from(
-                el.querySelectorAll("h2, h3, h4, p, li, section, div[data-section]")
+                el.querySelectorAll("h2, h3, h4, p, li, section, div[data-section], [class*='break-inside']")
             ) as HTMLElement[];
 
             type NodeSnap = { node: HTMLElement; absTop: number; height: number };
@@ -161,7 +162,10 @@ export default function ResumePreview({
                 before.parentNode?.insertBefore(sp, before);
             }
 
-            setPageCount(Math.max(1, Math.ceil((el.scrollHeight - 8) / A4_H)));
+            // Cap page count based on maxPages setting
+            const rawPages = Math.max(1, Math.ceil((el.scrollHeight - 8) / A4_H));
+            const cappedPages = maxPages > 0 ? Math.min(rawPages, maxPages) : rawPages;
+            setPageCount(cappedPages);
         };
 
         const t = setTimeout(run, 300);
@@ -188,6 +192,7 @@ export default function ResumePreview({
     const headingPt = typeof headingSize === 'number' ? headingSize : (headingSize === "small" ? 9 : headingSize === "large" ? 13 : 11);
     const bodyPt = typeof fontSize === 'number' ? fontSize : (fontSize === "small" ? 8.5 : fontSize === "large" ? 11 : 9.5);
 
+    const maxPages: number = layout.maxPages ?? 0;
     const scaledW = A4_W * scale;
     const scaledH = pageCount * A4_H * scale;
 
@@ -212,7 +217,9 @@ export default function ResumePreview({
                         className="paper-page"
                         style={{
                             width: A4_W,
-                            minHeight: pageCount * A4_H,
+                            minHeight: maxPages > 0 ? undefined : pageCount * A4_H,
+                            height: maxPages > 0 ? pageCount * A4_H : undefined,
+                            overflow: maxPages > 0 ? "hidden" : "visible",
                             background: "#fff",
                             boxSizing: "border-box",
                             paddingTop: `${topMm}mm`,
