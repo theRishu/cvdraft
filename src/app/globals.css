@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@plugin "daisyui" {
+  themes: light;
+}
+
 @layer base {
   :root {
     --bg: #fdf9f6;
@@ -165,6 +169,31 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
+
+  /* ── Dynamic Typography Mapping ── */
+  .paper-page h1 {
+    font-size: var(--resume-name-size, 26pt) !important;
+  }
+
+  .paper-page h2 {
+    font-size: var(--resume-heading-size, 11pt) !important;
+  }
+
+  .paper-page h3 {
+    font-size: var(--resume-body-size, 9.5pt) !important;
+    font-weight: 600;
+  }
+
+  .paper-page p,
+  .paper-page li,
+  .paper-page span:not(.no-scale) {
+    font-size: var(--resume-body-size, 9.5pt) !important;
+  }
+
+  /* Job Title usually mapped to h2 in some templates or custom classes */
+  .resume-job-title {
+    font-size: var(--resume-title-size, 11pt) !important;
+  }
 }
 
 /* Scrollbar */
@@ -203,14 +232,22 @@
     margin: 0;
   }
 
+  .pdf-export-wrapper {
+    min-height: auto !important;
+  }
+
   .paper-page {
     width: 210mm !important;
     height: auto !important;
     min-height: auto !important;
     box-shadow: none !important;
     margin: 0 !important;
-    padding: 0 !important;
     overflow: visible !important;
+  }
+
+  /* When exporting PDF via html2pdf, spacers can sometimes cause huge gaps depending on zoom level */
+  .js-spacer {
+    display: none !important;
   }
 
   section,

@@ -60,7 +60,7 @@ export async function POST(req: Request) {
             initialData = {
                 userId,
                 title: title || "Software Engineer Resume",
-                templateId: templateId || "ats",
+                templateId: templateId || "singlecolumn",
                 personalInfo: {
                     fullName: user.firstName + " " + user.lastName,
                     email: user.emailAddresses[0].emailAddress || "john.doe@example.com",

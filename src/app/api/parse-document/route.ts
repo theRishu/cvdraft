@@ -36,13 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ resumeData: json, source: "json" });
     }
 
-    if (fileName.endsWith(".docx")) {
-      // DOCX — extract text via mammoth
-      const mammoth = await import("mammoth");
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const result = await mammoth.extractRawText({ buffer });
-      text = result.value;
-    } else if (fileName.endsWith(".pdf")) {
+    if (fileName.endsWith(".pdf")) {
       // PDF — extract text using the PDF.js approach (arrayBuffer → text extraction)
       // We'll send the raw text extracted from the file bytes via a simple heuristic
       // Since pdf-parse needs Node.js fs, we use a simpler approach:
@@ -62,7 +56,7 @@ export async function POST(req: Request) {
     } else if (fileName.endsWith(".txt")) {
       text = await file.text();
     } else {
-      return NextResponse.json({ error: "Unsupported file type. Use PDF, DOCX, TXT, or JSON." }, { status: 400 });
+      return NextResponse.json({ error: "Unsupported file type. Use PDF, TXT, or JSON." }, { status: 400 });
     }
 
     if (!text || text.length < 30) {
@@ -86,7 +80,7 @@ You are a resume parser. Extract all information from the following resume text 
 The JSON must exactly follow this structure (omit empty arrays/fields):
 {
   "title": "string (e.g. 'Software Engineer Resume')",
-  "templateId": "ats",
+  "templateId": "singlecolumn",
   "personalInfo": {
     "fullName": "string",
     "title": "string (job title/headline)",

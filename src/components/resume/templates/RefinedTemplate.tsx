@@ -7,8 +7,8 @@ import { Mail, Phone, MapPin, Globe, Linkedin, Github } from "lucide-react";
  * 
  * Supports various professional variations through layout props.
  */
-export default function MinimalistTemplate({ data }: { data: any }) {
-    const variant = 'minimalist' as string;
+export default function RefinedTemplate({ data }: { data: any }) {
+    const variant = 'refined' as string;
     const { personalInfo, experience, education, skills, projects, certifications, languages, customSection } = data;
     const themeColor = data.layout?.themeColor ?? data.themeColor;
     const layout = data.layout || {};

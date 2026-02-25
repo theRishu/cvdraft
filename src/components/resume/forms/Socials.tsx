@@ -23,6 +23,7 @@ export default function Socials({ data = [], onChange, textAlign, onTextAlignCha
     };
 
     const getIcon = (platform: string) => {
+        if (!platform) return <Globe className="w-4 h-4" />;
         switch (platform.toLowerCase()) {
             case 'linkedin': return <Linkedin className="w-4 h-4" />;
             case 'github': return <Github className="w-4 h-4" />;
@@ -33,36 +34,36 @@ export default function Socials({ data = [], onChange, textAlign, onTextAlignCha
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
-                        <Share2 className="w-6 h-6 text-blue-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <Share2 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Socials</h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Digital Presence — {data.length} links</p>
+                        <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Socials</h3>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Digital Presence — {data.length} links</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     {onTextAlignChange && <AlignmentToggle value={textAlign || "left"} onChange={onTextAlignChange} />}
                     <button
                         onClick={handleAdd}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
                     >
                         <Plus className="w-4 h-4 text-blue-600" />
-                        Add Link
+                        <span className="whitespace-nowrap">Add Link</span>
                     </button>
                 </div>
             </div>
 
             <div className="space-y-4">
                 {data.map((item) => (
-                    <div key={item.id} className="flex gap-4 items-center p-2 bg-slate-50/50 rounded-[1.5rem] border border-slate-100 hover:border-slate-200 transition-all duration-300">
+                    <div key={item.id} className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center p-3 sm:p-2 bg-slate-50/50 rounded-2xl sm:rounded-[1.5rem] border border-slate-100 hover:border-slate-200 transition-all duration-300 relative">
                         <div className="relative">
                             <select
                                 value={item.platform}
                                 onChange={(e) => handleChange(item.id, 'platform', e.target.value)}
-                                className="pl-10 pr-4 py-3 bg-white border-2 border-slate-100 focus:border-slate-900 rounded-2xl text-sm font-bold outline-none transition-all appearance-none cursor-pointer min-w-[140px]"
+                                className="w-full sm:w-auto pl-10 pr-4 py-3 bg-white border-2 border-slate-100 focus:border-slate-900 rounded-xl sm:rounded-2xl text-sm font-bold outline-none transition-all appearance-none cursor-pointer sm:min-w-[140px]"
                             >
                                 <option value="LinkedIn">LinkedIn</option>
                                 <option value="GitHub">GitHub</option>
@@ -80,16 +81,16 @@ export default function Socials({ data = [], onChange, textAlign, onTextAlignCha
                                 value={item.url}
                                 onChange={(e) => handleChange(item.id, 'url', e.target.value)}
                                 placeholder="https://..."
-                                className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-100 focus:border-slate-900 rounded-2xl text-sm font-bold outline-none transition-all duration-300 placeholder:text-slate-300"
+                                className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-100 focus:border-slate-900 rounded-xl sm:rounded-2xl text-sm font-bold outline-none transition-all duration-300 placeholder:text-slate-300"
                             />
                             <LinkIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         </div>
 
                         <button
                             onClick={() => handleRemove(item.id)}
-                            className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            className="absolute sm:static -top-2 -right-2 sm:top-auto sm:right-auto p-2 bg-white sm:bg-transparent border border-slate-100 sm:border-0 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all shadow-sm sm:shadow-none"
                         >
-                            <X className="w-4 h-4" />
+                            <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
                     </div>
                 ))}

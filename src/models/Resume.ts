@@ -181,7 +181,7 @@ export interface IResume {
 const ResumeSchema = new Schema<IResume>({
     userId: { type: String, required: true, index: true },
     title: { type: String, default: 'Untitled Resume' },
-    templateId: { type: String, default: 'modern' },
+    templateId: { type: String, default: 'singlecolumn' },
     themeColor: { type: String, default: '#0f172a' },
     fontSize: { type: String, default: 'medium' },
     personalInfo: { type: PersonalInfoSchema, default: {} },

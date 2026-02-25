@@ -1,217 +1,287 @@
-import React from 'react';
+import { RichText } from "@/lib/richText";
+import React from "react";
+import { Mail, Phone, MapPin, Globe, Linkedin, Github } from "lucide-react";
 
+/**
+ * Enhanced Single Column Template Engine
+ * 
+ * Supports various professional variations through layout props.
+ */
 export default function ModernTemplate({ data }: { data: any }) {
-    const { personalInfo, experience, education, skills, socialLinks } = data;
+    const variant = 'modern' as string;
+    const { personalInfo, experience, education, skills, projects, certifications, languages, customSection } = data;
+    const themeColor = data.layout?.themeColor ?? data.themeColor;
+    const layout = data.layout || {};
+    const fontSize = layout.fontSize ?? data.fontSize;
 
-    const { themeColor = "#0f172a" } = data; // Default slate-900
+    // Core properties overridden by variant
+    const fontFamily = layout.fontFamily || (
+        ['executive', 'corporate', 'classic'].includes(variant) ? 'Merriweather, serif' :
+            ['modern', 'startup', 'tech'].includes(variant) ? 'Inter, sans-serif' :
+                ['minimalist', 'refined'].includes(variant) ? 'Outfit, sans-serif' :
+                    'Roboto, sans-serif'
+    );
 
-    const fs = data.fontSize || "medium";
-    const fsize = {
-        name: fs === "small" ? "text-[20px]" : fs === "large" ? "text-[28px]" : "text-[24px]",
-        title: fs === "small" ? "text-[13.3px]" : fs === "large" ? "text-[16px]" : "text-[14.7px]",
-        contact: fs === "small" ? "text-[12px]" : fs === "large" ? "text-[14.7px]" : "text-[13.3px]",
-        section: fs === "small" ? "text-[12px]" : fs === "large" ? "text-[14.7px]" : "text-[13.3px]",
-        body: fs === "small" ? "text-[12px]" : fs === "large" ? "text-[14.7px]" : "text-[13.3px]",
-        sub: fs === "small" ? "text-[10.5px]" : fs === "large" ? "text-[13.3px]" : "text-[12px]",
+    // Styling variants configuration
+    const config: Record<string, any> = {
+        executive: { headerAlign: 'center', nameStyle: 'uppercase tracking-widest', sectionBorder: 'border-b-2', sectionTitleUpper: true, titleStyle: 'italic text-stone-600', compact: false },
+        modern: { headerAlign: 'left', nameStyle: 'tracking-tight', sectionBorder: 'border-l-4 pl-3', sectionTitleUpper: false, titleStyle: 'font-bold text-stone-700', compact: true },
+        minimalist: { headerAlign: 'left', nameStyle: 'font-light tracking-wide', sectionBorder: 'border-b', sectionTitleUpper: true, titleStyle: 'font-mono text-stone-500', compact: true },
+        academic: { headerAlign: 'center', nameStyle: 'font-serif', sectionBorder: 'border-t border-b py-1', sectionTitleUpper: true, titleStyle: 'text-stone-600 font-medium', compact: false },
+        creative: { headerAlign: 'right', nameStyle: 'font-black tracking-tighter', sectionBorder: 'border-b-4', sectionTitleUpper: true, titleStyle: 'font-bold uppercase tracking-widest text-[#0f172a]', compact: false },
+        classic: { headerAlign: 'center', nameStyle: 'font-serif', sectionBorder: 'border-b border-double', sectionTitleUpper: true, titleStyle: 'font-serif text-stone-600 italic', compact: false },
+        startup: { headerAlign: 'left', nameStyle: 'font-black tracking-tight', sectionBorder: 'border-b-2 border-dashed border-stone-300', sectionTitleUpper: false, titleStyle: 'font-medium tracking-tight', compact: true },
+        tech: { headerAlign: 'left', nameStyle: 'font-mono tracking-tight', sectionBorder: 'border-l-2 pl-2', sectionTitleUpper: true, titleStyle: 'font-mono text-stone-400', compact: true },
+        corporate: { headerAlign: 'left', nameStyle: 'font-bold uppercase', sectionBorder: 'border-b pb-1', sectionTitleUpper: true, titleStyle: 'uppercase text-stone-700 font-bold', compact: true },
+        refined: { headerAlign: 'center', nameStyle: 'font-medium tracking-widest', sectionBorder: 'border-b border-opacity-50', sectionTitleUpper: true, titleStyle: 'font-light tracking-widest text-stone-500 uppercase', compact: false }
     };
 
-    const sp = data.layout?.sectionSpacing || "normal";
-    const spacing = {
-        sectionY: sp === "compact" ? "space-y-4" : sp === "large" || sp === "spacious" ? "space-y-8" : "space-y-6",
-        itemY: sp === "compact" ? "space-y-3" : sp === "large" || sp === "spacious" ? "space-y-6" : "space-y-4",
-        mb: sp === "compact" ? "mb-3" : sp === "large" || sp === "spacious" ? "mb-8" : "mb-5",
-        pb: sp === "compact" ? "pb-3" : sp === "large" || sp === "spacious" ? "pb-8" : "pb-5",
-        headMb: sp === "compact" ? "mb-2" : sp === "large" || sp === "spacious" ? "mb-5" : "mb-3",
-        titleMb: sp === "compact" ? "mb-3" : sp === "large" || sp === "spacious" ? "mb-6" : "mb-4",
-        colGap: sp === "compact" ? "gap-6" : sp === "large" || sp === "spacious" ? "gap-12" : "gap-9",
-        sidebarPl: sp === "compact" ? "pl-5" : sp === "large" || sp === "spacious" ? "pl-10" : "pl-7",
+    const style = config[variant];
+
+    const getIcon = (network: string | undefined) => {
+        switch (network?.toLowerCase()) {
+            case "linkedin": return <Linkedin className="w-3.5 h-3.5" />;
+            case "github": return <Github className="w-3.5 h-3.5" />;
+            default: return <Globe className="w-3.5 h-3.5" />;
+        }
     };
 
-    const getAlign = (key: string) => {
-        return data.layout?.sectionAlignment?.[key] || data.layout?.textAlign || "left";
+    const parseSkill = (skillName: any) => {
+        if (typeof skillName !== 'string') return { category: null, itemsStr: String(skillName || ''), isCategory: false };
+        if (skillName.includes(':')) {
+            const [cat, ...rest] = skillName.split(':');
+            return { category: cat.trim(), itemsStr: rest.join(':').trim(), isCategory: true };
+        }
+        const commonCategories = ['language', 'languages', 'frontend', 'front-end', 'front end', 'backend', 'back-end', 'back end', 'database', 'databases', 'tools', 'tool', 'cloud', 'devops', 'testing', 'frameworks', 'libraries'];
+        const lowerName = skillName.toLowerCase();
+        for (const cat of commonCategories) {
+            if (lowerName.startsWith(cat + ' ')) {
+                const actualCategory = skillName.substring(0, cat.length).trim();
+                const displayCategory = actualCategory.charAt(0).toUpperCase() + actualCategory.slice(1);
+                const itemsStr = skillName.substring(cat.length).trim();
+                return { category: displayCategory, itemsStr, isCategory: true };
+            }
+        }
+        return { category: null, itemsStr: skillName, isCategory: false };
     };
 
-    const getJustify = (key: string) => {
-        const align = getAlign(key);
-        return align === "center" ? "justify-center" : align === "right" ? "justify-end" : "justify-start";
+    const renderSkills = (skillsArray: any[]) => {
+        if (!skillsArray || skillsArray.length === 0) return null;
+        const hasAnyCategory = skillsArray.some(s => parseSkill(s.name).isCategory);
+
+        return (
+            <div className={`flex ${hasAnyCategory ? 'flex-col gap-1.5' : 'flex-wrap gap-2'} ${style.compact ? 'mb-4' : 'mb-6'}`}>
+                {skillsArray.map((skill: any, idx: number) => {
+                    const { category, itemsStr, isCategory } = parseSkill(skill.name);
+                    if (isCategory) {
+                        const sep = itemsStr.includes('|') ? '|' : (itemsStr.includes(',') ? ',' : null);
+                        const items = sep ? itemsStr.split(sep).map((i: string) => i.trim()).filter(Boolean) : [itemsStr];
+                        return (
+                            <div key={`${skill.id}-${idx}`} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
+                                <span className={`font-bold text-[0.9em] text-stone-900 sm:w-1/4 shrink-0 ${variant === 'corporate' ? 'uppercase text-[0.8em]' : ''}`}>{category}</span>
+                                <div className="flex flex-wrap flex-1 gap-1">
+                                    {items.map((item: string, i: number) => (
+                                        <span key={i} className="text-stone-700 text-[0.9em]">
+                                            {item}{i < items.length - 1 ? (['corporate', 'tech'].includes(variant) ? ' | ' : ', ') : ''}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    }
+                    return (
+                        <span key={skill.id} className="bg-stone-50 border border-stone-200 text-stone-700 px-2 py-0.5 rounded text-[0.85em] font-medium">
+                            {skill.name}
+                        </span>
+                    );
+                })}
+            </div>
+        );
     };
 
-    const getItemsAlign = (key: string) => {
-        const align = getAlign(key);
-        return align === "center" ? "items-center" : align === "right" ? "items-end" : "items-start";
-    };
+    // Render Section Header
+    const SectionHeader = ({ title }: { title: string }) => (
+        <h3
+            style={{ color: themeColor || "#0f172a", borderColor: themeColor || "#0f172a" }}
+            className={`font-bold mb-3 ${style.sectionBorder} ${style.sectionTitleUpper ? 'uppercase tracking-wider' : 'tracking-tight'} text-[1.1em] pb-1`}
+        >
+            {title}
+        </h3>
+    );
 
     return (
-        <div className={`font-sans text-slate-900 bg-white min-h-screen`} style={{ lineHeight: data.layout?.lineHeight || 1.6 }}>
+        <div className={`flex flex-col bg-white text-stone-800 leading-relaxed`} style={{ 
+                fontFamily: fontFamily, 
+                fontSize: typeof fontSize === 'number' ? `${fontSize}pt` : fontSize || "10pt"
+            }}>
+
             {/* Header */}
-            <header className={`border-b-2 ${spacing.pb} ${spacing.mb} print:shadow-none flex flex-col ${getAlign("personalInfo") === "center" ? "items-center text-center" : getAlign("personalInfo") === "right" ? "items-end text-right" : "items-start text-left"}`} style={{ borderColor: themeColor }}>
-                <h1 className={`${fsize.name} font-bold mb-0.5 print:shadow-none`} style={{ color: themeColor }}>{personalInfo?.fullName}</h1>
-                <p className={`${fsize.title} font-medium text-slate-600 mb-2 print:shadow-none`}>{personalInfo?.title}</p>
+            <div className={`flex flex-col ${style.headerAlign === 'center' ? 'items-center text-center' : style.headerAlign === 'right' ? 'items-end text-right' : 'items-start text-left'} pb-5 mb-6 ${variant === 'academic' ? 'border-b-4 border-double' : variant === 'minimalist' ? '' : 'border-b'} border-stone-200`}>
+                <h1
+                    style={{ color: themeColor || "#0f172a" }}
+                    className={`text-[2.8em] font-bold leading-none mb-1.5 ${style.nameStyle}`}
+                >
+                    {personalInfo.fullName}
+                </h1>
 
-                <div className={`flex flex-wrap gap-4 ${fsize.contact} text-slate-500 print:shadow-none ${getJustify("personalInfo")}`}>
-                    {personalInfo?.email && <span>{personalInfo.email}</span>}
-                    {personalInfo?.phone && <span>• {personalInfo.phone}</span>}
-                    {personalInfo?.address && <span>• {personalInfo.address}</span>}
+                {personalInfo.title && (
+                    <h2 className={`${style.titleStyle} text-[1.1em] mb-4`}>
+                        {personalInfo.title}
+                    </h2>
+                )}
+
+                <div className={`flex flex-wrap ${style.headerAlign === 'center' ? 'justify-center' : style.headerAlign === 'right' ? 'justify-end' : 'justify-start'} gap-x-4 gap-y-1.5 text-[0.85em] ${variant === 'corporate' ? 'font-medium uppercase tracking-wider text-[0.75em]' : 'text-stone-600'}`}>
+                    {[personalInfo.email, personalInfo.phone, personalInfo.address].filter(Boolean).map((info, i) => (
+                        <span key={i} className="flex items-center gap-1.5">
+                            {['modern', 'startup', 'tech'].includes(variant) && i === 0 && <Mail className="w-3.5 h-3.5" />}
+                            {['modern', 'startup', 'tech'].includes(variant) && i === 1 && <Phone className="w-3.5 h-3.5" />}
+                            {['modern', 'startup', 'tech'].includes(variant) && i === 2 && <MapPin className="w-3.5 h-3.5" />}
+                            {info}
+                        </span>
+                    ))}
+                    {data.socialLinks?.map((link: any) => (
+                        <span key={link.id} className="flex items-center gap-1.5">
+                            {['modern', 'startup', 'tech'].includes(variant) && getIcon(link.network)}
+                            <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                {link.network || link.url.replace(/^https?:\/\//, '')}
+                            </a>
+                        </span>
+                    ))}
                 </div>
-            </header>
+            </div>
 
-            <div className={`grid grid-cols-12 ${spacing.colGap} print:shadow-none`}>
-                {/* Main Column */}
-                <div className={`col-span-8 ${spacing.sectionY} print:shadow-none`}>
-                    {personalInfo?.summary && (
-                        <section className={`break-inside-avoid flex flex-col ${getItemsAlign("summary")}`}>
-                            <h3 className={`${fsize.section} font-bold tracking-wider text-slate-400 ${spacing.headMb} print:shadow-none w-full ${getAlign("summary") === "center" ? "text-center" : getAlign("summary") === "right" ? "text-right" : ""}`}>Profile</h3>
-                            <p className={`text-slate-700 leading-relaxed ${fsize.body} whitespace-pre-wrap print:shadow-none ${getAlign("summary") === "center" ? "text-center" : getAlign("summary") === "right" ? "text-right" : "text-left"}`}>{personalInfo.summary}</p>
-                        </section>
-                    )}
+            <div className={`flex flex-col w-full ${style.compact ? 'space-y-4' : 'space-y-6'}`}>
+                {personalInfo.summary && (
+                    <section className={style.compact ? 'mb-4' : 'mb-6'}>
+                        {variant !== 'minimalist' && <SectionHeader title="Professional Summary" />}
+                        <p className={`text-stone-700 text-[0.95em] ${variant === 'academic' || variant === 'classic' ? 'text-justify leading-loose' : 'leading-relaxed'}`}>
+                            {personalInfo.summary}
+                        </p>
+                    </section>
+                )}
 
-                    {experience?.length > 0 && (
-                        <section className={`break-inside-avoid flex flex-col ${getItemsAlign("experience")}`}>
-                            <h3 className={`${fsize.section} font-bold tracking-wider text-slate-400 ${spacing.titleMb} print:shadow-none`}>Experience</h3>
-                            <div className={`${spacing.itemY} print:shadow-none`}>
-                                {experience.map((exp: any, i: number) => (
-                                    <div key={i}>
-                                        <div className="flex justify-between items-baseline mb-1 print:shadow-none">
-                                            <h4 className={`${fsize.body} font-bold text-slate-900 print:shadow-none`}>{exp.jobTitle}</h4>
-                                            <span className={`${fsize.sub} text-slate-500 font-medium print:shadow-none`}>
-                                                {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate}
-                                            </span>
-                                        </div>
-                                        <div className={`${fsize.body} text-slate-600 font-medium mb-2 print:shadow-none`}>{exp.companyName}</div>
-                                        <p className={`${fsize.body} text-slate-600 whitespace-pre-wrap leading-relaxed print:shadow-none ${getAlign("experience") === "center" ? "text-center" : getAlign("experience") === "right" ? "text-right" : "text-left"}`}>{exp.description}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
-
-                    {education?.length > 0 && (
-                        <section className={`break-inside-avoid flex flex-col ${getItemsAlign("education")}`}>
-                            <h3 className={`${fsize.section} font-bold tracking-wider text-slate-400 ${spacing.titleMb} print:shadow-none`}>Education</h3>
-                            <div className={`${spacing.itemY} print:shadow-none`}>
-                                {education.map((edu: any, i: number) => (
-                                    <div key={i}>
-                                        <div className="flex justify-between items-baseline mb-1 print:shadow-none">
-                                            <h4 className={`${fsize.body} font-bold text-slate-900 print:shadow-none`}>{edu.schoolName}</h4>
-                                            <span className={`${fsize.sub} text-slate-500 font-medium print:shadow-none`}>
-                                                {edu.startDate} - {edu.endDate}
-                                            </span>
-                                        </div>
-                                        <div className={`${fsize.body} text-slate-600 print:shadow-none`}>{edu.degree}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
-
-                    {data.projects?.length > 0 && (
-                        <section className={`break-inside-avoid flex flex-col ${getItemsAlign("projects")}`}>
-                            <h3 className={`${fsize.section} font-bold tracking-wider text-slate-400 ${spacing.titleMb} print:shadow-none`}>Projects</h3>
-                            <div className={`${spacing.itemY} print:shadow-none`}>
-                                {data.projects.map((project: any, i: number) => (
-                                    <div key={i}>
-                                        <div className="flex justify-between items-baseline mb-1 print:shadow-none">
-                                            <h4 className={`${fsize.body} font-bold text-slate-900 print:shadow-none`}>{project.title}</h4>
-                                            <span className={`${fsize.sub} text-slate-500 font-medium print:shadow-none`}>
-                                                {project.startDate} - {project.endDate}
-                                            </span>
-                                        </div>
-                                        {project.link && (
-                                            <a href={project.link} target="_blank" rel="noopener noreferrer" className={`${fsize.sub} text-blue-600 hover:underline mb-1 block print:shadow-none`}>
-                                                {project.link}
-                                            </a>
-                                        )}
-                                        <p className={`${fsize.body} text-slate-600 whitespace-pre-wrap mb-2 leading-relaxed print:shadow-none ${getAlign("projects") === "center" ? "text-center" : getAlign("projects") === "right" ? "text-right" : "text-left"}`}>{project.description}</p>
-                                        {project.technologies?.length > 0 && (
-                                            <div className="flex flex-wrap gap-2 print:shadow-none">
-                                                {project.technologies.map((tech: string, j: number) => (
-                                                    <span key={j} className={`${fsize.sub} bg-slate-50 text-slate-500 px-1.5 py-0.5 rounded border border-slate-100 print:shadow-none`}>
-                                                        {tech}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
-
-                    {data.customSection?.items?.length > 0 && (
-                        <section className={`break-inside-avoid flex flex-col ${getItemsAlign("customSection")}`}>
-                            <h3 className={`${fsize.section} font-bold tracking-wider text-slate-400 ${spacing.titleMb} print:shadow-none`}>{data.customSection.title || "Custom Section"}</h3>
-                            <div className={`${spacing.itemY} print:shadow-none`}>
-                                {data.customSection.items.map((item: any, i: number) => (
-                                    <div key={i}>
-                                        <div className="flex justify-between items-baseline mb-1 print:shadow-none">
-                                            <h4 className={`${fsize.body} font-bold text-slate-900 print:shadow-none`}>{item.name}</h4>
-                                            <span className={`${fsize.sub} text-slate-500 font-medium print:shadow-none`}>
-                                                {item.startDate} {item.endDate && `- ${item.endDate}`}
-                                            </span>
-                                        </div>
-                                        <p className={`${fsize.body} text-slate-600 whitespace-pre-wrap print:shadow-none ${getAlign("customSection") === "center" ? "text-center" : getAlign("customSection") === "right" ? "text-right" : "text-left"}`}>{item.description}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
-                </div>
-
-                {/* Sidebar Column */}
-                <div className={`col-span-4 ${spacing.sectionY} border-l border-slate-100 ${spacing.sidebarPl} print:shadow-none`}>
-                    {skills?.length > 0 && (
-                        <section className={`break-inside-avoid flex flex-col ${getItemsAlign("skills")}`}>
-                            <h3 className={`text-sm font-bold tracking-wider text-slate-400 ${spacing.titleMb} print:shadow-none`}>Skills</h3>
-                            <div className="flex flex-col gap-1.5 print:shadow-none">
-                                {skills.map((skill: any, i: number) => (
-                                    <div key={i} className="flex items-center gap-2 print:shadow-none">
-                                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 print:shadow-none" style={{ background: themeColor }} />
-                                        <span className="text-slate-700 text-xs font-medium print:shadow-none">
-                                            {skill.name}
+                {experience?.length > 0 && (
+                    <section className={style.compact ? 'mb-4' : 'mb-6'}>
+                        <SectionHeader title="Experience" />
+                        <div className={style.compact ? 'space-y-3' : 'space-y-5'}>
+                            {experience.map((exp: any) => (
+                                <div key={exp.id}>
+                                    <div className="flex justify-between items-baseline mb-0.5">
+                                        <h4 className={`font-bold text-[1.05em] text-stone-900 ${variant === 'corporate' ? 'uppercase tracking-wide text-[0.9em]' : ''}`}>{exp.jobTitle}</h4>
+                                        <span className={`text-[0.9em] text-stone-600 shrink-0 ml-4 ${variant === 'corporate' ? 'font-bold' : 'font-medium'}`}>
+                                            {exp.startDate} – {exp.isCurrent ? "Present" : exp.endDate}
                                         </span>
                                     </div>
-                                ))}
-                            </div>
-                        </section>
-                    )}
+                                    <div className="flex justify-between items-center text-[0.95em] text-stone-600 mb-1.5">
+                                        <span className={variant === 'corporate' ? 'font-bold text-stone-800' : 'italic'}>{exp.companyName}</span>
+                                        {exp.address && <span>{exp.address}</span>}
+                                    </div>
+                                    {exp.description && (
+                                        <p className={`text-stone-700 text-[0.95em] whitespace-pre-line ${variant === 'academic' || variant === 'classic' ? 'text-justify leading-loose' : 'leading-relaxed'} ${variant === 'modern' ? 'pl-3 border-l-2 border-stone-100' : ''}`}>
+                                            <RichText text={exp.description || ""} />
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
 
-                    {data.languages?.length > 0 && (
-                        <section className={`break-inside-avoid flex flex-col ${getItemsAlign("languages")}`}>
-                            <h3 className="text-sm font-bold  tracking-wider text-slate-400 mb-4 print:shadow-none">Languages</h3>
-                            <ul className="space-y-2 print:shadow-none">
-                                {data.languages.map((lang: any, i: number) => (
-                                    <li key={i} className="flex justify-between items-center text-sm print:shadow-none">
-                                        <span className="font-medium text-slate-700 print:shadow-none">{lang.name}</span>
-                                        <span className="text-slate-500 text-xs print:shadow-none">{lang.level}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </section>
-                    )}
+                {education?.length > 0 && (
+                    <section className={style.compact ? 'mb-4' : 'mb-6'}>
+                        <SectionHeader title="Education" />
+                        <div className={style.compact ? 'space-y-3' : 'space-y-4'}>
+                            {education.map((edu: any) => (
+                                <div key={edu.id}>
+                                    <div className="flex justify-between items-baseline mb-0.5">
+                                        <h4 className={`font-bold text-[1.05em] text-stone-900 ${variant === 'corporate' ? 'uppercase tracking-wide text-[0.9em]' : ''}`}>{edu.degree}</h4>
+                                        <span className={`text-[0.9em] text-stone-600 shrink-0 ml-4 ${variant === 'corporate' ? 'font-bold' : 'font-medium'}`}>
+                                            {edu.startDate} – {edu.isCurrent ? "Present" : edu.endDate}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[0.95em] text-stone-600 mb-0.5">
+                                        <span className={variant === 'corporate' ? 'font-bold text-stone-800' : 'italic'}>{edu.schoolName}</span>
+                                    </div>
+                                    {edu.description && (
+                                        <p className="text-stone-700 text-[0.95em] mt-1"><RichText text={edu.description || ""} /></p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
 
-                    {data.certifications?.length > 0 && (
-                        <section className={`break-inside-avoid flex flex-col ${getItemsAlign("certifications")}`}>
-                            <h3 className="text-sm font-bold  tracking-wider text-slate-400 mb-4 print:shadow-none">Certifications</h3>
-                            <div className="space-y-3 print:shadow-none">
-                                {data.certifications.map((cert: any, i: number) => (
-                                    <div key={i}>
-                                        <div className="text-sm font-bold text-slate-800 leading-tight print:shadow-none">{cert.name}</div>
-                                        <div className="text-xs text-slate-500 print:shadow-none">{cert.issuer} {cert.date && `• ${cert.date}`}</div>
+                {skills?.length > 0 && (
+                    <section>
+                        <SectionHeader title="Skills" />
+                        {renderSkills(skills)}
+                    </section>
+                )}
+
+                {projects?.length > 0 && (
+                    <section className={style.compact ? 'mb-4' : 'mb-6'}>
+                        <SectionHeader title="Projects" />
+                        <div className={style.compact ? 'space-y-4' : 'space-y-5'}>
+                            {projects.map((proj: any) => (
+                                <div key={proj.id}>
+                                    <div className="flex justify-between items-baseline mb-0.5">
+                                        <h4 className={`font-bold text-[1.05em] text-stone-900 flex items-center flex-wrap gap-2 ${variant === 'corporate' ? 'uppercase tracking-wide text-[0.9em]' : ''}`}>
+                                            {proj.title}
+                                            {proj.link && (
+                                                <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-[0.8em] font-normal text-stone-500 hover:text-indigo-600 hover:underline inline-flex items-center gap-1 transition-colors">
+                                                    <Globe className="w-3 h-3" />
+                                                    {proj.link.replace(/^https?:\/\/(www\.)?/, '')}
+                                                </a>
+                                            )}
+                                        </h4>
+                                        {proj.startDate && (
+                                            <span className={`text-[0.9em] text-stone-600 shrink-0 ml-4 ${variant === 'corporate' ? 'font-bold' : 'font-medium'}`}>
+                                                {proj.startDate} – {proj.endDate || "Present"}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {proj.techStack && (
+                                        <div className="text-[0.85em] font-medium text-stone-500 mb-1.5">
+                                            <span className="italic">Tech:</span> {proj.techStack}
+                                        </div>
+                                    )}
+                                    {proj.description && (
+                                        <p className="text-stone-700 text-[0.95em] whitespace-pre-line leading-relaxed">
+                                            <RichText text={proj.description || ""} />
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
+
+                <div className={`flex flex-col ${style.compact ? 'space-y-4' : 'space-y-6'} w-full`}>
+                    {certifications?.length > 0 && (
+                        <section className={style.compact ? 'mb-4' : 'mb-6'}>
+                            <SectionHeader title="Certifications" />
+                            <div className={style.compact ? 'space-y-2' : 'space-y-3'}>
+                                {certifications.map((cert: any, certIdx: number) => (
+                                    <div key={cert.id ?? certIdx}>
+                                        <div className="flex justify-between items-baseline">
+                                            <h4 className={`font-bold text-[0.95em] text-stone-900 ${variant === 'corporate' ? 'uppercase tracking-wide text-[0.8em]' : ''}`}>{cert.title}</h4>
+                                            {cert.date && <span className={`text-[0.85em] text-stone-500 ml-2 shrink-0 ${variant === 'corporate' ? 'font-bold' : ''}`}>{cert.date}</span>}
+                                        </div>
+                                        {cert.issuer && <div className={`text-[0.9em] text-stone-600 ${variant === 'corporate' ? 'font-bold text-stone-800' : 'italic'}`}>{cert.issuer}</div>}
                                     </div>
                                 ))}
                             </div>
                         </section>
                     )}
 
-                    {socialLinks?.length > 0 && (
-                        <section className="break-inside-avoid">
-                            <h3 className="text-sm font-bold  tracking-wider text-slate-400 mb-4 print:shadow-none">Links</h3>
-                            <div className="space-y-2 print:shadow-none">
-                                {socialLinks.map((link: any, i: number) => (
-                                    <div key={i}>
-                                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline break-all print:shadow-none">
-                                            {link.platform}
-                                        </a>
+                    {languages?.length > 0 && (
+                        <section>
+                            <SectionHeader title="Languages" />
+                            <div className="space-y-1">
+                                {languages.map((lang: any, langIdx: number) => (
+                                    <div key={lang.id ?? langIdx} className="flex justify-between items-baseline text-[0.95em]">
+                                        <span className={`text-stone-900 ${variant === 'corporate' ? 'font-bold uppercase tracking-wide text-[0.8em]' : 'font-medium'}`}>{lang.name}</span>
+                                        <span className="text-[0.9em] text-stone-500 italic">{lang.proficiency}</span>
                                     </div>
                                 ))}
                             </div>

@@ -27,14 +27,14 @@ export default function Languages({ data = [], onChange, textAlign, onTextAlignC
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
-                        <Globe className="w-6 h-6 text-blue-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Languages</h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Global Communication</p>
+                        <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Languages</h3>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Global Communication</p>
                     </div>
                 </div>
                 {onTextAlignChange && (
@@ -42,14 +42,14 @@ export default function Languages({ data = [], onChange, textAlign, onTextAlignC
                 )}
             </div>
 
-            <div className="flex gap-3 bg-slate-50/50 p-3 rounded-[2rem] border border-slate-100 group focus-within:border-slate-200 transition-all">
+            <div className="flex flex-col sm:flex-row gap-3 bg-slate-50/50 p-3 rounded-2xl sm:rounded-[2rem] border border-slate-100 group focus-within:border-slate-200 transition-all">
                 <div className="flex-1 relative">
                     <input
                         type="text"
                         value={newItem}
                         onChange={(e) => setNewItem(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && addLanguage()}
-                        className="w-full bg-white border-2 border-slate-100 focus:border-slate-900 rounded-2xl px-5 py-3 text-sm outline-none transition-all duration-300 font-bold"
+                        className="w-full bg-white border-2 border-slate-100 focus:border-slate-900 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 text-sm outline-none transition-all duration-300 font-bold"
                         placeholder="e.g. French, Spanish"
                         list="language-suggestions"
                     />
@@ -66,7 +66,7 @@ export default function Languages({ data = [], onChange, textAlign, onTextAlignC
                 <select
                     value={newLevel}
                     onChange={(e) => setNewLevel(e.target.value)}
-                    className="bg-white border-2 border-slate-100 focus:border-slate-900 rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all appearance-none cursor-pointer min-w-[140px]"
+                    className="bg-white border-2 border-slate-100 focus:border-slate-900 rounded-xl sm:rounded-2xl px-4 py-3 text-sm font-bold outline-none transition-all appearance-none cursor-pointer sm:min-w-[140px]"
                 >
                     <option>Native</option>
                     <option>Fluent</option>
@@ -82,9 +82,10 @@ export default function Languages({ data = [], onChange, textAlign, onTextAlignC
                         e.stopPropagation();
                         addLanguage();
                     }}
-                    className="bg-slate-900 text-white px-5 py-3 rounded-2xl font-black hover:bg-blue-600 transition-all active:scale-95 shadow-lg shadow-slate-900/10"
+                    className="bg-slate-900 text-white px-5 py-3 rounded-xl sm:rounded-2xl font-black hover:bg-blue-600 transition-all active:scale-95 shadow-lg shadow-slate-900/10 flex items-center justify-center gap-2"
                 >
                     <Plus className="w-5 h-5" />
+                    <span className="sm:hidden text-xs uppercase tracking-widest">Add Language</span>
                 </button>
             </div>
 

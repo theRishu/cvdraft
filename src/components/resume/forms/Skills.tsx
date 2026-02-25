@@ -72,14 +72,14 @@ export default function Skills({ data = [], onChange, textAlign, onTextAlignChan
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
-                        <Zap className="w-6 h-6 text-blue-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Skills</h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Technical Arsenal — {data.length} added</p>
+                        <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Skills</h3>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Technical Arsenal — {data.length} added</p>
                     </div>
                 </div>
                 {onTextAlignChange && (
@@ -89,7 +89,7 @@ export default function Skills({ data = [], onChange, textAlign, onTextAlignChan
 
             {/* Add skill input */}
             <div className="relative">
-                <form onSubmit={e => { e.preventDefault(); handleAdd(); }} className="flex gap-3">
+                <form onSubmit={e => { e.preventDefault(); handleAdd(); }} className="flex flex-col sm:flex-row gap-3">
                     <div className="flex-1 relative">
                         <input
                             value={newItem}
@@ -97,14 +97,14 @@ export default function Skills({ data = [], onChange, textAlign, onTextAlignChan
                             onFocus={() => setShowSuggestions(true)}
                             onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                             placeholder="e.g. React, Python, AWS…"
-                            className="w-full bg-white border-2 border-slate-100 focus:border-slate-900 rounded-2xl px-5 py-3.5 text-sm outline-none transition-all duration-300 font-bold"
+                            className="w-full bg-white border-2 border-slate-100 focus:border-slate-900 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-3.5 text-sm outline-none transition-all duration-300 font-bold"
                         />
                         {/* Autocomplete dropdown */}
                         {showSuggestions && filtered.length > 0 && (
-                            <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-slate-100 rounded-2xl shadow-lg z-20 overflow-hidden">
+                            <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-slate-100 rounded-xl sm:rounded-2xl shadow-lg z-20 overflow-hidden">
                                 {filtered.slice(0, 6).map(s => (
                                     <button key={s} type="button" onClick={() => handleAdd(s)}
-                                        className="w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                                        className="w-full text-left px-4 py-2 sm:py-2.5 text-sm font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
                                         {s}
                                     </button>
                                 ))}
@@ -112,8 +112,8 @@ export default function Skills({ data = [], onChange, textAlign, onTextAlignChan
                         )}
                     </div>
                     <button type="submit"
-                        className="bg-slate-900 text-white px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all active:scale-95 shadow-lg">
-                        Add
+                        className="bg-slate-900 text-white px-6 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all active:scale-95 shadow-lg">
+                        Add Skill
                     </button>
                 </form>
 

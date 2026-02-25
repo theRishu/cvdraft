@@ -4,10 +4,10 @@ import Link from "next/link";
 import {
     ArrowLeft, Download, FileText, User, Briefcase,
     GraduationCap, Star, Share2, Globe, Medal, Plus, Sparkles,
-    Loader2, AlertCircle, Eye, Sliders, Brain, Copy, ChevronUp,
+    Loader2, AlertCircle, Eye, Sliders, Copy, ChevronUp,
     ChevronDown, EyeOff, Keyboard, Moon, Sun, FileJson,
     FileDown, CheckCircle2, BarChart3, Clock, AlignLeft, AlignCenter,
-    AlignRight, Type, ChevronLeft, RefreshCw, CheckCircle, Layout, ClipboardPaste,
+    AlignRight, Type, ChevronLeft, RefreshCw, CheckCircle, Layout,
     MoreHorizontal, Printer, Link as LinkIcon, History, RefreshCcw, Trash2
 } from "lucide-react";
 import PersonalDetails from "./forms/PersonalDetails";
@@ -20,9 +20,8 @@ import Socials from "./forms/Socials";
 import Projects from "./forms/Projects";
 import CustomSection from "./forms/CustomSection";
 import LayoutSettings from "./forms/LayoutSettings";
-import CareerTools from "./forms/CareerTools";
+import TemplateSettings from "./forms/TemplateSettings";
 import ResumePreview from "./ResumePreview";
-import { generateDocx } from "@/lib/generateDocx";
 import { INITIAL_DATA } from "@/lib/defaultData";
 import { TEMPLATES } from "@/lib/templateOptions";
 
@@ -39,7 +38,7 @@ const SECTIONS = [
 ];
 
 const UTILITY_SECTIONS = [
-    { id: "ai-tools", label: "AI Tools", icon: Brain },
+    { id: "layout", label: "Appearance", icon: Sliders },
 ];
 
 const ALL_SECTIONS = [...SECTIONS, ...UTILITY_SECTIONS];
@@ -55,59 +54,41 @@ const SECTION_HINTS: Record<string, string> = {
     languages: "Languages you speak and your proficiency level",
     socials: "LinkedIn, GitHub, portfolio, and other profile links",
     custom: "Any additional section relevant to your application",
-    layout: "Templates, fonts, margins, and colors",
-    "ai-tools": "AI-powered career and resume tools",
+    layout: "Templates, fonts, margins, and colors"
 };
 
 // ── Resume completeness score ──────────────────────────────────────────────
 function getCompleteness(d: any) {
     const checks = [
-        { label: "Name", done: !!d.personalInfo?.fullName },
-        { label: "Email", done: !!d.personalInfo?.email },
-        { label: "Phone", done: !!d.personalInfo?.phone },
-        { label: "Summary", done: (d.personalInfo?.summary || "").length > 30 },
-        { label: "Experience", done: (d.experience || []).length > 0 },
+        { label: "Full Name", done: (d.personalInfo?.fullName || "").length > 2 },
+        { label: "Target Title", done: !!d.personalInfo?.title },
+        { label: "Contact Info", done: !!d.personalInfo?.email && !!d.personalInfo?.phone },
+        { label: "Pro Summary", done: (d.personalInfo?.summary || "").length > 50 },
+        { label: "Work History", done: (d.experience || []).length > 0 },
         { label: "Education", done: (d.education || []).length > 0 },
-        { label: "Skills", done: (d.skills || []).length >= 3 },
-        { label: "Projects", done: (d.projects || []).length > 0 },
-        { label: "Links", done: (d.socialLinks || []).length > 0 },
-        { label: "Job Title", done: !!d.personalInfo?.title },
+        { label: "Core Skills", done: (d.skills || []).length >= 5 },
+        { label: "Notable Projects", done: (d.projects || []).length > 0 },
+        { label: "Social Presence", done: (d.socialLinks || []).length > 0 },
     ];
     const done = checks.filter(c => c.done).length;
     return { score: Math.round((done / checks.length) * 100), checks };
 }
 
-export default function ResumeEditor({ resume, userId, userAiKeysData, preferredProvider = "gemini" }: { resume: any; userId: string; userAiKeysData?: { gemini: boolean, openai: boolean }; preferredProvider?: string }) {
+export default function ResumeEditor({ resume, userId }: { resume: any; userId: string; }) {
     const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
     const [activeSection, setActiveSection] = useState("personal");
-    const [hasGemini, setHasGemini] = useState(userAiKeysData?.gemini || false);
-    const [hasOpenai, setHasOpenai] = useState(userAiKeysData?.openai || false);
-    const [activeProvider, setActiveProvider] = useState<"gemini" | "openai">(preferredProvider as any);
-    const [showProviderMenu, setShowProviderMenu] = useState(false);
-    const providerMenuRef = useRef<HTMLDivElement>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
-    const [isDownloadingDocx, setIsDownloadingDocx] = useState(false);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [noKeyToast, setNoKeyToast] = useState(false);
-    const [interviewQuestions, setInterviewQuestions] = useState<string[]>([]);
-    const [isPredicting, setIsPredicting] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
     const [showShortcuts, setShowShortcuts] = useState(false);
     const [showScore, setShowScore] = useState(false);
     const [showTypography, setShowTypography] = useState(false);
     const [showLayout, setShowLayout] = useState(false);
     const [hiddenSections, setHiddenSections] = useState<Set<string>>(new Set());
     const [copyToast, setCopyToast] = useState(false);
-    const [aiStatus, setAiStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
-    const [showImportModal, setShowImportModal] = useState(false);
-    const [importText, setImportText] = useState("");
-    const [isImporting, setIsImporting] = useState(false);
-    const [importError, setImportError] = useState("");
     const previewRef = useRef<HTMLDivElement>(null);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
-    const [showTemplateMenu, setShowTemplateMenu] = useState(false);
     const moreMenuRef = useRef<HTMLDivElement>(null);
+    const [showTemplateMenu, setShowTemplateMenu] = useState(false);
     const templateMenuRef = useRef<HTMLDivElement>(null);
 
     const [resumeData, setResumeData] = useState(() => {
@@ -129,20 +110,9 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
         };
     });
 
-    useEffect(() => {
-        // Sync the state if props update
-        if (userAiKeysData) {
-            setHasGemini(userAiKeysData.gemini);
-            setHasOpenai(userAiKeysData.openai);
-        }
-    }, [userAiKeysData]);
-
     // Close menus on outside click
     useEffect(() => {
         const handler = (e: MouseEvent) => {
-            if (providerMenuRef.current && !providerMenuRef.current.contains(e.target as Node)) {
-                setShowProviderMenu(false);
-            }
             if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
                 setShowMoreMenu(false);
             }
@@ -152,7 +122,7 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
         };
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
-    }, [showProviderMenu, showMoreMenu, showTemplateMenu]);
+    }, [showMoreMenu, showTemplateMenu]);
 
     // Auto-save
     useEffect(() => {
@@ -186,10 +156,6 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
             if ((e.ctrlKey || e.metaKey) && e.key === "p") {
                 e.preventDefault(); downloadPDF();
             }
-            // Ctrl/Cmd + D → dark mode toggle
-            if ((e.ctrlKey || e.metaKey) && e.key === "d") {
-                e.preventDefault(); setDarkMode(v => !v);
-            }
             // Ctrl/Cmd + ? → shortcuts
             if ((e.ctrlKey || e.metaKey) && e.key === "/") {
                 e.preventDefault(); setShowShortcuts(v => !v);
@@ -201,90 +167,85 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
         return () => window.removeEventListener("keydown", handler);
     }, [resumeData]);
 
-    // ── Import resume from pasted text ──────────────────────────────────────
-    const handleImportText = async () => {
-        if (!importText.trim()) return;
-        const anyKey = hasGemini || hasOpenai;
-        if (!anyKey) {
-            setImportError("Please add an AI API key in the Dashboard first.");
-            return;
-        }
-        setIsImporting(true);
-        setImportError("");
-        try {
-            const res = await fetch("/api/parse-text", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    provider: activeProvider,
-                    text: importText,
-                }),
-            });
-            const parsed = await res.json();
-            if (!res.ok) throw new Error(parsed.error || "Parse failed");
-            setResumeData((prev: any) => ({
-                ...prev,
-                personalInfo: parsed.personalInfo ?? prev.personalInfo,
-                experience: parsed.experience?.length ? parsed.experience : prev.experience,
-                education: parsed.education?.length ? parsed.education : prev.education,
-                skills: parsed.skills?.length ? parsed.skills : prev.skills,
-                projects: parsed.projects?.length ? parsed.projects : prev.projects,
-                certifications: parsed.certifications?.length ? parsed.certifications : prev.certifications,
-                languages: parsed.languages?.length ? parsed.languages : prev.languages,
-                socialLinks: parsed.socialLinks?.length ? parsed.socialLinks : prev.socialLinks,
-            }));
-            setShowImportModal(false);
-            setImportText("");
-        } catch (e: any) {
-            setImportError(e.message || "Something went wrong, please try again.");
-        } finally {
-            setIsImporting(false);
-        }
-    };
 
-    // ── PDF download ────────────────────────────────────────────────────────
+
+    // ── PDF download ──────────────────────────────────────────────────────
     const downloadPDF = async () => {
-        if (!previewRef.current) return;
         setIsDownloading(true);
+        if (mobileView === "editor" && window.innerWidth < 768) {
+            setMobileView("preview");
+            await new Promise(r => setTimeout(r, 300));
+        }
         try {
-            const iframe = document.createElement("iframe");
-            iframe.style.cssText = "position:absolute;top:-99999px;left:-99999px;width:210mm;";
-            document.body.appendChild(iframe);
-            const doc = iframe.contentWindow?.document;
-            if (!doc) throw new Error("no doc");
-            const styles = Array.from(document.querySelectorAll("style,link[rel='stylesheet']")).map(s => s.outerHTML).join("");
-            doc.open();
-            doc.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${resumeData.title || "Resume"}</title>${styles}
-            <style>
-                @page{size:A4 portrait;margin:0}
-                body{margin:0;padding:0;background:#fff;-webkit-print-color-adjust:exact}
-                .paper-page{box-shadow:none!important;margin:0!important;width:210mm!important;min-height:297mm!important;
-                    padding:${resumeData.layout?.topMargin ?? 15}mm ${resumeData.layout?.rightMargin ?? 20}mm ${resumeData.layout?.bottomMargin ?? 15}mm ${resumeData.layout?.leftMargin ?? 20}mm!important}
-                .no-print{display:none!important}
-            </style></head><body>${previewRef.current.innerHTML}</body></html>`);
-            doc.close();
-            await new Promise(r => setTimeout(r, 900));
-            iframe.contentWindow?.print();
-            setTimeout(() => { document.body.removeChild(iframe); setIsDownloading(false); }, 1000);
-        } catch (e) { console.error("PDF error", e); setIsDownloading(false); }
+            // html2canvas-pro supports oklch/lab (DaisyUI v5)
+            // @ts-ignore
+            const html2canvasPro = (await import("html2canvas-pro")).default;
+            const { jsPDF } = await import("jspdf");
+
+            const paper = document.querySelector('.paper-page') as HTMLElement;
+            const wrapper = document.querySelector('.pdf-export-wrapper') as HTMLElement;
+            if (!paper || !wrapper) throw new Error("Preview not found");
+
+            // Temporarily reset the CSS scale transform so html2canvas captures at full A4 resolution
+            const prevTransform = wrapper.style.transform;
+            wrapper.style.transform = "none";
+            await new Promise(r => setTimeout(r, 80));
+
+            const canvas = await html2canvasPro(paper, {
+                scale: 2,
+                useCORS: true,
+                width: 794,
+                windowWidth: 794,
+                scrollX: 0,
+                scrollY: 0,
+            });
+
+            wrapper.style.transform = prevTransform;
+
+            // Slice canvas into A4 pages
+            const A4_W_MM = 210;
+            const A4_H_MM = 297;
+            const MM_PER_PX = A4_W_MM / canvas.width; // mm per canvas pixel
+            const A4_H_PX = Math.round(A4_H_MM / MM_PER_PX); // pixels that equal one A4 page height
+
+            const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+            const totalHeightPX = canvas.height;
+            let offsetPX = 0;
+            let pageIdx = 0;
+
+            while (offsetPX < totalHeightPX) {
+                if (pageIdx > 0) pdf.addPage();
+                const remainingPX = totalHeightPX - offsetPX;
+                // Skip tiny trailing pages (< 10mm of content)
+                if (remainingPX < Math.round(10 / MM_PER_PX)) break;
+
+                // Slice this page from the canvas
+                const sliceCanvas = document.createElement('canvas');
+                sliceCanvas.width = canvas.width;
+                sliceCanvas.height = Math.min(A4_H_PX, remainingPX);
+                const ctx = sliceCanvas.getContext('2d')!;
+                ctx.drawImage(canvas, 0, offsetPX, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+
+                const sliceImg = sliceCanvas.toDataURL('image/jpeg', 0.98);
+                const sliceHeightMM = sliceCanvas.height * MM_PER_PX;
+                pdf.addImage(sliceImg, 'JPEG', 0, 0, A4_W_MM, sliceHeightMM);
+
+                offsetPX += A4_H_PX;
+                pageIdx++;
+            }
+
+            const safeTitle = (resumeData.title || "Resume").replace(/[^a-zA-Z0-9.\-_]/g, '_');
+            pdf.save(`${safeTitle}.pdf`);
+
+        } catch (e) {
+            console.error("PDF error", e);
+            alert("PDF generation failed. Use Ctrl+P to print as PDF instead.");
+        } finally {
+            setIsDownloading(false);
+        }
     };
 
-    // ── DOCX download ───────────────────────────────────────────────────────
-    const downloadDocx = async () => {
-        setIsDownloadingDocx(true);
-        try {
-            const blob = await generateDocx(resumeData);
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url; a.download = `${resumeData.title || "resume"}.docx`;
-            document.body.appendChild(a); a.click(); a.remove();
-            URL.revokeObjectURL(url);
-        } catch (e) { alert("DOCX failed."); }
-        finally { setIsDownloadingDocx(false); }
-    };
-
-    // ── Copy as plain text ──────────────────────────────────────────────────
-    const copyAsText = () => {
+    const getTxtContent = () => {
         const p = resumeData.personalInfo || {};
         const lines: string[] = [
             p.fullName || "", p.title || "",
@@ -306,16 +267,27 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
             lines.push("", "EDUCATION");
             for (const e of resumeData.education) lines.push(`${e.degree} – ${e.schoolName} (${e.startDate}–${e.endDate})`);
         }
-        navigator.clipboard.writeText(lines.join("\n"));
+        return lines.join("\n");
+    };
+
+    const copyAsText = () => {
+        navigator.clipboard.writeText(getTxtContent());
         setCopyToast(true);
         setTimeout(() => setCopyToast(false), 2500);
+    };
+
+    const downloadTxt = () => {
+        const a = document.createElement("a");
+        a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(getTxtContent());
+        a.download = `${(resumeData.title || "resume").replace(/[^a-zA-Z0-9.\-_]/g, '_')}.txt`;
+        document.body.appendChild(a); a.click(); a.remove();
     };
 
     // ── Export JSON ─────────────────────────────────────────────────────────
     const exportJson = () => {
         const a = document.createElement("a");
         a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(resumeData, null, 2));
-        a.download = `${resumeData.title || "resume"}.json`;
+        a.download = `${(resumeData.title || "resume").replace(/[^a-zA-Z0-9.\-_]/g, '_')}.json`;
         document.body.appendChild(a); a.click(); a.remove();
     };
 
@@ -328,23 +300,7 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
         });
     };
 
-    const checkAiKey = async () => {
-        const hasKey = activeProvider === "gemini" ? hasGemini : hasOpenai;
-        if (!hasKey) { setAiStatus("invalid"); return; }
-        setAiStatus("checking");
-        try {
-            const res = await fetch("/api/generate", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    provider: activeProvider,
-                    section: "personal",
-                    currentContent: "Hi, just a ping.",
-                }),
-            });
-            setAiStatus(res.ok ? "valid" : "invalid");
-        } catch { setAiStatus("invalid"); }
-    };
+
 
     const updateLayout = (field: string, value: any) => {
         setResumeData((prev: any) => ({
@@ -370,7 +326,6 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
         }));
     };
 
-    const showNoKey = () => { setNoKeyToast(true); setTimeout(() => setNoKeyToast(false), 4000); };
 
     const renderForm = () => {
         const bind = (key: keyof typeof resumeData) => ({
@@ -393,6 +348,7 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
             case "languages": return <Languages          {...bind("languages")} />;
             case "socials": return <Socials             {...bind("socialLinks")} />;
             case "custom": return <CustomSection      {...bind("customSection")} />;
+
             case "layout": return <LayoutSettings
                 data={{ ...resumeData.layout, themeColor: resumeData.themeColor, fontSize: resumeData.fontSize, templateId: resumeData.templateId }}
                 onChange={(d: any) => setResumeData((p: any) => ({
@@ -403,16 +359,6 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
                     layout: { ...d, sectionAlignment: p.layout?.sectionAlignment }, // Preserve granular alignments
                 }))}
             />;
-            case "ai-tools": return (
-                <CareerTools
-                    data={resumeData}
-                    interviewQuestions={interviewQuestions}
-                    setInterviewQuestions={setInterviewQuestions}
-                    isPredicting={isPredicting}
-                    setIsPredicting={setIsPredicting}
-                    provider={activeProvider}
-                />
-            );
             default: return null;
         }
     };
@@ -422,372 +368,157 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
     const wordCount = JSON.stringify(resumeData.personalInfo || {}).split(/\s+/).length
         + (resumeData.experience || []).reduce((a: number, e: any) => a + (e.description || "").split(/\s+/).length, 0);
 
-    const bg = darkMode ? "#1e1e2e" : "#f5f4f0";
-    const editorBg = darkMode ? "#2a2a3e" : "white";
 
     return (
-        <div className="flex flex-col h-screen overflow-hidden" style={{ background: bg }}>
+        <div className="flex flex-col h-screen overflow-hidden bg-base-300 text-base-content selection:bg-primary/30">
 
             {/* ── Header ─────────────────────────────────────────────────── */}
-            <header className="shrink-0 h-14 border-b flex items-center justify-between px-4 shadow-sm z-50"
-                style={{ background: editorBg, borderColor: darkMode ? "#3a3a5c" : "#e2e8f0" }}>
-                <div className="flex items-center gap-3">
-                    <Link href="/dashboard" className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors text-stone-500">
+            <header className="shrink-0 h-14 border-b flex items-center justify-between px-3 sm:px-4 shadow-sm z-50 print:hidden bg-base-100/90 backdrop-blur-xl border-base-content/10">
+                <div className="flex items-center gap-2 sm:gap-3 overflow-hidden shrink-0 min-w-0">
+                    <Link href="/dashboard" className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-base-content/10 transition-colors text-base-content/60 shrink-0">
                         <ArrowLeft className="w-4 h-4" />
                     </Link>
-                    <div>
+                    <div className="min-w-0 hidden sm:block">
                         <input
                             type="text"
                             value={resumeData.title}
                             onChange={e => setResumeData((p: any) => ({ ...p, title: e.target.value }))}
-                            className="block text-sm font-bold bg-transparent border-none outline-none w-36 sm:w-48 truncate"
-                            style={{ color: darkMode ? "#e2e8f0" : "#1e293b" }}
+                            className="block text-sm font-bold bg-transparent border-none outline-none w-28 sm:w-48 truncate text-base-content placeholder-base-content/40"
                             placeholder="My Resume"
                         />
-                        <p className="text-[10px] text-stone-400 leading-none mt-0.5 flex items-center gap-1">
-                            {isSaving ? <><Loader2 className="w-2.5 h-2.5 animate-spin" /> Saving…</> : <><CheckCircle2 className="w-2.5 h-2.5 text-green-500" /> Saved</>}
-                            <span className="mx-1">·</span>
-                            <span className="text-stone-400">{wordCount}w</span>
+                        <p className="text-[9px] sm:text-[10px] text-base-content/50 font-medium leading-none mt-0.5 flex items-center gap-1">
+                            {isSaving ? <><Loader2 className="w-2.5 h-2.5 animate-spin" /> Saving…</> : <><CheckCircle2 className="w-2.5 h-2.5 text-success" /> Saved</>}
+                            <span className="text-base-content/20">|</span> <span>{wordCount}w</span>
                         </p>
                     </div>
-                    {/* Import from text */}
-                    <button
-                        onClick={() => setShowImportModal(true)}
-                        title="Import resume from pasted text (AI)"
-                        className="hidden sm:flex items-center gap-1.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs font-bold px-3 py-1.5 rounded-xl transition-all"
-                    >
-                        <ClipboardPaste className="w-3.5 h-3.5" />
-                        Import
-                    </button>
                 </div>
 
-                <div className="flex items-center gap-1.5">
-                    {/* Mobile toggle */}
-                    <div className="flex md:hidden bg-stone-100 rounded-xl p-1 gap-1">
-                        <button onClick={() => setMobileView("editor")}
-                            className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${mobileView === "editor" ? "bg-white shadow text-stone-800" : "text-stone-400"}`}>
-                            <FileText className="w-3 h-3" /> Edit
-                        </button>
-                        <button onClick={() => setMobileView("preview")}
-                            className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${mobileView === "preview" ? "bg-white shadow text-stone-800" : "text-stone-400"}`}>
-                            <Eye className="w-3 h-3" /> Preview
-                        </button>
-                    </div>
+                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none flex-1 justify-end min-w-0 ml-2">
+                    {/* 1. Template Picker removed from navbar */}
 
-                    {/* Spacer for removed utility nav — those are now in the sidebar */}
+                    <div className="w-px h-5 bg-base-content/10 mx-1 shrink-0" />
+                    {/* 2. Design/Layout Tab */}
+                    <button onClick={() => { setActiveSection("layout"); setMobileView("editor"); }}
+                        className="flex items-center gap-1.5 h-8 px-3 rounded-xl bg-secondary/10 hover:bg-secondary/20 text-secondary font-bold text-xs transition-colors shrink-0">
+                        <Sliders className="w-3.5 h-3.5" />
+                        <span className="hidden lg:inline">Design</span>
+                    </button>
 
-                    {/* Score badge */}
+                    <div className="w-px h-5 bg-base-content/10 mx-1 shrink-0" />
+
+                    {/* 3. Score */}
                     <button onClick={() => setShowScore(v => !v)}
-                        className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all"
-                        style={{ background: completeness.score >= 80 ? "#dcfce7" : "#fef9c3", color: completeness.score >= 80 ? "#16a34a" : "#ca8a04" }}>
+                        className={`flex items-center gap-1.5 h-8 px-2.5 rounded-lg font-bold text-xs transition-colors shrink-0 ${completeness.score >= 80 ? 'bg-success/10 text-success hover:bg-success/20' : 'bg-warning/10 text-warning hover:bg-warning/20'}`}>
                         <BarChart3 className="w-3.5 h-3.5" /> {completeness.score}%
                     </button>
 
-                    {/* Dark mode */}
-                    <button onClick={() => setDarkMode(v => !v)}
-                        className="hidden sm:flex w-8 h-8 items-center justify-center rounded-xl hover:bg-stone-100 text-stone-500 transition-colors">
-                        {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+
+                    <div className="w-px h-5 bg-base-content/10 mx-1 shrink-0" />
+
+                    {/* 5. Share */}
+                    <button onClick={() => { navigator.clipboard.writeText(window.location.href); alert("Editor link copied!"); }}
+                        title="Copy Share Link"
+                        className="flex w-8 h-8 items-center justify-center rounded-lg hover:bg-base-content/10 text-base-content/60 transition-colors shrink-0">
+                        <LinkIcon className="w-4 h-4" />
                     </button>
 
-                    {/* Export actions — Copy / DOCX / PDF in navbar */}
-                    <div className="hidden sm:flex items-center gap-1 bg-stone-100 rounded-xl p-1">
-                        <button onClick={copyAsText} title="Copy as plain text"
-                            className={`flex items-center gap-1.5 h-7 px-2.5 text-xs font-semibold rounded-lg transition-all ${copyToast ? "text-green-600 bg-white shadow-sm" : "text-stone-600 hover:bg-white hover:shadow-sm"
-                                }`}>
-                            {copyToast ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                            {copyToast ? "Copied!" : "Copy"}
-                        </button>
-                        <button onClick={downloadDocx} disabled={isDownloadingDocx}
-                            title="Download Word DOCX"
-                            className="flex items-center gap-1.5 h-7 px-2.5 text-xs font-semibold text-stone-600 hover:bg-white hover:shadow-sm rounded-lg transition-all disabled:opacity-50">
-                            {isDownloadingDocx ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
-                            DOCX
-                        </button>
-                        <button onClick={downloadPDF} disabled={isDownloading}
-                            className="flex items-center gap-1.5 h-7 px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all disabled:opacity-50 active:scale-95">
-                            {isDownloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-                            PDF
-                        </button>
-                    </div>
-
-                    {/* Typography Setting */}
-                    <div className="relative">
-                        <button onClick={() => { setShowTypography(!showTypography); setShowLayout(false); }}
-                            className={`hidden sm:flex w-8 h-8 items-center justify-center rounded-xl transition-all ${showTypography ? "bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200" : "hover:bg-stone-100 text-stone-500"}`}
-                            title="Typography & Sizing">
-                            <Type className="w-4 h-4" />
-                        </button>
-                        {showTypography && (
-                            <div className="absolute top-full mt-2 right-0 w-64 bg-white border border-stone-100 rounded-2xl shadow-2xl p-5 z-[100] animate-in fade-in slide-in-from-top-2">
-                                <h5 className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-4">Typography</h5>
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between items-center">
-                                            <label className="text-xs font-bold text-stone-800">Line Height</label>
-                                            <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">{resumeData.layout?.lineHeight || 1.45}</span>
-                                        </div>
-                                        <input type="range" min="1.0" max="2.0" step="0.05"
-                                            value={resumeData.layout?.lineHeight || 1.45}
-                                            onChange={e => updateLayout("lineHeight", parseFloat(e.target.value))}
-                                            className="w-full accent-indigo-600" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-stone-800">Preview Layout</label>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <button onClick={() => updateLayout("isBlindMode", !resumeData.layout?.isBlindMode)}
-                                                className={`py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${resumeData.layout?.isBlindMode ? "bg-emerald-600 text-white" : "bg-stone-50 text-stone-500"}`}>
-                                                Blind Mode
-                                            </button>
-                                            <button onClick={() => updateLayout("showGrid", !resumeData.layout?.showGrid)}
-                                                className={`py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${resumeData.layout?.showGrid ? "bg-indigo-600 text-white" : "bg-stone-50 text-stone-500"}`}>
-                                                Draft Grid
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        {showTypography && <div className="fixed inset-0 z-[90]" onClick={() => setShowTypography(false)} />}
-                    </div>
-
-                    {/* Layout Setting popup */}
-                    <div className="relative">
-                        <button onClick={() => { setShowLayout(!showLayout); setShowTypography(false); }}
-                            className={`hidden sm:flex w-8 h-8 items-center justify-center rounded-xl transition-all ${showLayout ? "bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200" : "hover:bg-stone-100 text-stone-500"}`}
-                            title="Template & Layout settings">
-                            <Layout className="w-4 h-4" />
-                        </button>
-                        {showLayout && (
-                            <div className="absolute top-full mt-2 right-0 w-[420px] bg-white border border-stone-100 rounded-2xl shadow-2xl p-6 z-[100] max-h-[85vh] overflow-y-auto animate-in fade-in slide-in-from-top-2">
-                                <h5 className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-4">Design & Templates</h5>
-                                <LayoutSettings
-                                    data={{ ...resumeData.layout, themeColor: resumeData.themeColor, fontSize: resumeData.fontSize, templateId: resumeData.templateId, sectionSpacing: resumeData.sectionSpacing }}
-                                    onChange={(d: any) => setResumeData((p: any) => ({
-                                        ...p,
-                                        themeColor: d.themeColor ?? p.themeColor,
-                                        fontSize: d.fontSize ?? p.fontSize,
-                                        templateId: d.templateId ?? p.templateId,
-                                        sectionSpacing: d.sectionSpacing ?? p.sectionSpacing,
-                                        layout: { ...d, sectionAlignment: p.layout?.sectionAlignment },
-                                    }))}
-                                />
-                            </div>
-                        )}
-                        {showLayout && <div className="fixed inset-0 z-[90]" onClick={() => setShowLayout(false)} />}
-                    </div>
-
-                    {/* Template selection dropdown */}
-                    <div ref={templateMenuRef} className="relative hidden sm:block">
-                        <button onClick={() => { setShowTemplateMenu(v => !v); setShowLayout(false); setShowTypography(false); setShowMoreMenu(false); setShowProviderMenu(false); }}
-                            className={`flex items-center gap-1.5 h-8 px-3 rounded-xl transition-all font-bold text-xs ${showTemplateMenu ? "bg-indigo-600 text-white shadow-md shadow-indigo-200" : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 ring-1 ring-indigo-200"}`}
-                            title="Choose Resume Template">
-                            <Layout className="w-4 h-4" />
-                            Templates
-                        </button>
-                        {showTemplateMenu && (
-                            <div className="absolute right-0 top-full mt-2 w-[540px] bg-white border border-stone-200 rounded-2xl shadow-2xl p-5 z-[110] animate-in fade-in zoom-in-95 duration-150 max-h-[75vh] overflow-y-auto">
-                                <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-4">Choose a Template</p>
-                                <div className="grid grid-cols-4 gap-4">
-                                    {TEMPLATES.map(t => (
-                                        <button key={t.id} onClick={() => { setResumeData((p: any) => ({ ...p, templateId: t.id })); setShowTemplateMenu(false); }}
-                                            className={`relative aspect-[3/4] flex flex-col rounded-xl overflow-hidden border-2 transition-all group ${resumeData.templateId === t.id ? 'border-indigo-600 ring-2 ring-indigo-600/20' : 'border-stone-200 hover:border-indigo-300'}`}>
-                                            <div className="flex-1 bg-stone-100 p-2 overflow-hidden items-center justify-center flex pointer-events-none transition-transform group-hover:scale-105">
-                                                <div className="w-full h-full bg-white shadow-sm overflow-hidden rounded-md border border-stone-200/50">
-                                                    {t.preview(resumeData.themeColor || "#0f172a")}
-                                                </div>
-                                            </div>
-                                            <div className="bg-white border-t border-stone-100 py-2 px-2 text-center h-8 flex items-center justify-center">
-                                                <span className={`text-[10px] font-bold ${resumeData.templateId === t.id ? 'text-indigo-600' : 'text-stone-600'}`}>
-                                                    {t.label}
-                                                </span>
-                                            </div>
-                                            {resumeData.templateId === t.id && (
-                                                <div className="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 bg-indigo-600 rounded-full shadow-sm">
-                                                    <CheckCircle className="w-2.5 h-2.5 text-white" />
-                                                </div>
-                                            )}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* More actions dropdown */}
-                    <div ref={moreMenuRef} className="relative hidden sm:block">
-                        <button onClick={() => setShowMoreMenu(v => !v)}
-                            className={`flex w-8 h-8 items-center justify-center rounded-xl transition-all ${showMoreMenu ? "bg-stone-200 text-stone-800" : "hover:bg-stone-100 text-stone-500"}`}
-                            title="More Actions">
+                    {/* 6. Settings Menu */}
+                    <div className="relative" ref={moreMenuRef}>
+                        <button onClick={() => setShowMoreMenu(v => !v)} title="Options"
+                            className="flex w-8 h-8 items-center justify-center rounded-lg hover:bg-base-content/10 text-base-content/60 transition-colors shrink-0">
                             <MoreHorizontal className="w-4 h-4" />
                         </button>
                         {showMoreMenu && (
-                            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-stone-200 rounded-2xl shadow-xl py-2 z-[110] animate-in fade-in zoom-in-95 duration-150">
-                                <p className="px-3 pb-1.5 pt-0.5 text-[10px] font-bold text-stone-400 uppercase tracking-widest">Additional Tools</p>
-
-                                <button onClick={() => { window.print(); setShowMoreMenu(false); }}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors">
-                                    <Printer className="w-4 h-4 text-stone-400" /> Print
+                            <div className="absolute right-0 top-full mt-2 w-48 bg-base-200 border border-base-content/10 rounded-2xl shadow-xl py-2 z-[110] animate-in fade-in">
+                                <button onClick={() => { if (confirm("Load demo data?")) setResumeData(INITIAL_DATA); setShowMoreMenu(false); }}
+                                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-info hover:bg-info/10 transition-colors">
+                                    <RefreshCcw className="w-4 h-4" /> Load Demo Data
                                 </button>
-
-                                <button onClick={() => {
-                                    navigator.clipboard.writeText(window.location.href);
-                                    alert("Editor link copied! Need pro tier for public sharing.");
-                                    setShowMoreMenu(false);
-                                }}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors">
-                                    <LinkIcon className="w-4 h-4 text-stone-400" /> Share Link
+                                <button onClick={() => { if (confirm("Clear ALL data?")) setResumeData({ title: "Blank Resume", personalInfo: {}, experience: [], education: [], skills: [], projects: [], socialLinks: [] }); setShowMoreMenu(false); }}
+                                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error/10 transition-colors">
+                                    <Trash2 className="w-4 h-4" /> Clear Template
                                 </button>
-
-                                <button onClick={() => { alert("Version history is a Pro feature."); setShowMoreMenu(false); }}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors">
-                                    <History className="w-4 h-4 text-stone-400" /> History
-                                </button>
-
-                                <div className="h-px bg-stone-100 my-1" />
-
-                                <button onClick={() => {
-                                    if (confirm("Load demo data? Current content will be lost.")) {
-                                        setResumeData(INITIAL_DATA);
-                                    }
-                                    setShowMoreMenu(false);
-                                }}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-stone-600 hover:bg-blue-50 hover:text-blue-700 transition-colors">
-                                    <RefreshCcw className="w-4 h-4 text-blue-400" /> Load Demo
-                                </button>
-
-                                <button onClick={() => {
-                                    if (confirm("Are you sure you want to clear EVERYTHING?")) {
-                                        setResumeData({ title: "Blank Resume", personalInfo: {}, experience: [], education: [], skills: [], projects: [], socialLinks: [] });
-                                    }
-                                    setShowMoreMenu(false);
-                                }}
-                                    className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                                    <Trash2 className="w-4 h-4" /> Clear All
+                                <div className="h-px bg-base-content/10 my-1" />
+                                <button onClick={() => { setMobileView(mobileView === "editor" ? "preview" : "editor"); setShowMoreMenu(false); }}
+                                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-base-content/70 md:hidden hover:bg-base-content/5 transition-colors">
+                                    <Layout className="w-4 h-4" /> Toggle Preview
                                 </button>
                             </div>
                         )}
                     </div>
 
-                    {/* AI Provider picker */}
-                    <div ref={providerMenuRef} className="relative hidden sm:block">
-                        <button
-                            onClick={() => setShowProviderMenu(v => !v)}
-                            title="Switch AI provider"
-                            className={`flex items-center gap-1.5 h-8 px-2.5 rounded-xl text-xs font-semibold transition-all border ${aiStatus === "valid" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                                aiStatus === "invalid" ? "bg-red-50 text-red-600 border-red-200" :
-                                    "bg-stone-50 text-stone-500 border-stone-200 hover:bg-stone-100"
-                                }`}
-                        >
-                            <span className={`w-2 h-2 rounded-full ${activeProvider === "gemini" ? "bg-blue-400" :
-                                activeProvider === "openai" ? "bg-emerald-500" : "bg-orange-400"
-                                }`} />
-                            <span className="capitalize">{activeProvider}</span>
-                            {aiStatus === "checking" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Brain className="w-3 h-3 opacity-50" />}
-                        </button>
+                    <div className="w-px h-5 bg-base-content/10 mx-1 shrink-0 hidden md:block" />
 
-                        {showProviderMenu && (
-                            <div className="absolute right-0 top-full mt-1.5 w-52 bg-white border border-stone-200 rounded-2xl shadow-xl py-2 z-[110] animate-in fade-in zoom-in-95 duration-150">
-                                <p className="px-3 pb-1.5 pt-0.5 text-[10px] font-bold text-stone-400 uppercase tracking-widest">Switch AI Provider</p>
-                                {([
-                                    { id: "gemini", label: "Google Gemini", emoji: "✨", hasKey: hasGemini, color: "bg-blue-400" },
-                                    { id: "openai", label: "OpenAI GPT", emoji: "⚙️", hasKey: hasOpenai, color: "bg-emerald-500" },
-                                ] as const).filter(p => !!p.hasKey).map(p => (
-                                    <button
-                                        key={p.id}
-                                        onClick={async () => {
-                                            setActiveProvider(p.id as "gemini" | "openai");
-                                            setShowProviderMenu(false);
-                                            setAiStatus("idle");
-                                            // Persist to database
-                                            try {
-                                                await fetch("/api/user", {
-                                                    method: "PATCH",
-                                                    headers: { "Content-Type": "application/json" },
-                                                    body: JSON.stringify({ preferredProvider: p.id }),
-                                                });
-                                            } catch { /* non-critical */ }
-                                        }}
-                                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${activeProvider === p.id
-                                            ? "bg-indigo-50 text-indigo-700 font-semibold"
-                                            : "hover:bg-stone-50 text-stone-700"
-                                            }`}
-                                    >
-                                        <span className={`w-2 h-2 rounded-full shrink-0 ${p.color}`} />
-                                        <span>{p.emoji} {p.label}</span>
-                                        {activeProvider === p.id && <CheckCircle className="w-3.5 h-3.5 ml-auto text-indigo-500" />}
-                                    </button>
-                                ))}
-                                <div className="border-t border-stone-100 mt-1.5 pt-1.5 px-3">
-                                    <button onClick={() => { checkAiKey(); setShowProviderMenu(false); }}
-                                        className="w-full text-xs text-stone-400 hover:text-indigo-600 transition-colors py-1 text-left font-medium">
-                                        Test connection →
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                    {/* 7. Copy TXT */}
+                    <button onClick={downloadTxt} title="Download TXT format"
+                        className="flex items-center gap-1 h-8 px-2 rounded-lg hover:bg-base-content/10 text-base-content/60 transition-colors shrink-0">
+                        <FileText className="w-4 h-4" />
+                        <span className="text-xs font-bold hidden xl:block">TXT</span>
+                    </button>
+
+                    {/* 9. Download PDF */}
+                    <button
+                        onClick={downloadPDF}
+                        disabled={isDownloading}
+                        title="Download PDF"
+                        className="flex items-center gap-2 h-9 px-4 rounded-xl font-bold text-xs text-white shrink-0 ml-2 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed select-none"
+                        style={{
+                            background: isDownloading
+                                ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+                                : 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+                            boxShadow: isDownloading ? 'none' : '0 0 16px rgba(99,102,241,0.55), 0 2px 8px rgba(0,0,0,0.18)',
+                        }}
+                    >
+                        {isDownloading
+                            ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /><span>Downloading…</span></>
+                            : <><Download className="w-3.5 h-3.5" /><span>Download PDF</span></>
+                        }
+                    </button>
 
                 </div>
             </header>
 
             {/* ── Body ───────────────────────────────────────────────────── */}
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden print:overflow-visible">
 
                 {/* Icon nav rail — desktop */}
-                <nav className="hidden md:flex flex-col items-center gap-1 py-4 px-1.5 border-r shrink-0 w-[66px] overflow-y-auto"
-                    style={{ background: editorBg, borderColor: darkMode ? "#3a3a5c" : "#e2e8f0" }}>
+                <nav className="hidden md:flex flex-col items-center gap-1 py-4 px-1.5 border-r shrink-0 w-[66px] overflow-y-auto print:hidden bg-base-200/50 backdrop-blur-xl border-base-content/10">
                     {SECTIONS.map(s => {
                         const hidden = hiddenSections.has(s.id);
                         return (
                             <button key={s.id} title={s.label} onClick={() => setActiveSection(s.id)}
-                                className={`relative w-12 h-12 flex flex-col items-center justify-center rounded-2xl transition-all duration-200 group ${activeSection === s.id
-                                    ? "bg-indigo-50 ring-2 ring-indigo-300 scale-105 text-indigo-600"
+                                className={`relative w-12 h-12 flex flex-col items-center justify-center rounded-2xl transition-all duration-300 group ${activeSection === s.id
+                                    ? "bg-primary/20 ring-1 ring-primary/50 scale-105 text-primary shadow-[0_0_15px_rgba(139,92,246,0.3)]"
                                     : hidden
-                                        ? "text-stone-300 hover:text-stone-500"
-                                        : "text-stone-400 hover:bg-stone-50 hover:text-stone-700"
+                                        ? "text-base-content/30 hover:text-base-content/50"
+                                        : "text-base-content/50 hover:bg-base-content/10 hover:text-base-content"
                                     }`}>
                                 <s.icon className="w-5 h-5" />
-                                {hidden && <div className="absolute bottom-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                                {hidden && <div className="absolute bottom-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-warning" />}
                             </button>
                         );
                     })}
-
-                    {/* Divider */}
-                    <div className="w-8 h-px my-1" style={{ background: darkMode ? "#3a3a5c" : "#e2e8f0" }} />
-
-                    {/* Layout & AI Tools */}
-                    {UTILITY_SECTIONS.map(s => (
-                        <button key={s.id} title={s.label} onClick={() => setActiveSection(s.id)}
-                            className={`relative w-12 h-12 flex flex-col items-center justify-center rounded-2xl transition-all duration-200 group ${activeSection === s.id
-                                ? "bg-indigo-50 ring-2 ring-indigo-300 scale-105 text-indigo-600"
-                                : "text-stone-400 hover:bg-stone-50 hover:text-stone-700"
-                                }`}>
-                            <s.icon className="w-5 h-5" />
-                        </button>
-                    ))}
                 </nav>
 
                 {/* Editor panel */}
-                <aside className={`flex-col w-full md:w-[420px] lg:w-[460px] shrink-0 border-r overflow-hidden ${mobileView === "preview" ? "hidden md:flex" : "flex"}`}
-                    style={{ background: editorBg, borderColor: darkMode ? "#3a3a5c" : "#e2e8f0" }}>
+                <aside className={`flex-col w-full md:w-[420px] lg:w-[460px] shrink-0 border-r overflow-hidden print:hidden bg-base-100/90 backdrop-blur-2xl border-base-content/10 ${mobileView === "preview" ? "hidden md:flex" : "flex"}`}>
 
                     {/* Section header with hide toggle */}
-                    <div className="shrink-0 px-5 pt-4 pb-3 border-b flex items-center gap-3"
-                        style={{ borderColor: darkMode ? "#3a3a5c" : "#f1f5f9" }}>
-                        <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
-                            <current.icon style={{ width: 18, height: 18 }} className="text-indigo-500" />
+                    <div className="shrink-0 px-5 pt-4 pb-3 border-b border-base-content/5 flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                            <current.icon style={{ width: 18, height: 18 }} className="text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <h2 className="text-base font-bold" style={{ color: darkMode ? "#e2e8f0" : "#1e293b" }}>{current.label}</h2>
-                            <p className="text-xs text-stone-400">{SECTION_HINTS[activeSection] || ""}</p>
+                            <h2 className="text-base font-bold text-base-content tracking-tight">{current.label}</h2>
+                            <p className="text-xs text-base-content/50">{SECTION_HINTS[activeSection] || ""}</p>
                         </div>
                         {/* Hide/show section from resume */}
                         {SECTIONS.some(s => s.id === activeSection) && (
                             <button onClick={() => toggleSection(activeSection)}
                                 title={hiddenSections.has(activeSection) ? "Show on resume" : "Hide from resume"}
                                 className={`p-2 rounded-xl transition-colors text-xs flex items-center gap-1 ${hiddenSections.has(activeSection)
-                                    ? "bg-amber-50 text-amber-600 hover:bg-amber-100"
-                                    : "hover:bg-stone-100 text-stone-400"
+                                    ? "bg-warning/20 text-warning hover:bg-warning/30"
+                                    : "hover:bg-base-content/10 text-base-content/50"
                                     }`}>
                                 <EyeOff className="w-4 h-4" />
                                 <span className="hidden sm:inline text-[10px] font-semibold">
@@ -797,63 +528,65 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
                         )}
                     </div>
 
-                    {/* AI key missing banner */}
-                    {!(hasGemini || hasOpenai) && (
-                        <div className="shrink-0 mx-4 mt-3 flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700">
-                            <Sparkles className="w-3.5 h-3.5 shrink-0 text-amber-500" />
-                            <span>AI off. <Link href="/dashboard" className="font-bold underline">Add a key in Dashboard → Settings</Link></span>
-                        </div>
-                    )}
 
-                    {/* Mobile section pills */}
-                    <div className="md:hidden shrink-0 flex gap-1.5 px-4 pt-3 pb-1 flex-wrap">
+
+                    {/* Mobile section pills - horizontally scrollable for better UX */}
+                    <div className="md:hidden shrink-0 flex gap-2 px-4 py-3 border-b border-base-content/5 overflow-x-auto scrollbar-none bg-base-100/50 backdrop-blur-md">
                         {ALL_SECTIONS.map(s => (
                             <button key={s.id} onClick={() => setActiveSection(s.id)}
-                                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeSection === s.id ? "bg-indigo-600 text-white" : "bg-stone-100 text-stone-500"}`}>
-                                <s.icon className="w-3 h-3" /> {s.label}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${activeSection === s.id
+                                    ? "bg-primary text-primary-content border-primary shadow-[0_0_10px_rgba(139,92,246,0.3)]"
+                                    : "bg-base-200 text-base-content/70 border-base-content/10 hover:border-primary/50"}`}>
+                                <s.icon className="w-3.5 h-3.5" />
+                                {s.label}
                             </button>
                         ))}
                     </div>
 
                     {/* Form */}
-                    <div className="flex-1 overflow-y-auto px-5 py-4 pb-24">
-                        <div key={activeSection} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="flex-1 overflow-y-auto px-5 py-4 pb-24 scrollbar-thin scrollbar-thumb-base-content/10 scrollbar-track-transparent">
+                        <div key={activeSection} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                             {renderForm()}
                         </div>
                     </div>
                 </aside>
 
                 {/* Preview pane */}
-                <section className={`flex-1 flex-col overflow-hidden ${mobileView === "editor" ? "hidden md:flex" : "flex"}`}
-                    style={{ background: darkMode ? "#161625" : "#e8e6e1" }}>
+                <section className={`flex-1 flex-col overflow-hidden print:overflow-visible print:!flex ${mobileView === "editor" ? "hidden md:flex" : "flex"} bg-base-300/50 relative`}>
+
+                    {/* Background glow for preview */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] bg-primary/10 rounded-full blur-[120px] pointer-events-none print:hidden" />
+                    <div className="absolute top-0 right-0 w-[30vw] h-[30vw] bg-secondary/10 rounded-full blur-[100px] pointer-events-none print:hidden" />
+
                     {/* Preview toolbar — all export actions live here, not on the canvas */}
-                    <div className="shrink-0 flex items-center justify-between px-5 py-2 border-b"
-                        style={{ background: editorBg, borderColor: darkMode ? "#3a3a5c" : "#e2e8f0" }}>
+                    <div className="shrink-0 flex items-center justify-between px-5 py-2 border-b print:hidden bg-base-100/60 backdrop-blur-xl border-base-content/10 z-10">
                         <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1.5 text-xs text-stone-500 font-medium">
+                            <div className="flex items-center gap-1.5 text-xs text-base-content/60 font-medium tracking-wide">
                                 <Eye className="w-3.5 h-3.5" /> Live Preview
                             </div>
                             {/* Zoom controls */}
-                            <div className="flex items-center gap-1.5 bg-stone-100 px-2 py-1 rounded-lg ml-2">
-                                <button onClick={() => updateLayout("scale", Math.max(0.4, (resumeData.layout?.scale || 1) - 0.1))} className="text-stone-400 hover:text-stone-600">
+                            <div className="flex items-center gap-1.5 bg-base-200/50 border border-base-content/10 px-2 py-1 rounded-lg ml-2">
+                                <button onClick={() => updateLayout("scale", Math.max(0.4, (resumeData.layout?.scale || 1) - 0.1))} className="text-base-content/50 hover:text-base-content">
                                     <ChevronLeft className="w-3 h-3" />
                                 </button>
-                                <span className="text-[10px] font-bold text-stone-500 w-8 text-center">{Math.round((resumeData.layout?.scale || 1) * 100)}%</span>
-                                <button onClick={() => updateLayout("scale", Math.min(1.5, (resumeData.layout?.scale || 1) + 0.1))} className="text-stone-400 hover:text-stone-600">
+                                <span className="text-[10px] font-bold text-base-content/70 w-10 text-center">
+                                    {resumeData.layout?.scale ? `${Math.round(resumeData.layout.scale * 100)}%` : 'Auto'}
+                                </span>
+                                <button onClick={() => updateLayout("scale", Math.min(1.5, (resumeData.layout?.scale || 1) + 0.1))} className="text-base-content/50 hover:text-base-content">
                                     <Plus className="w-3 h-3" />
                                 </button>
                             </div>
                         </div>
                         {/* Export actions — clean, always visible, no floating overlay */}
                         <div className="flex items-center gap-1.5">
-                            <div className="flex items-center gap-1.5 text-[10px] text-stone-400 mr-1 hidden lg:flex">
+                            <div className="flex items-center gap-1.5 text-[10px] text-base-content/40 mr-1 hidden lg:flex font-medium">
                                 <Clock className="w-3 h-3" />
                                 ~{Math.max(1, Math.round(wordCount / 200))} min read
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 overflow-y-auto flex items-start justify-center p-6 lg:p-10">
-                        <div ref={previewRef} className="shadow-2xl rounded-sm overflow-hidden">
+                    <div className="flex-1 overflow-y-auto flex items-start justify-center p-2 sm:p-6 lg:p-10 print:p-0 print:overflow-visible text-black print:bg-white print:block relative z-10 scrollbar-thin scrollbar-thumb-base-content/20 scrollbar-track-transparent">
+                        <div ref={previewRef} className="shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden w-full max-w-fit flex justify-center print:shadow-none print:max-w-none print:w-auto print:block transition-all duration-300">
                             <ResumePreview data={resumeData} hiddenSections={hiddenSections} />
                         </div>
                     </div>
@@ -861,102 +594,53 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
             </div>
 
             {/* ── Mobile bottom nav ─────────────────────────────────────── */}
-            <div className="md:hidden shrink-0 flex items-center justify-around h-14 bg-white border-t border-stone-200 px-1">
-                {SECTIONS.slice(0, 3).map(s => (
+            <div className="md:hidden shrink-0 grid grid-cols-5 items-center h-16 bg-base-100/90 backdrop-blur-xl border-t border-base-content/10 px-2 shadow-[0_-10px_30px_rgba(0,0,0,0.3)] print:hidden relative z-50">
+                {SECTIONS.slice(0, 4).map(s => (
                     <button key={s.id} onClick={() => { setActiveSection(s.id); setMobileView("editor"); }}
-                        className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all ${activeSection === s.id && mobileView === "editor" ? "text-indigo-600" : "text-stone-400"}`}>
-                        <s.icon className="w-5 h-5" />
-                        <span className="text-[8px] font-semibold">{s.label}</span>
+                        className={`flex flex-col items-center justify-center gap-1 h-full transition-all ${activeSection === s.id && mobileView === "editor" ? "text-primary" : "text-base-content/50"}`}>
+                        <div className={`p-1.5 rounded-lg transition-all ${activeSection === s.id && mobileView === "editor" ? "bg-primary/20 shadow-[0_0_10px_rgba(139,92,246,0.3)]" : ""}`}>
+                            <s.icon className="w-5 h-5" />
+                        </div>
+                        <span className="text-[8px] font-black uppercase tracking-wider">{s.label.split(' ')[0]}</span>
                     </button>
                 ))}
 
                 <button onClick={() => setMobileView(mobileView === "preview" ? "editor" : "preview")}
-                    className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all ${mobileView === "preview" ? "text-indigo-600" : "text-stone-400"}`}>
-                    <Eye className="w-5 h-5" />
-                    <span className="text-[8px] font-semibold">Preview</span>
+                    className={`flex flex-col items-center justify-center gap-1 h-full transition-all ${mobileView === "preview" ? "text-primary" : "text-base-content/50"}`}>
+                    <div className={`p-1.5 rounded-lg transition-all ${mobileView === "preview" ? "bg-primary/20 shadow-[0_0_10px_rgba(139,92,246,0.3)]" : ""}`}>
+                        <Eye className="w-5 h-5" />
+                    </div>
+                    <span className="text-[8px] font-black uppercase tracking-wider">Preview</span>
                 </button>
             </div>
 
-            {/* ── Import from text modal ──────────────────────────────── */}
-            {showImportModal && (
-                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4"
-                    style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)" }}
-                    onClick={() => setShowImportModal(false)}>
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 animate-in zoom-in-90 duration-200" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-start justify-between mb-4">
-                            <div>
-                                <h3 className="text-lg font-black text-stone-900 flex items-center gap-2">
-                                    <ClipboardPaste className="w-5 h-5 text-indigo-500" />
-                                    Import from Text
-                                </h3>
-                                <p className="text-xs text-stone-400 mt-0.5">Paste your old resume and AI will auto-fill all fields</p>
-                            </div>
-                            <button onClick={() => setShowImportModal(false)} className="text-stone-400 hover:text-stone-600 transition-colors text-xl leading-none">✕</button>
-                        </div>
 
-                        {importError && (
-                            <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-xs font-medium px-3 py-2.5 rounded-xl mb-4">
-                                <AlertCircle className="w-4 h-4 shrink-0" />
-                                {importError}
-                            </div>
-                        )}
-
-                        <textarea
-                            value={importText}
-                            onChange={e => setImportText(e.target.value)}
-                            placeholder="Paste your resume here... (plain text, LinkedIn About section, Word doc content, etc.)"
-                            rows={10}
-                            className="w-full text-xs text-stone-700 bg-stone-50 border border-stone-200 rounded-2xl p-4 resize-none outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all"
-                        />
-                        <p className="text-[10px] text-stone-400 mt-2 mb-4">
-                            ⚡ Tip: Copy-paste from Word, Google Docs, or LinkedIn — AI handles the rest
-                        </p>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setShowImportModal(false)}
-                                className="flex-1 py-2.5 rounded-2xl border border-stone-200 text-sm font-semibold text-stone-500 hover:bg-stone-50 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleImportText}
-                                disabled={isImporting || !importText.trim()}
-                                className="flex-1 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                            >
-                                {isImporting ? <><Loader2 className="w-4 h-4 animate-spin" /> Parsing with AI...</> : <><Sparkles className="w-4 h-4" /> Auto-fill Resume</>}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* ── Completeness score overlay ──────────────────────────── */}
             {showScore && (
-                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4"
-                    style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }}
+                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
                     onClick={() => setShowScore(false)}>
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 animate-in zoom-in-90 duration-200" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-lg font-black text-stone-900 mb-1">Resume Score</h3>
-                        <p className="text-xs text-stone-400 mb-4">Fill each section to improve ATS readiness</p>
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="relative w-20 h-20 shrink-0">
+                    <div className="bg-base-200 border border-base-content/10 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-sm p-8 animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-xl font-black text-base-content mb-2 tracking-tight">Resume Score</h3>
+                        <p className="text-sm text-base-content/60 mb-6 font-medium">Fill each section to improve ATS readiness</p>
+                        <div className="flex items-center gap-5 mb-8">
+                            <div className="relative w-24 h-24 shrink-0">
                                 <svg className="w-full h-full -rotate-90">
-                                    <circle cx="40" cy="40" r="34" stroke="#f1f5f9" strokeWidth="6" fill="transparent" />
-                                    <circle cx="40" cy="40" r="34" stroke={completeness.score >= 80 ? "#22c55e" : "#6366f1"} strokeWidth="6" fill="transparent"
-                                        strokeDasharray={213.6} strokeDashoffset={213.6 - (213.6 * completeness.score) / 100}
-                                        className="transition-all duration-700" />
+                                    <circle cx="48" cy="48" r="42" className="stroke-base-content/5" strokeWidth="8" fill="transparent" />
+                                    <circle cx="48" cy="48" r="42" className={completeness.score >= 80 ? "stroke-success" : "stroke-primary"} strokeWidth="8" fill="transparent"
+                                        strokeDasharray={263.89} strokeDashoffset={263.89 - (263.89 * completeness.score) / 100}
+                                        style={{ transition: "stroke-dashoffset 1s ease-out, stroke 0.5s ease" }} />
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-xl font-black text-stone-900">{completeness.score}</span>
-                                    <span className="text-[8px] font-bold text-stone-400 uppercase">%</span>
+                                    <span className="text-3xl font-black text-base-content">{completeness.score}</span>
+                                    <span className="text-[10px] font-bold text-base-content/40 uppercase">%</span>
                                 </div>
                             </div>
-                            <div className="flex-1 space-y-2">
+                            <div className="flex-1 space-y-3">
                                 {completeness.checks.map((c, i) => (
                                     <div key={i} className="flex items-center justify-between text-xs">
-                                        <span className={c.done ? "text-stone-600" : "text-stone-400"}>{c.label}</span>
-                                        <span className={`w-4 h-4 rounded-full flex items-center justify-center text-white ${c.done ? "bg-green-500" : "bg-stone-200"}`}>
+                                        <span className={c.done ? "text-base-content" : "text-base-content/40 font-medium"}>{c.label}</span>
+                                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${c.done ? "bg-success/20 text-success" : "bg-base-content/10 text-transparent"}`}>
                                             {c.done ? "✓" : ""}
                                         </span>
                                     </div>
@@ -964,7 +648,7 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
                             </div>
                         </div>
                         <button onClick={() => setShowScore(false)}
-                            className="w-full py-3 bg-indigo-600 text-white text-sm font-bold rounded-2xl hover:bg-indigo-700 transition-colors">
+                            className="w-full py-4 bg-base-content text-base-100 text-sm font-bold rounded-2xl hover:bg-primary hover:text-white transition-all hover:shadow-[0_0_20px_rgba(139,92,246,0.4)]">
                             Got it
                         </button>
                     </div>
@@ -973,54 +657,38 @@ export default function ResumeEditor({ resume, userId, userAiKeysData, preferred
 
             {/* ── Keyboard shortcuts overlay ──────────────────────────── */}
             {showShortcuts && (
-                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4"
-                    style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }}
+                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
                     onClick={() => setShowShortcuts(false)}>
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 animate-in zoom-in-90 duration-200" onClick={e => e.stopPropagation()}>
-                        <h3 className="text-lg font-black text-stone-900 mb-4">Keyboard Shortcuts</h3>
-                        {[
-                            ["Ctrl + S", "Save now"],
-                            ["Ctrl + P", "Download PDF"],
-                            ["Ctrl + D", "Toggle dark mode"],
-                            ["Ctrl + /", "Show shortcuts"],
-                            ["Escape", "Close overlays"],
-                        ].map(([key, action]) => (
-                            <div key={key} className="flex items-center justify-between py-2 border-b border-stone-100 last:border-0">
-                                <span className="text-xs text-stone-500">{action}</span>
-                                <kbd className="px-2 py-1 bg-stone-100 rounded-lg text-xs font-mono font-bold text-stone-700">{key}</kbd>
-                            </div>
-                        ))}
+                    <div className="bg-base-200 border border-base-content/10 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-sm p-8 animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-xl font-black text-base-content mb-6 tracking-tight">Keyboard Shortcuts</h3>
+                        <div className="space-y-4">
+                            {[
+                                ["Ctrl + S", "Save now"],
+                                ["Ctrl + P", "Download PDF"],
+                                ["Ctrl + /", "Show shortcuts"],
+                                ["Escape", "Close overlays"],
+                            ].map(([key, action]) => (
+                                <div key={key} className="flex items-center justify-between py-1">
+                                    <span className="text-sm text-base-content/60 font-medium">{action}</span>
+                                    <kbd className="px-3 py-1.5 bg-base-300 rounded-lg text-xs font-mono font-bold text-base-content shadow-inner border border-base-content/5">{key}</kbd>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
 
-            {/* ── Toast notifications ─────────────────────────────────── */}
-            {noKeyToast && (
-                <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-3 fade-in duration-300">
-                    <div className="flex items-center gap-2 bg-stone-900 text-white px-5 py-3 rounded-2xl shadow-lg text-sm font-medium">
-                        <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-                        <span>AI is off. <Link href="/dashboard" className="text-indigo-300 underline font-bold">Add your key in Dashboard</Link></span>
-                    </div>
-                </div>
-            )}
+
 
             {copyToast && (
-                <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-3 fade-in duration-300">
-                    <div className="flex items-center gap-2 bg-green-600 text-white px-5 py-3 rounded-2xl shadow-lg text-sm font-medium">
-                        <CheckCircle2 className="w-4 h-4 shrink-0" /> Resume copied as plain text!
+                <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
+                    <div className="flex items-center gap-2 bg-success/20 border border-success/30 backdrop-blur-md text-success-content pl-4 pr-5 py-3 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.4)] text-sm font-bold">
+                        <CheckCircle2 className="w-5 h-5 shrink-0" /> Resume copied to clipboard!
                     </div>
                 </div>
             )}
 
-            {/* AI loading overlay */}
-            {isGenerating && (
-                <div className="fixed inset-0 bg-white/60 backdrop-blur-sm z-[90] flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-3 bg-white px-10 py-8 rounded-3xl shadow-xl border border-stone-100">
-                        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-                        <p className="text-sm font-semibold text-stone-700">Making it better…</p>
-                    </div>
-                </div>
-            )}
+
         </div>
     );
 }

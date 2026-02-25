@@ -38,28 +38,28 @@ export default function Education({ data = [], onChange, textAlign, onTextAlignC
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
-                        <GraduationCap className="w-6 h-6 text-blue-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Education</h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Academic Records — {data.length} entries</p>
+                        <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Education</h3>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Academic Records — {data.length} entries</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     {onTextAlignChange && <AlignmentToggle value={textAlign || "left"} onChange={onTextAlignChange} />}
                     <button onClick={handleAdd}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
-                        <Plus className="w-4 h-4 text-emerald-600" /> Add Education
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
+                        <Plus className="w-4 h-4 text-emerald-600" /> <span className="whitespace-nowrap">Add Education</span>
                     </button>
                 </div>
             </div>
 
             <div className="space-y-6">
                 {data.map((item: any, idx: number) => (
-                    <div key={item.id} className="p-6 bg-slate-50/50 border-2 border-slate-100 rounded-[2rem] space-y-6 relative group hover:border-slate-200 transition-all duration-300">
+                    <div key={item.id} className="p-4 sm:p-6 bg-slate-50/50 border-2 border-slate-100 rounded-[1.5rem] sm:rounded-[2rem] space-y-6 relative group hover:border-slate-200 transition-all duration-300">
                         {/* Header controls */}
                         <div className="flex items-start justify-between">
                             <div className="flex gap-1">

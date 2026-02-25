@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Trash2, Edit, MoreVertical, Loader2, FileText, Copy } from "lucide-react";
+import { Trash2, Edit, MoreVertical, Loader2, FileText, Copy, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ResumePreview from "@/components/resume/ResumePreview";
 
@@ -11,6 +11,7 @@ export default function ResumeCard({ resume }: { resume: any }) {
     const [isDuplicating, setIsDuplicating] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [isRenaming, setIsRenaming] = useState(false);
+    const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
     const [renameValue, setRenameValue] = useState(resume.title || "Untitled");
     const previewRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(0.3);
@@ -79,6 +80,53 @@ export default function ResumeCard({ resume }: { resume: any }) {
         a.download = `${resume.title || "resume"}.json`;
         document.body.appendChild(a); a.click(); a.remove();
         setShowMenu(false);
+    };
+
+    const handleDownloadPdf = async (e: React.MouseEvent) => {
+        e.preventDefault(); e.stopPropagation();
+        setShowMenu(false);
+        setIsDownloadingPdf(true);
+        try {
+            const originalPaper = previewRef.current?.querySelector('.paper-page');
+            if (!originalPaper) throw new Error("Could not find resume content");
+
+            const clone = originalPaper.cloneNode(true) as HTMLElement;
+            clone.querySelectorAll(".no-print").forEach(el => el.remove());
+
+            const styles = Array.from(document.querySelectorAll("style,link[rel='stylesheet']:not([href*='google'])"))
+                .map(s => s.outerHTML)
+                .join("");
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/api/export-pdf';
+            form.target = '_blank';
+
+            const addField = (name: string, value: string) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            };
+
+            const safeTitle = (resume.title || "Resume").replace(/[^a-zA-Z0-9.\-_]/g, '_');
+
+            addField('title', safeTitle);
+            addField('layout', JSON.stringify(resume.layout || {}));
+            addField('css', styles);
+            addField('html', clone.innerHTML);
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+        } catch (e) {
+            console.error("PDF error", e);
+            alert("Failed to generate PDF. Please try again.");
+        } finally {
+            setIsDownloadingPdf(false);
+        }
     };
 
     return (
@@ -153,6 +201,10 @@ export default function ResumeCard({ resume }: { resume: any }) {
                             <button onClick={handleDuplicate} disabled={isDuplicating}
                                 className="w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 flex items-center gap-2.5 transition-colors disabled:opacity-60">
                                 {isDuplicating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4 text-stone-400" />} Duplicate
+                            </button>
+                            <div className="h-px bg-stone-100 my-1" />
+                            <button onClick={handleDownloadPdf} disabled={isDownloadingPdf} className="w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 flex items-center gap-2.5 transition-colors disabled:opacity-60">
+                                {isDownloadingPdf ? <Loader2 className="w-4 h-4 animate-spin text-stone-400" /> : <Download className="w-4 h-4 text-stone-400" />} Download PDF
                             </button>
                             <button onClick={handleExportJson} className="w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 flex items-center gap-2.5 transition-colors">
                                 <FileText className="w-4 h-4 text-stone-400" /> Export JSON

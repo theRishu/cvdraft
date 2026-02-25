@@ -26,15 +26,8 @@ export default async function EditResumePage({ params }: { params: Params }) {
         redirect("/dashboard");
     }
 
-    const user = await User.findOne({ userId }).lean();
-    const userAiKeysData = {
-        gemini: !!user?.aiKeys?.gemini,
-        openai: !!user?.aiKeys?.openai,
-    };
-    const preferredProvider = user?.preferredProvider || "gemini";
-
     // Convert to serializable object
     const serializedResume = JSON.parse(JSON.stringify(resume));
 
-    return <ResumeEditor resume={serializedResume} userId={userId} userAiKeysData={userAiKeysData} preferredProvider={preferredProvider} />;
+    return <ResumeEditor resume={serializedResume} userId={userId} />;
 }

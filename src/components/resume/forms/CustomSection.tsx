@@ -51,10 +51,10 @@ export default function CustomSection({ data, onChange, textAlign, onTextAlignCh
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4 flex-1">
-                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
-                        <Layout className="w-6 h-6 text-blue-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+                <div className="flex items-center gap-3 sm:gap-4 flex-1">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <Layout className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                     </div>
                     <div className="flex-1">
                         <div className="flex items-center gap-2 group/title">
@@ -62,22 +62,22 @@ export default function CustomSection({ data, onChange, textAlign, onTextAlignCh
                                 type="text"
                                 value={data.title || ""}
                                 onChange={(e) => onChange({ ...data, title: e.target.value })}
-                                className="bg-transparent text-xl font-black text-slate-900 tracking-tight outline-none border-b-2 border-transparent focus:border-blue-500 transition-all w-full max-w-xs"
+                                className="bg-transparent text-lg sm:text-xl font-black text-slate-900 tracking-tight outline-none border-b-2 border-transparent focus:border-blue-500 transition-all w-full max-w-xs"
                                 placeholder="Section Title"
                             />
-                            <Edit3 className="w-4 h-4 text-slate-300 group-hover/title:text-blue-500 transition-colors" />
+                            <Edit3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-300 group-hover/title:text-blue-500 transition-colors" />
                         </div>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Custom Additions</p>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Custom Additions</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     {onTextAlignChange && <AlignmentToggle value={textAlign || "left"} onChange={onTextAlignChange} />}
                     <button
                         onClick={handleAdd}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
                     >
                         <Plus className="w-4 h-4 text-blue-600" />
-                        Add Item
+                        <span className="whitespace-nowrap">Add Item</span>
                     </button>
                 </div>
             </div>
@@ -113,7 +113,7 @@ function SortableCustomItem({ id, data, onUpdate, onDelete }: { id: string, data
     const style = { transform: CSS.Transform.toString(transform), transition };
 
     return (
-        <div ref={setNodeRef} style={style} className="bg-white p-6 rounded-[2rem] border-2 border-slate-100 shadow-sm group hover:border-slate-200 transition-all duration-300 relative">
+        <div ref={setNodeRef} style={style} className="bg-white p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-slate-100 shadow-sm group hover:border-slate-200 transition-all duration-300 relative">
             <div className="flex items-center justify-between mb-6">
                 <div {...attributes} {...listeners} className="cursor-grab text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 p-2 rounded-xl">
                     <GripVertical className="w-5 h-5" />

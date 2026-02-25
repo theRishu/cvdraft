@@ -7,12 +7,14 @@ import { Mail, Phone, MapPin, Globe, Linkedin, Github } from "lucide-react";
  * 
  * Supports various professional variations through layout props.
  */
-export default function MinimalistTemplate({ data }: { data: any }) {
-    const variant = 'minimalist' as string;
-    const { personalInfo, experience, education, skills, projects, certifications, languages, customSection } = data;
-    const themeColor = data.layout?.themeColor ?? data.themeColor;
-    const layout = data.layout || {};
-    const fontSize = layout.fontSize ?? data.fontSize;
+interface EnhancedSingleColumnProps {
+    data: any;
+    variant: 'executive' | 'modern' | 'minimalist' | 'academic' | 'creative' | 'classic' | 'startup' | 'tech' | 'corporate' | 'refined';
+}
+
+export default function EnhancedSingleColumnTemplate({ data, variant }: EnhancedSingleColumnProps) {
+    const { personalInfo, experience, education, skills, projects, certifications, languages, customSection, themeColor, fontSize } = data;
+    const layout = data.layout || {}; const { topMargin, bottomMargin, leftMargin, rightMargin } = layout;
 
     // Core properties overridden by variant
     const fontFamily = layout.fontFamily || (
@@ -110,10 +112,7 @@ export default function MinimalistTemplate({ data }: { data: any }) {
     );
 
     return (
-        <div className={`flex flex-col bg-white text-stone-800 leading-relaxed`} style={{ 
-                fontFamily: fontFamily, 
-                fontSize: typeof fontSize === 'number' ? `${fontSize}pt` : fontSize || "10pt"
-            }}>
+        <div className={`flex flex-col bg-white text-stone-800 leading-relaxed`} style={{ fontFamily: fontFamily, fontSize: typeof fontSize === 'number' ? `${fontSize}pt` : fontSize || "10pt", paddingTop: `${topMargin || 15}mm`, paddingBottom: `${bottomMargin || 15}mm`, paddingLeft: `${leftMargin || 20}mm`, paddingRight: `${rightMargin || 20}mm` }}>
 
             {/* Header */}
             <div className={`flex flex-col ${style.headerAlign === 'center' ? 'items-center text-center' : style.headerAlign === 'right' ? 'items-end text-right' : 'items-start text-left'} pb-5 mb-6 ${variant === 'academic' ? 'border-b-4 border-double' : variant === 'minimalist' ? '' : 'border-b'} border-stone-200`}>

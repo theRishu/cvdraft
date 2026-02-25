@@ -26,31 +26,31 @@ export default function Certifications({ data = [], onChange, textAlign, onTextA
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
-                        <Award className="w-6 h-6 text-blue-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <Award className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Certifications</h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Verified Excellence</p>
+                        <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Certifications</h3>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Verified Excellence</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     {onTextAlignChange && <AlignmentToggle value={textAlign || "left"} onChange={onTextAlignChange} />}
                     <button
                         onClick={addCert}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
                     >
                         <Plus className="w-4 h-4 text-blue-600" />
-                        Add Certificate
+                        <span className="whitespace-nowrap">Add Certificate</span>
                     </button>
                 </div>
             </div>
 
             <div className="space-y-6">
                 {(data || []).map((cert, index) => (
-                    <div key={index} className="p-6 bg-slate-50/50 border-2 border-slate-100 rounded-[2rem] space-y-6 relative group hover:border-slate-200 transition-all duration-300">
+                    <div key={index} className="p-4 sm:p-6 bg-slate-50/50 border-2 border-slate-100 rounded-[1.5rem] sm:rounded-[2rem] space-y-6 relative group hover:border-slate-200 transition-all duration-300">
                         <button
                             onClick={() => removeCert(index)}
                             className="absolute top-6 right-6 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"

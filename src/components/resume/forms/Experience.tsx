@@ -43,31 +43,31 @@ export default function Experience({ data = [], onChange, textAlign, onTextAlign
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
-                        <Briefcase className="w-6 h-6 text-blue-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Experience</h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Professional Journey — {data.length} entries</p>
+                        <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Experience</h3>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Professional Journey — {data.length} entries</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     {onTextAlignChange && <AlignmentToggle value={textAlign || "left"} onChange={onTextAlignChange} />}
                     <button
                         onClick={handleAdd}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
                     >
                         <Plus className="w-4 h-4 text-blue-600" />
-                        Add Position
+                        <span className="whitespace-nowrap">Add Position</span>
                     </button>
                 </div>
             </div>
 
             <div className="space-y-12">
                 {data.map((item, index) => (
-                    <div key={item.id} className="relative pl-8 border-l-2 border-slate-100 space-y-6 group">
+                    <div key={item.id} className="relative pl-6 sm:pl-8 border-l-2 border-slate-100 space-y-6 group">
                         {/* Timeline Bullet */}
                         <div className="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-white border-4 border-slate-900 shadow-sm group-hover:scale-125 transition-transform duration-300"></div>
 

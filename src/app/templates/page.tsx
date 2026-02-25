@@ -8,31 +8,23 @@ import {
     BarChart3, Stethoscope, Scale, Megaphone, Rocket, Award, Loader2, Check,
 } from "lucide-react";
 
+import { TEMPLATES as ACTUAL_TEMPLATES } from "@/lib/templateOptions";
+
 const TEMPLATES = [
-    { id: "modern", name: "Modern", category: "Popular", color: "#6366f1", desc: "Clean layout with a sidebar for skills & links", icon: Sparkles },
-    { id: "ats", name: "ATS Optimized", category: "Popular", color: "#0ea5e9", desc: "Maximum compatibility with applicant tracking systems", icon: Award },
-    { id: "minimalist", name: "Minimalist", category: "Popular", color: "#64748b", desc: "Elegant simplicity — let your content speak", icon: Sparkles },
-    { id: "professional", name: "Professional", category: "Classic", color: "#0f172a", desc: "Traditional format trusted by Fortune 500 recruiters", icon: Briefcase },
-    { id: "classic", name: "Classic", category: "Classic", color: "#374151", desc: "Timeless two-column layout with clear hierarchy", icon: Briefcase },
-    { id: "elegant", name: "Elegant", category: "Creative", color: "#7c3aed", desc: "Sophisticated design with refined typography", icon: Palette },
-    { id: "creative", name: "Creative", category: "Creative", color: "#ec4899", desc: "Bold visual impact for design-forward roles", icon: Palette },
-    { id: "corporate", name: "Corporate", category: "Business", color: "#1e40af", desc: "Structured layout for executive & corporate roles", icon: Briefcase },
-    { id: "executive", name: "Executive", category: "Business", color: "#0f172a", desc: "Authoritative design for senior leadership", icon: Award },
-    { id: "tech", name: "Tech", category: "Industry", color: "#059669", desc: "Showcases technical skills and projects", icon: Code2 },
-    { id: "dev", name: "Developer", category: "Industry", color: "#16a34a", desc: "Tailored for software engineers & developers", icon: Code2 },
-    { id: "startup", name: "Startup", category: "Industry", color: "#f97316", desc: "Dynamic layout for fast-paced startup roles", icon: Rocket },
-    { id: "academic", name: "Academic", category: "Industry", color: "#7c3aed", desc: "Structured for research, publications & teaching", icon: GraduationCap },
-    { id: "student", name: "Student", category: "Industry", color: "#06b6d4", desc: "Perfect for new graduates & first-time job seekers", icon: GraduationCap },
-    { id: "design", name: "Design", category: "Creative", color: "#e11d48", desc: "Visual-first layout for UX/UI & graphic designers", icon: Palette },
-    { id: "finance", name: "Finance", category: "Industry", color: "#047857", desc: "Numbers-focused layout for finance professionals", icon: BarChart3 },
-    { id: "medical", name: "Medical", category: "Industry", color: "#0891b2", desc: "Clean format for healthcare & medical roles", icon: Stethoscope },
-    { id: "legal", name: "Legal", category: "Industry", color: "#1e293b", desc: "Formal layout for legal professionals", icon: Scale },
-    { id: "marketing", name: "Marketing", category: "Industry", color: "#c026d3", desc: "Engaging design for marketing & brand roles", icon: Megaphone },
-    { id: "management", name: "Management", category: "Business", color: "#4f46e5", desc: "Leadership-focused layout for management roles", icon: Briefcase },
-    { id: "sales", name: "Sales", category: "Business", color: "#ea580c", desc: "Results-driven design highlighting achievements", icon: BarChart3 },
+    { id: "singlecolumn", name: "Professional", category: "Standard", color: "#6366f1", desc: "Clean, ATS-friendly single column layout perfect for modern professionals", icon: Sparkles },
+    { id: "executive", name: "Executive", category: "Standard", color: "#334155", desc: "Strict, formal serif typography for senior roles and traditional industries", icon: Briefcase },
+    { id: "modern", name: "Modern", category: "Standard", color: "#8b5cf6", desc: "Sleek sans-serif design with bold contrast and clear hierarchy", icon: Palette },
+    { id: "minimalist", name: "Minimalist", category: "Standard", color: "#0ea5e9", desc: "Ultra-clean layout prioritizing content and readability above all else", icon: Sparkles },
+    { id: "academic", name: "Academic", category: "Standard", color: "#a8a29e", desc: "Formal, double-bordered structure designed for academic and research CVs", icon: GraduationCap },
+    { id: "creative", name: "Creative", category: "Standard", color: "#ec4899", desc: "High-impact right-aligned headers and bold accents", icon: Palette },
+    { id: "classic", name: "Classic", category: "Standard", color: "#1e293b", desc: "Timeless styling with classic proportions and elegant typography", icon: Scale },
+    { id: "startup", name: "Startup", category: "Standard", color: "#f59e0b", desc: "Punchy, dynamic presentation with modern formatting for tech startups", icon: Rocket },
+    { id: "tech", name: "Tech", category: "Standard", color: "#10b981", desc: "Mono-spaced headers and crisp layout precision ideal for engineers", icon: Code2 },
+    { id: "corporate", name: "Corporate", category: "Standard", color: "#3b82f6", desc: "Compact, data-dense structure optimized for corporate sector screening", icon: BarChart3 },
+    { id: "refined", name: "Refined", category: "Standard", color: "#8b5cf6", desc: "Elegant minimalism with subtle section dividers and wide tracking", icon: Award },
 ];
 
-const CATEGORIES = ["All", "Popular", "Classic", "Creative", "Business", "Industry"];
+const CATEGORIES = ["All", "Standard"];
 
 export default function TemplatesPage() {
     const router = useRouter();
@@ -114,10 +106,11 @@ export default function TemplatesPage() {
                 </div>
 
                 {/* Template grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 ${filtered.length === 1 ? 'max-w-sm mx-auto' : ''}`}>
                     {filtered.map((t) => {
                         const Icon = t.icon;
                         const isCreating = creating === t.id;
+                        const actualTemplate = ACTUAL_TEMPLATES.find(at => at.id === t.id);
                         return (
                             <div
                                 key={t.id}
@@ -130,13 +123,8 @@ export default function TemplatesPage() {
                                         background: `linear-gradient(135deg, ${t.color}08, ${t.color}15)`,
                                     }}
                                 >
-                                    <div className="w-16 sm:w-20 h-24 sm:h-28 bg-white rounded-lg shadow-md border border-stone-100 flex flex-col p-2 sm:p-2.5 gap-1 group-hover:scale-105 transition-transform duration-300">
-                                        <div className="h-2 rounded-sm" style={{ background: t.color, width: "60%" }} />
-                                        <div className="h-1 bg-stone-100 rounded-sm" style={{ width: "80%" }} />
-                                        <div className="h-1 bg-stone-50 rounded-sm" style={{ width: "70%" }} />
-                                        <div className="flex-1" />
-                                        <div className="h-1 bg-stone-50 rounded-sm" style={{ width: "90%" }} />
-                                        <div className="h-1 bg-stone-50 rounded-sm" style={{ width: "50%" }} />
+                                    <div className="w-[72px] sm:w-[84px] aspect-[3/4.2] bg-white rounded-lg shadow-md border border-stone-200 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105">
+                                        {actualTemplate?.preview(t.color)}
                                     </div>
 
                                     {/* Category badge */}

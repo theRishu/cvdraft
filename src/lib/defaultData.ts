@@ -1,108 +1,71 @@
 export const INITIAL_DATA = {
-    title: "Software Engineer Resume",
-    templateId: "ats",
+    title: "Rishu Kumar Pandey Resume",
+    templateId: "singlecolumn",
     personalInfo: {
-        fullName: "John Doe",
-        email: "john.doe@example.com",
-        title: "Senior Software Engineer",
-        phone: "+1 (555) 123-4567",
-        address: "123 Tech Lane, San Francisco, CA 94105",
-        summary: "Senior Software Engineer with over 5 years of experience in building scalable web applications and distributed systems.\n\nExpert in React, Node.js, and TypeScript, with a strong focus on clean code, performance optimization, and user-centric design.\n\nProven track record of delivering high-quality software solutions in fast-paced startup environments."
+        fullName: "Rishu Kumar Pandey",
+        email: "rishukp2512@gmail.com",
+        title: "Cybersecurity Consultant",
+        phone: "+91-9838788045",
+        address: "Noida, UP, India",
+        summary: "Cybersecurity Consultant with 1 year of hands-on SOC experience, specializing in Security Operations, SIEM, and SOAR tools. Skilled in threat detection, log analysis, and incident response in 24x7 enterprise SOC environments. Experienced with CrowdStrike, Chronicle, XSOAR, and Microsoft 365 Defender, with a strong foundation in cloud security, EDR/XDR, and email security. Known for quick decision-making, confidentiality handling, and maintaining high security posture across enterprise systems."
     },
     experience: [
         {
             id: "1",
-            jobTitle: "Senior Software Engineer",
-            companyName: "TechFlow Systems",
-            startDate: "Jan 2021",
+            jobTitle: "SOC Analyst",
+            companyName: "LTIMindtree",
+            startDate: "Dec 2024",
             endDate: "Present",
-            address: "San Francisco, CA",
+            address: "Hyderabad, India",
             isCurrent: true,
-            description: "• Led the frontend development of a high-traffic e-commerce platform using React and Next.js, resulting in a 30% increase in conversion rates.\n• Architected and implemented a microservices-based backend using Node.js and GraphQL, improving system scalability and maintainability.\n• Mentored junior developers and conducted code reviews to ensure high-quality standards and best practices.\n• Optimized application performance, reducing page load times by 40% through code splitting and efficient data fetching strategies."
-        },
-        {
-            id: "2",
-            jobTitle: "Software Engineer",
-            companyName: "Innovate Digital",
-            startDate: "Jun 2018",
-            endDate: "Dec 2020",
-            address: "Austin, TX",
-            isCurrent: false,
-            description: "• Developed and maintained multiple client-facing web applications using JavaScript, HTML5, and CSS3.\n• Collaborated with UX/UI designers to translate complex requirements into intuitive and responsive user interfaces.\n• Integrated third-party APIs and services to enhance application functionality and user experience.\n• Participated in agile development processes, including sprint planning and daily stand-ups."
+            description: "• Operated as a SOC Level 1 Analyst in a 24x7 monitoring environment.\n• Performed security monitoring, incident triage, and response using CrowdStrike, Chronicle, and Microsoft Defender.\n• Investigated phishing, malware, and ransomware alerts; executed incident response playbooks in XSOAR.\n• Maintained operational security by documenting incidents and reporting in ServiceNow.\n• Improved detection coverage by analyzing firewall, proxy, and endpoint logs.\n\nKey Skills Used: CrowdStrike | Chronicle | Microsoft Defender | XSOAR | ServiceNow | Threat Hunting | Incident Response | Log Analysis"
         }
     ],
     education: [
         {
-            id: "3",
-            degree: "Bachelor of Science in Computer Science",
-            schoolName: "University of California, Berkeley",
-            startDate: "Aug 2014",
-            endDate: "May 2018",
+            id: "2",
+            degree: "B.Tech in Computer Science & Engineering (CSE)",
+            schoolName: "Jai Narain College of Technology",
+            startDate: "2019",
+            endDate: "2023",
+            address: "Bhopal",
             isCurrent: false,
-            description: "• Major GPA: 3.8/4.0\n• Coursework: Data Structures, Algorithms, Web Development, Database Systems, Computer Architecture.\n• Extracurriculars: Vice President of the Computer Science Society, Organizer of HackUCB."
+            description: ""
         }
     ],
     skills: [
-        { id: "4", name: "JavaScript", rating: 5 },
-        { id: "5", name: "TypeScript", rating: 5 },
-        { id: "6", name: "React", rating: 5 },
-        { id: "7", name: "Next.js", rating: 4 },
-        { id: "8", name: "Node.js", rating: 4 },
-        { id: "9", name: "GraphQL", rating: 3 },
-        { id: "10", name: "MongoDB", rating: 4 },
-        { id: "11", name: "PostgreSQL", rating: 4 },
-        { id: "12", name: "Docker", rating: 3 },
-        { id: "13", name: "AWS", rating: 3 },
-        { id: "14", name: "Git", rating: 5 }
+        { id: "s1", name: "Google Chronicle, Next-Gen SIEM", rating: 5 },
+        { id: "s2", name: "CrowdStrike, Microsoft Defender", rating: 5 },
+        { id: "s3", name: "Palo Alto Cortex XSOAR", rating: 4 },
+        { id: "s4", name: "Microsoft O365 Security, Proofpoint (TAP/TRAP)", rating: 4 },
+        { id: "s5", name: "Microsoft Azure Security Center", rating: 4 },
+        { id: "s6", name: "VirusTotal, MXToolBox, AbuseIPDB, Browserling", rating: 5 },
+        { id: "s7", name: "ServiceNow", rating: 4 },
+        { id: "s8", name: "TCP/IP, DNS, DHCP, Firewall, Proxy, WAF", rating: 4 }
     ],
-    projects: [
-        {
-            id: "15",
-            title: "E-commerce Dashboard",
-            techStack: "React, Redux, Tailwind CSS",
-            startDate: "2020",
-            endDate: "2021",
-            link: "https://demo-dashboard.example.com",
-            description: "• Developed a comprehensive admin dashboard for managing products, orders, and users.\n• Implemented real-time data visualization using Chart.js.\n• Achieved 95% test coverage using Jest and React Testing Library."
-        },
-        {
-            id: "16",
-            title: "Task Management API",
-            techStack: "Node.js, Express, MongoDB",
-            startDate: "2019",
-            endDate: "2020",
-            link: "https://api.example.com",
-            description: "• Designed and deployed a RESTful API for a task management application.\n• Implemented robust authentication and authorization using JWT.\n• Optimized database queries, reducing response times by 50%."
-        }
-    ],
-    socialLinks: [
-        { id: "17", network: "LinkedIn", url: "https://linkedin.com/in/johndoe" },
-        { id: "18", network: "GitHub", url: "https://github.com/johndoe" },
-        { id: "19", network: "Portfolio", url: "https://johndoe.dev" }
-    ],
+    projects: [],
+    socialLinks: [],
     certifications: [
         {
-            id: "20",
-            title: "AWS Certified Developer - Associate",
-            issuer: "Amazon Web Services",
-            date: "Mar 2022"
+            id: "c1",
+            title: "Microsoft Certified: Security, Compliance & Identity Fundamentals (SC-900)",
+            issuer: "Microsoft",
+            date: ""
+        },
+        {
+            id: "c2",
+            title: "Cisco Networking Basics",
+            issuer: "Cisco",
+            date: ""
         }
     ],
     languages: [
-        { id: "21", name: "English", proficiency: "Native" },
-        { id: "22", name: "Spanish", proficiency: "Conversational" }
+        { id: "l1", name: "English", proficiency: "Fluent" },
+        { id: "l2", name: "Hindi", proficiency: "Native" }
     ],
     customSection: {
         id: "custom",
-        title: "Awards",
-        items: [
-            {
-                id: "23",
-                title: "Employee of the Year",
-                subtitle: "TechFlow Systems",
-                date: "2022",
-                description: "Awarded for exceptional performance and leadership in frontend development."
-            }
-        ]
+        title: "",
+        items: []
     }
 };

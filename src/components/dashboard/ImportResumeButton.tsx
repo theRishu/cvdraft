@@ -76,7 +76,7 @@ export default function ImportResumeButton() {
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
-                accept=".json,.pdf,.docx,.txt"
+                accept=".json,.pdf,.txt"
                 className="hidden"
             />
 
@@ -84,7 +84,7 @@ export default function ImportResumeButton() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isImporting}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-stone-700 bg-white border border-stone-200 hover:bg-stone-50 hover:border-stone-300 rounded-xl transition-all shadow-sm disabled:opacity-60"
-                title="Import from PDF, DOCX, or JSON"
+                title="Import from PDF or JSON"
             >
                 {isImporting
                     ? <Loader2 className="w-4 h-4 animate-spin" />

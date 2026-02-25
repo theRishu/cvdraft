@@ -244,7 +244,7 @@ export default function NewResumeModal({ trigger, className }: Props) {
                                     <input
                                         ref={fileRef}
                                         type="file"
-                                        accept=".pdf,.docx,.txt,.json"
+                                        accept=".pdf,.txt,.json"
                                         className="hidden"
                                         onChange={handleFileImport}
                                     />
@@ -258,7 +258,7 @@ export default function NewResumeModal({ trigger, className }: Props) {
                                         </div>
                                         <div>
                                             <p className="text-sm font-bold">{importing ? "Importing…" : "Import from file"}</p>
-                                            <p className="text-xs text-stone-400">PDF, DOCX, TXT, or JSON — AI parses and fills it for you</p>
+                                            <p className="text-xs text-stone-400">PDF, TXT, or JSON — AI parses and fills it for you</p>
                                         </div>
                                         {!importing && <ArrowRight className="w-4 h-4 ml-auto shrink-0 text-stone-400" />}
                                     </button>

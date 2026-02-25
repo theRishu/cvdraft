@@ -24,7 +24,6 @@ import {
 
 const NAV_LINKS = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/templates", label: "Templates", icon: Palette },
     { href: "/stat", label: "Analytics", icon: BarChart3 },
 ];
 

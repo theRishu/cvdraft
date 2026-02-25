@@ -50,24 +50,24 @@ export default function Projects({ data = [], onChange, textAlign, onTextAlignCh
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
-                        <Rocket className="w-6 h-6 text-blue-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                        <Rocket className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">Projects</h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Builds & Creations — {data.length} entries</p>
+                        <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Projects</h3>
+                        <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Builds & Creations — {data.length} entries</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     {onTextAlignChange && <AlignmentToggle value={textAlign || "left"} onChange={onTextAlignChange} />}
                     <button
                         onClick={handleAdd}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold text-slate-900 hover:border-slate-900 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
                     >
                         <Plus className="w-4 h-4 text-blue-600" />
-                        Add Project
+                        <span className="whitespace-nowrap">Add Project</span>
                     </button>
                 </div>
             </div>
@@ -103,7 +103,7 @@ function SortableProject({ id, data, onUpdate, onDelete }: { id: string, data: a
     const style = { transform: CSS.Transform.toString(transform), transition };
 
     return (
-        <div ref={setNodeRef} style={style} className="bg-white p-6 rounded-[2rem] border-2 border-slate-100 shadow-sm group hover:border-slate-200 transition-all duration-300 relative">
+        <div ref={setNodeRef} style={style} className="bg-white p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-slate-100 shadow-sm group hover:border-slate-200 transition-all duration-300 relative">
             <div className="flex items-center justify-between mb-6">
                 <div {...attributes} {...listeners} className="cursor-grab text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 p-2 rounded-xl">
                     <GripVertical className="w-5 h-5" />
@@ -173,13 +173,61 @@ function SortableProject({ id, data, onUpdate, onDelete }: { id: string, data: a
                             <Sparkles className="w-3.5 h-3.5" /> Improve with AI
                         </button>
                     </div>
-                    <textarea
-                        value={data.description || ""}
-                        onChange={(e) => onUpdate(id, "description", e.target.value)}
-                        placeholder="Built X using Y to achieve Z..."
-                        rows={4}
-                        className="w-full bg-slate-50/50 border-2 border-slate-100 focus:border-slate-900 focus:bg-white rounded-[1.5rem] px-5 py-4 text-sm outline-none transition-all duration-300 font-medium leading-relaxed resize-none"
-                    />
+                    {/* Rich text toolbar + textarea */}
+                    <div className="relative">
+                        {/* Mini formatting toolbar */}
+                        <div className="flex items-center gap-1 mb-1.5">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mr-1">Format:</span>
+                            <button
+                                type="button"
+                                title="Bold (wraps selected text in **bold**)"
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    const ta = e.currentTarget.closest('.rich-text-group')?.querySelector('textarea') as HTMLTextAreaElement;
+                                    if (!ta) return;
+                                    const { selectionStart: s, selectionEnd: e2, value } = ta;
+                                    if (s === e2) return;
+                                    const selected = value.slice(s, e2);
+                                    const isBold = selected.startsWith('**') && selected.endsWith('**');
+                                    const newText = isBold
+                                        ? value.slice(0, s) + selected.slice(2, -2) + value.slice(e2)
+                                        : value.slice(0, s) + '**' + selected + '**' + value.slice(e2);
+                                    onUpdate(id, 'description', newText);
+                                    setTimeout(() => { ta.selectionStart = s; ta.selectionEnd = isBold ? e2 - 4 : e2 + 4; }, 10);
+                                }}
+                                className="w-6 h-6 rounded-md bg-white border border-slate-200 hover:border-slate-900 text-xs font-black text-slate-700 flex items-center justify-center transition-all shadow-sm"
+                            >B</button>
+                            <button
+                                type="button"
+                                title="Italic (wraps selected text in *italic*)"
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    const ta = e.currentTarget.closest('.rich-text-group')?.querySelector('textarea') as HTMLTextAreaElement;
+                                    if (!ta) return;
+                                    const { selectionStart: s, selectionEnd: e2, value } = ta;
+                                    if (s === e2) return;
+                                    const selected = value.slice(s, e2);
+                                    const isItalic = selected.startsWith('*') && selected.endsWith('*') && !selected.startsWith('**');
+                                    const newText = isItalic
+                                        ? value.slice(0, s) + selected.slice(1, -1) + value.slice(e2)
+                                        : value.slice(0, s) + '*' + selected + '*' + value.slice(e2);
+                                    onUpdate(id, 'description', newText);
+                                    setTimeout(() => { ta.selectionStart = s; ta.selectionEnd = isItalic ? e2 - 2 : e2 + 2; }, 10);
+                                }}
+                                className="w-6 h-6 rounded-md bg-white border border-slate-200 hover:border-slate-900 text-xs italic font-bold text-slate-700 flex items-center justify-center transition-all shadow-sm"
+                            >I</button>
+                            <span className="text-[9px] text-slate-300 ml-1">Select text then click B or I</span>
+                        </div>
+                        <div className="rich-text-group">
+                            <textarea
+                                value={data.description || ""}
+                                onChange={(e) => onUpdate(id, "description", e.target.value)}
+                                placeholder={"Built X using Y to achieve Z...\nUse **bold** or *italic* for emphasis"}
+                                rows={4}
+                                className="w-full bg-slate-50/50 border-2 border-slate-100 focus:border-slate-900 focus:bg-white rounded-[1.5rem] px-5 py-4 text-sm outline-none transition-all duration-300 font-medium leading-relaxed resize-none"
+                            />
+                        </div>
+                    </div>
 
                     {/* STAR & Verb Upgrade UI */}
                     {data.description && data.description.length > 5 && (
