@@ -183,12 +183,9 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
             const { jsPDF } = await import("jspdf");
 
             const paper = document.querySelector('.paper-page') as HTMLElement;
-            const wrapper = document.querySelector('.pdf-export-wrapper') as HTMLElement;
-            if (!paper || !wrapper) throw new Error("Preview not found");
+            if (!paper) throw new Error("Preview not found");
 
-            // Temporarily reset the CSS scale transform so html2canvas captures at full A4 resolution
-            const prevTransform = wrapper.style.transform;
-            wrapper.style.transform = "none";
+            // paper-page is fixed off-screen; just capture it directly at 2x retina
             await new Promise(r => setTimeout(r, 80));
 
             const canvas = await html2canvasPro(paper, {
@@ -199,8 +196,6 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
                 scrollX: 0,
                 scrollY: 0,
             });
-
-            wrapper.style.transform = prevTransform;
 
             // Slice canvas into A4 pages
             const A4_W_MM = 210;

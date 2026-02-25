@@ -11,12 +11,11 @@ import StartupTemplate from "./templates/StartupTemplate";
 import TechTemplate from "./templates/TechTemplate";
 import CorporateTemplate from "./templates/CorporateTemplate";
 import RefinedTemplate from "./templates/RefinedTemplate";
+import EnhancedSingleColumnTemplate from "./templates/EnhancedSingleColumnTemplate";
 
 const MM = 3.7795275591;
-const A4_W_MM = 210;
-const A4_H_MM = 297;
-const A4_W = Math.round(A4_W_MM * MM); // 794px
-const A4_H = Math.round(A4_H_MM * MM); // 1123px
+const A4_W = Math.round(210 * MM);   // 794 px
+const A4_H = Math.round(297 * MM);   // 1123 px
 
 export function Template({ data }: { data: any }) {
     switch (data.templateId) {
@@ -30,6 +29,7 @@ export function Template({ data }: { data: any }) {
         case "tech": return <TechTemplate data={data} />;
         case "corporate": return <CorporateTemplate data={data} />;
         case "refined": return <RefinedTemplate data={data} />;
+        case "enhancedsinglecolumn": return <EnhancedSingleColumnTemplate data={data} variant="modern" />;
         default: return <SingleColumnTemplate data={data} />;
     }
 }
@@ -49,51 +49,47 @@ export default function ResumePreview({
 }) {
     const rawDisplay = (isBlindMode && !isExporting) ? {
         ...data,
-        personalInfo: {
-            ...data.personalInfo,
-            fullName: "REDACTED NAME",
-            email: "redacted@privacy.com",
-            phone: "+XX XXX XXXXX",
-            address: "Confidential",
-        },
-        socialLinks: (data.socialLinks || []).map((l: any) => ({
-            ...l, url: "https://confidential.link", username: "redacted",
-        })),
+        personalInfo: { ...data.personalInfo, fullName: "REDACTED NAME", email: "redacted@privacy.com", phone: "+XX XXX XXXXX", address: "Confidential" },
+        socialLinks: (data.socialLinks || []).map((l: any) => ({ ...l, url: "https://confidential", username: "redacted" })),
     } : data;
 
-    // Apply hidden sections: zero out arrays for hidden section ids
-    const SECTION_KEY_MAP: Record<string, string> = {
+    const SECTION_KEY: Record<string, string> = {
         experience: "experience", education: "education", skills: "skills",
         projects: "projects", certifications: "certifications",
         languages: "languages", socials: "socialLinks", custom: "customSection",
     };
     const displayData = !hiddenSections?.size ? rawDisplay : {
         ...rawDisplay,
-        ...Object.fromEntries(
-            [...hiddenSections].map(id => [SECTION_KEY_MAP[id] ?? id, id === "custom" ? { ...rawDisplay.customSection, items: [] } : []])
-        ),
-        personalInfo: hiddenSections.has("personal")
-            ? { ...rawDisplay.personalInfo, summary: "" }
-            : rawDisplay.personalInfo,
+        ...Object.fromEntries([...hiddenSections].map(id => [SECTION_KEY[id] ?? id, id === "custom" ? { ...rawDisplay.customSection, items: [] } : []])),
+        personalInfo: hiddenSections.has("personal") ? { ...rawDisplay.personalInfo, summary: "" } : rawDisplay.personalInfo,
     };
 
-    const wrapperRef = useRef<HTMLDivElement>(null); // the scroll container
-    const paperRef = useRef<HTMLDivElement>(null); // actual A4 paper div
+    const layout = data.layout || {};
+    const topMm = layout.topMargin ?? 15;
+    const botMm = layout.bottomMargin ?? 15;
+    const leftMm = layout.leftMargin ?? 20;
+    const rightMm = layout.rightMargin ?? 20;
+    const fontFam = layout.fontFamily ?? "Inter, sans-serif";
+    const maxPages = layout.maxPages ?? 0;
+    const topPx = topMm * MM;
+    const botPx = botMm * MM;
+
+    const headerSize = layout.headerSize ?? data.headerSize ?? "medium";
+    const titleSize = layout.titleSize ?? data.titleSize;
+    const headingSize = layout.headingSize ?? data.headingSize ?? "medium";
+    const fontSize = layout.fontSize ?? data.fontSize ?? "medium";
+    const namePt = typeof headerSize === "number" ? headerSize : headerSize === "small" ? 20 : headerSize === "large" ? 32 : 26;
+    const titlePt = typeof titleSize === "number" ? titleSize : 11;
+    const headingPt = typeof headingSize === "number" ? headingSize : headingSize === "small" ? 9 : headingSize === "large" ? 13 : 11;
+    const bodyPt = typeof fontSize === "number" ? fontSize : fontSize === "small" ? 8.5 : fontSize === "large" ? 11 : 9.5;
+
+    const wrapperRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(0.75);
-    const [pageCount, setPageCount] = useState(1);
-
-    // ── Scale: fit A4 width inside the wrapper ──────────────────────
     const recalcScale = useCallback(() => {
-        const wrapper = wrapperRef.current;
-        if (!wrapper) return;
-        if (data.layout?.scale) {
-            setScale(data.layout.scale);
-            return;
-        }
-        const available = wrapper.clientWidth;
-        if (available > 0) setScale(Math.min(1, available / A4_W));
-    }, [data.layout?.scale]);
-
+        if (layout.scale) { setScale(layout.scale); return; }
+        const w = wrapperRef.current?.clientWidth ?? 0;
+        if (w > 0) setScale(Math.min(1, w / A4_W));
+    }, [layout.scale]);
     useEffect(() => {
         recalcScale();
         const ro = new ResizeObserver(recalcScale);
@@ -102,10 +98,27 @@ export default function ResumePreview({
         return () => { ro.disconnect(); window.removeEventListener("resize", recalcScale); };
     }, [recalcScale]);
 
-    // ── Paginator: ONE spacer per page boundary (no compounding) ─────────
+    // The SINGLE visible paper — spacers run here and this is also the PDF target
+    const paperRef = useRef<HTMLDivElement>(null);
+    const [pageCount, setPageCount] = useState(1);
+
     useEffect(() => {
-        const paper = paperRef.current;
-        if (!paper) return;
+        if (contentRef) (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = paperRef.current;
+    });
+
+    // ── Spacer: push block elements OUT of the bottom-margin zone ────
+    // How it works:
+    //   • At each A4_H boundary, the region [pageEnd-botPx … pageEnd+topPx] is the "gutter"
+    //     (bottom margin of this page + top margin of next page).
+    //   • Any block element whose TOP lands inside [pageEnd-botPx … pageEnd]
+    //     gets a spacer inserted before it so it moves to pageEnd+topPx.
+    //   • The spacer itself is invisible white space — it IS the margin gap.
+    //   • Because the spacer lives inside the paper, it fills the margin zone on
+    //     BOTH pages (bottom of old page visible + top of new page), giving
+    //     consistent margins everywhere.
+    useEffect(() => {
+        const el = paperRef.current;
+        if (!el) return;
         let cancelled = false;
 
         const run = () => {
@@ -113,112 +126,76 @@ export default function ResumePreview({
             const el = paperRef.current;
             el.querySelectorAll(".js-spacer").forEach(n => n.remove());
 
-            const botPx = (data.layout?.bottomMargin ?? 15) * MM;
-            const topPx = (data.layout?.topMargin ?? 15) * MM;
-            const elRect = el.getBoundingClientRect();
+            const rect = el.getBoundingClientRect();
+            const nodes = Array.from(el.querySelectorAll("h2,h3,h4,p,li")) as HTMLElement[];
 
-            // ── Step 1: Snapshot all candidate positions BEFORE any DOM mutation ──
-            const maxPages: number = data.layout?.maxPages ?? 0;
-            const candidates = Array.from(
-                el.querySelectorAll("h2, h3, h4, p, li, section, div[data-section], [class*='break-inside']")
-            ) as HTMLElement[];
-
-            type NodeSnap = { node: HTMLElement; absTop: number; height: number };
-            const snaps: NodeSnap[] = candidates.map(node => {
+            const snaps = nodes.map(node => {
                 const r = node.getBoundingClientRect();
-                return {
-                    node,
-                    absTop: (r.top - elRect.top) / scale,
-                    height: r.height / scale,
-                };
-            }).sort((a, b) => a.absTop - b.absTop);
+                return { node, top: (r.top - rect.top) / scale, height: r.height / scale };
+            }).sort((a, b) => a.top - b.top);
 
-            // ── Step 2: Walk elements, tracking virtual position after spacers ──
-            let cumulativeShift = 0;
-            const handledPages = new Set<number>();
-            const toInsert: { before: HTMLElement; height: number }[] = [];
+            let shift = 0;
+            const done = new Set<number>();
+            const contentH = A4_H - topPx - botPx; // usable content height per page
 
-            for (const snap of snaps) {
-                const top = snap.absTop + cumulativeShift;
-                const bot = top + snap.height;
+            for (const s of snaps) {
+                const top = s.top + shift;
                 const page = Math.floor(top / A4_H);
-                const pageBot = (page + 1) * A4_H;
-                const usableBot = pageBot - botPx;
+                const pageEnd = (page + 1) * A4_H;
+                const usableBot = pageEnd - botPx;
+                const bot = top + s.height;
 
-                if (bot > usableBot && top < usableBot && !handledPages.has(page)) {
-                    // This element crosses the usable bottom → push to next page
-                    const shift = (pageBot + topPx) - top;
-                    toInsert.push({ before: snap.node, height: shift });
-                    cumulativeShift += shift;
-                    handledPages.add(page);
+                // Push element if its BOTTOM crosses the usable area AND
+                // the element is short enough to fit on the next page
+                // (avoids huge gaps for very tall elements like multi-page descriptions)
+                if (bot > usableBot && s.height < contentH && !done.has(page)) {
+                    const h = (pageEnd + topPx) - top;
+                    const sp = document.createElement("div");
+                    sp.className = "js-spacer";
+                    sp.style.cssText = `height:${h}px;width:100%;display:block;pointer-events:none;`;
+                    s.node.parentNode?.insertBefore(sp, s.node);
+                    shift += h;
+                    done.add(page);
                 }
             }
 
-            // ── Step 3: Insert spacers all at once ──
-            for (const { before, height } of toInsert) {
-                const sp = document.createElement("div");
-                sp.className = "js-spacer";
-                sp.style.cssText = `height:${height}px;width:100%;display:block;clear:both;pointer-events:none;`;
-                before.parentNode?.insertBefore(sp, before);
-            }
-
-            // Cap page count based on maxPages setting
-            const rawPages = Math.max(1, Math.ceil((el.scrollHeight - 8) / A4_H));
-            const cappedPages = maxPages > 0 ? Math.min(rawPages, maxPages) : rawPages;
-            setPageCount(cappedPages);
+            const raw = Math.max(1, Math.ceil((el.scrollHeight - 4) / A4_H));
+            const capped = maxPages > 0 ? Math.min(raw, maxPages) : raw;
+            setPageCount(capped);
         };
 
         const t = setTimeout(run, 300);
-        let ro_t: ReturnType<typeof setTimeout>;
-        const ro = new ResizeObserver(() => { clearTimeout(ro_t); ro_t = setTimeout(run, 200); });
-        ro.observe(paper);
-        return () => { cancelled = true; clearTimeout(t); clearTimeout(ro_t); ro.disconnect(); };
-    }, [data, scale]);
+        let rot: ReturnType<typeof setTimeout>;
+        const ro = new ResizeObserver(() => { clearTimeout(rot); rot = setTimeout(run, 200); });
+        ro.observe(el);
+        return () => { cancelled = true; clearTimeout(t); clearTimeout(rot); ro.disconnect(); };
+    }, [data, scale, topPx, botPx, maxPages]);
 
-    const layout = data.layout || {};
-    const topMm = layout.topMargin ?? data.topMargin ?? 15;
-    const botMm = layout.bottomMargin ?? data.bottomMargin ?? 15;
-    const leftMm = layout.leftMargin ?? data.leftMargin ?? 20;
-    const rightMm = layout.rightMargin ?? data.rightMargin ?? 20;
-    const fontFam = layout.fontFamily ?? data.fontFamily ?? "Inter, sans-serif";
-    const headerSize = layout.headerSize ?? data.headerSize ?? "medium";
-    const titleSize = layout.titleSize ?? data.titleSize;
-    const headingSize = layout.headingSize ?? data.headingSize ?? "medium";
-    const fontSize = layout.fontSize ?? data.fontSize ?? "medium";
-
-    // Normalized typography calculations (convert string scales to pt)
-    const namePt = typeof headerSize === 'number' ? headerSize : (headerSize === "small" ? 20 : headerSize === "large" ? 32 : 26);
-    const titlePt = typeof titleSize === 'number' ? titleSize : (typeof headerSize === 'number' ? Math.max(10, Math.round(headerSize * 0.45)) : 11);
-    const headingPt = typeof headingSize === 'number' ? headingSize : (headingSize === "small" ? 9 : headingSize === "large" ? 13 : 11);
-    const bodyPt = typeof fontSize === 'number' ? fontSize : (fontSize === "small" ? 8.5 : fontSize === "large" ? 11 : 9.5);
-
-    const maxPages: number = layout.maxPages ?? 0;
+    // When maxPages is set, cap the paper height so overflow is hidden
+    const totalH = pageCount * A4_H;
     const scaledW = A4_W * scale;
-    const scaledH = pageCount * A4_H * scale;
+    const scaledH = totalH * scale;
 
     return (
-        <div ref={wrapperRef} className="w-full flex justify-center overflow-x-hidden pb-8">
-            <div style={{ width: scaledW, height: scaledH, position: "relative", flexShrink: 0 }}>
-                {/* The single pdf-export-wrapper that we capture for PDF */}
-                <div className="pdf-export-wrapper" style={{
+        <div ref={wrapperRef} className="w-full flex justify-center overflow-x-hidden pb-10">
+            <div style={{ position: "relative", width: scaledW, height: scaledH, flexShrink: 0 }}>
+
+                {/* Scale wrapper */}
+                <div style={{
+                    position: "absolute", top: 0, left: 0,
                     width: A4_W,
-                    minHeight: pageCount * A4_H,
                     transformOrigin: "top left",
                     transform: `scale(${scale})`,
-                    position: "absolute",
-                    top: 0, left: 0,
                 }}>
-                    {/* The paper itself — single continuous flow */}
+                    {/* THE paper — single continuous, spacers live inside it */}
                     <div
-                        ref={(node) => {
-                            (paperRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-                            if (contentRef) (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-                        }}
+                        ref={paperRef}
                         className="paper-page"
                         style={{
                             width: A4_W,
-                            minHeight: maxPages > 0 ? undefined : pageCount * A4_H,
-                            height: maxPages > 0 ? pageCount * A4_H : undefined,
+                            minHeight: A4_H,
+                            // If maxPages is set, clip overflow so user sees exactly N pages
+                            maxHeight: maxPages > 0 ? totalH : undefined,
                             overflow: maxPages > 0 ? "hidden" : "visible",
                             background: "#fff",
                             boxSizing: "border-box",
@@ -227,49 +204,47 @@ export default function ResumePreview({
                             paddingLeft: `${leftMm}mm`,
                             paddingRight: `${rightMm}mm`,
                             fontFamily: fontFam,
-                            textAlign: layout.textAlign || "left",
+                            textAlign: (layout.textAlign || "left") as any,
                             lineHeight: layout.lineHeight || 1.45,
+                            boxShadow: "0 4px 32px rgba(0,0,0,0.13)",
                             position: "relative",
-                            boxShadow: "0 8px 40px rgba(0,0,0,0.18)",
-                            // @ts-ignore
-                            "--resume-name-size": `${namePt}pt`,
-                            "--resume-title-size": `${titlePt}pt`,
-                            "--resume-heading-size": `${headingPt}pt`,
-                            "--resume-body-size": `${bodyPt}pt`,
-                        } as React.CSSProperties}
+                            // CSS custom props for font sizes
+                            ["--resume-name-size" as string]: `${namePt}pt`,
+                            ["--resume-title-size" as string]: `${titlePt}pt`,
+                            ["--resume-heading-size" as string]: `${headingPt}pt`,
+                            ["--resume-body-size" as string]: `${bodyPt}pt`,
+                        }}
                     >
                         <Template data={displayData} />
 
-                        {/* Dashed page break indicator lines (visual only, no cropping) */}
+                        {/* Thin dashed page-break lines — purely visual, sit on top, don't block content */}
                         {Array.from({ length: pageCount - 1 }).map((_, i) => (
                             <div key={i} className="no-print" style={{
                                 position: "absolute",
                                 top: (i + 1) * A4_H,
                                 left: 0, right: 0,
-                                height: 2,
-                                zIndex: 10,
-                                background: "repeating-linear-gradient(90deg,#6366f1 0,#6366f1 8px,transparent 8px,transparent 16px)",
+                                height: 1,
+                                zIndex: 20,
+                                pointerEvents: "none",
+                                background: "repeating-linear-gradient(90deg,#818cf8 0,#818cf8 6px,transparent 6px,transparent 14px)",
                             }} />
                         ))}
                     </div>
-
-                    {/* Page number labels */}
-                    {Array.from({ length: pageCount }).map((_, i) => (
-                        <div key={i} className="no-print" style={{
-                            position: "absolute",
-                            top: i * A4_H + 8,
-                            left: A4_W + 10,
-                            fontSize: 10,
-                            color: "#a8a29e",
-                            fontWeight: 700,
-                            letterSpacing: "0.06em",
-                            textTransform: "uppercase" as const,
-                            whiteSpace: "nowrap" as const,
-                        }}>
-                            Page {i + 1}
-                        </div>
-                    ))}
                 </div>
+
+                {/* Page number labels shown to the right */}
+                {Array.from({ length: pageCount }).map((_, i) => (
+                    <div key={i} className="no-print" style={{
+                        position: "absolute",
+                        top: i * scaledH / pageCount + 6,
+                        left: scaledW + 8,
+                        fontSize: 10, color: "#a8a29e",
+                        fontWeight: 700, letterSpacing: "0.06em",
+                        textTransform: "uppercase", whiteSpace: "nowrap",
+                    }}>
+                        Page {i + 1}
+                    </div>
+                ))}
             </div>
         </div>
     );
