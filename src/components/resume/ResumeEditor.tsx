@@ -197,33 +197,45 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
                 scrollY: 0,
             });
 
-            // Slice canvas into A4 pages
+            // Slice canvas into A4 pages with correct margins
             const A4_W_MM = 210;
             const A4_H_MM = 297;
-            const MM_PER_PX = A4_W_MM / canvas.width; // mm per canvas pixel
-            const A4_H_PX = Math.round(A4_H_MM / MM_PER_PX); // pixels that equal one A4 page height
+            const MM_PER_PX = A4_W_MM / canvas.width;
+            const A4_H_PX = Math.round(A4_H_MM / MM_PER_PX);
+
+            const topMm = resumeData.layout?.topMargin ?? 15;
+            const botMm = resumeData.layout?.bottomMargin ?? 15;
 
             const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-            const totalHeightPX = canvas.height;
             let offsetPX = 0;
             let pageIdx = 0;
 
-            while (offsetPX < totalHeightPX) {
+            while (offsetPX < canvas.height) {
                 if (pageIdx > 0) pdf.addPage();
-                const remainingPX = totalHeightPX - offsetPX;
-                // Skip tiny trailing pages (< 10mm of content)
+                const remainingPX = canvas.height - offsetPX;
                 if (remainingPX < Math.round(10 / MM_PER_PX)) break;
 
-                // Slice this page from the canvas
+                const sliceH = Math.min(A4_H_PX, remainingPX);
                 const sliceCanvas = document.createElement('canvas');
                 sliceCanvas.width = canvas.width;
-                sliceCanvas.height = Math.min(A4_H_PX, remainingPX);
+                sliceCanvas.height = sliceH;
                 const ctx = sliceCanvas.getContext('2d')!;
-                ctx.drawImage(canvas, 0, offsetPX, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+                ctx.drawImage(canvas, 0, offsetPX, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
 
-                const sliceImg = sliceCanvas.toDataURL('image/jpeg', 0.98);
-                const sliceHeightMM = sliceCanvas.height * MM_PER_PX;
-                pdf.addImage(sliceImg, 'JPEG', 0, 0, A4_W_MM, sliceHeightMM);
+                const img = sliceCanvas.toDataURL('image/jpeg', 0.98);
+                const sliceHMM = sliceH * MM_PER_PX;
+
+                if (pageIdx === 0) {
+                    // Page 1: template already has paddingTop, place at y=0
+                    pdf.addImage(img, 'JPEG', 0, 0, A4_W_MM, sliceHMM);
+                } else {
+                    // Page 2+: add white top margin, place image below it
+                    pdf.setFillColor(255, 255, 255);
+                    pdf.rect(0, 0, A4_W_MM, topMm, 'F');
+                    pdf.addImage(img, 'JPEG', 0, topMm, A4_W_MM, Math.min(sliceHMM, A4_H_MM - topMm - botMm));
+                    // White bottom margin
+                    pdf.rect(0, A4_H_MM - botMm, A4_W_MM, botMm, 'F');
+                }
 
                 offsetPX += A4_H_PX;
                 pageIdx++;

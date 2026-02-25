@@ -13,6 +13,7 @@ import CorporateTemplate from "./templates/CorporateTemplate";
 import RefinedTemplate from "./templates/RefinedTemplate";
 import EnhancedSingleColumnTemplate from "./templates/EnhancedSingleColumnTemplate";
 
+// A4 at 96 dpi
 const MM = 3.7795275591;
 const A4_W = Math.round(210 * MM);   // 794 px
 const A4_H = Math.round(297 * MM);   // 1123 px
@@ -47,12 +48,14 @@ export default function ResumePreview({
     isExporting?: boolean;
     hiddenSections?: Set<string>;
 }) {
+    // Blind mode
     const rawDisplay = (isBlindMode && !isExporting) ? {
         ...data,
         personalInfo: { ...data.personalInfo, fullName: "REDACTED NAME", email: "redacted@privacy.com", phone: "+XX XXX XXXXX", address: "Confidential" },
         socialLinks: (data.socialLinks || []).map((l: any) => ({ ...l, url: "https://confidential", username: "redacted" })),
     } : data;
 
+    // Hidden sections
     const SECTION_KEY: Record<string, string> = {
         experience: "experience", education: "education", skills: "skills",
         projects: "projects", certifications: "certifications",
@@ -64,6 +67,7 @@ export default function ResumePreview({
         personalInfo: hiddenSections.has("personal") ? { ...rawDisplay.personalInfo, summary: "" } : rawDisplay.personalInfo,
     };
 
+    // Layout
     const layout = data.layout || {};
     const topMm = layout.topMargin ?? 15;
     const botMm = layout.bottomMargin ?? 15;
@@ -83,6 +87,14 @@ export default function ResumePreview({
     const headingPt = typeof headingSize === "number" ? headingSize : headingSize === "small" ? 9 : headingSize === "large" ? 13 : 11;
     const bodyPt = typeof fontSize === "number" ? fontSize : fontSize === "small" ? 8.5 : fontSize === "large" ? 11 : 9.5;
 
+    const cssVarStyle: React.CSSProperties & Record<string, string> = {
+        "--resume-name-size": `${namePt}pt`,
+        "--resume-title-size": `${titlePt}pt`,
+        "--resume-heading-size": `${headingPt}pt`,
+        "--resume-body-size": `${bodyPt}pt`,
+    };
+
+    // Responsive scale
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(0.75);
     const recalcScale = useCallback(() => {
@@ -98,45 +110,51 @@ export default function ResumePreview({
         return () => { ro.disconnect(); window.removeEventListener("resize", recalcScale); };
     }, [recalcScale]);
 
-    // The SINGLE visible paper — spacers run here and this is also the PDF target
-    const paperRef = useRef<HTMLDivElement>(null);
-    const [pageCount, setPageCount] = useState(1);
+    // ── Hidden paper: runs spacers, captures innerHTML for clips ─────
+    const hiddenRef = useRef<HTMLDivElement>(null);
+    const pdfRef = useRef<HTMLDivElement>(null);   // PDF capture target
 
+    const [pageCount, setPageCount] = useState(1);
+    const [paperHTML, setPaperHTML] = useState<string>("");
+
+    // Expose pdfRef as contentRef
     useEffect(() => {
-        if (contentRef) (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = paperRef.current;
+        if (contentRef) (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = pdfRef.current;
     });
 
-    // ── Spacer: push block elements OUT of the bottom-margin zone ────
-    // How it works:
-    //   • At each A4_H boundary, the region [pageEnd-botPx … pageEnd+topPx] is the "gutter"
-    //     (bottom margin of this page + top margin of next page).
-    //   • Any block element whose TOP lands inside [pageEnd-botPx … pageEnd]
-    //     gets a spacer inserted before it so it moves to pageEnd+topPx.
-    //   • The spacer itself is invisible white space — it IS the margin gap.
-    //   • Because the spacer lives inside the paper, it fills the margin zone on
-    //     BOTH pages (bottom of old page visible + top of new page), giving
-    //     consistent margins everywhere.
+    // ── Spacer algorithm ─────────────────────────────────────────────
+    // Runs on the HIDDEN paper.
+    // Inserts spacers so that:
+    //   • The BOTTOM of every page has `botMm` whitespace (no content in botPx zone)
+    //   • The TOP of every page N+1 has `topMm` whitespace (spacer extends topPx past boundary)
+    // After spacers settle, snapshots innerHTML → visible clips all share the same
+    // spacered layout, guaranteeing identical margins on every page.
     useEffect(() => {
-        const el = paperRef.current;
+        const el = hiddenRef.current;
         if (!el) return;
         let cancelled = false;
 
         const run = () => {
-            if (cancelled || !paperRef.current) return;
-            const el = paperRef.current;
+            if (cancelled || !hiddenRef.current) return;
+            const el = hiddenRef.current;
             el.querySelectorAll(".js-spacer").forEach(n => n.remove());
 
             const rect = el.getBoundingClientRect();
             const nodes = Array.from(el.querySelectorAll("h2,h3,h4,p,li")) as HTMLElement[];
+            const contentH = A4_H - topPx - botPx;
 
             const snaps = nodes.map(node => {
                 const r = node.getBoundingClientRect();
-                return { node, top: (r.top - rect.top) / scale, height: r.height / scale };
+                return {
+                    node,
+                    // Hidden paper has NO CSS transform → positions are 1:1 CSS pixels, no division needed
+                    top: r.top - rect.top,
+                    height: r.height,
+                };
             }).sort((a, b) => a.top - b.top);
 
             let shift = 0;
             const done = new Set<number>();
-            const contentH = A4_H - topPx - botPx; // usable content height per page
 
             for (const s of snaps) {
                 const top = s.top + shift;
@@ -145,9 +163,7 @@ export default function ResumePreview({
                 const usableBot = pageEnd - botPx;
                 const bot = top + s.height;
 
-                // Push element if its BOTTOM crosses the usable area AND
-                // the element is short enough to fit on the next page
-                // (avoids huge gaps for very tall elements like multi-page descriptions)
+                // Push if bottom crosses the usable area AND element fits on next page
                 if (bot > usableBot && s.height < contentH && !done.has(page)) {
                     const h = (pageEnd + topPx) - top;
                     const sp = document.createElement("div");
@@ -159,93 +175,92 @@ export default function ResumePreview({
                 }
             }
 
+            // Snapshot HTML for visible clips
             const raw = Math.max(1, Math.ceil((el.scrollHeight - 4) / A4_H));
             const capped = maxPages > 0 ? Math.min(raw, maxPages) : raw;
             setPageCount(capped);
+            setPaperHTML(el.innerHTML);
+
+            // Also update the PDF capture div
+            if (pdfRef.current) pdfRef.current.innerHTML = el.innerHTML;
         };
 
-        const t = setTimeout(run, 300);
+        const t = setTimeout(run, 350);
         let rot: ReturnType<typeof setTimeout>;
         const ro = new ResizeObserver(() => { clearTimeout(rot); rot = setTimeout(run, 200); });
         ro.observe(el);
         return () => { cancelled = true; clearTimeout(t); clearTimeout(rot); ro.disconnect(); };
     }, [data, scale, topPx, botPx, maxPages]);
 
-    // When maxPages is set, cap the paper height so overflow is hidden
-    const totalH = pageCount * A4_H;
+    // ── Shared paper style ───────────────────────────────────────────
+    const paperStyle: React.CSSProperties = {
+        width: A4_W,
+        boxSizing: "border-box",
+        background: "#fff",
+        paddingTop: `${topMm}mm`,
+        paddingBottom: `${botMm}mm`,
+        paddingLeft: `${leftMm}mm`,
+        paddingRight: `${rightMm}mm`,
+        fontFamily: fontFam,
+        textAlign: (layout.textAlign || "left") as any,
+        lineHeight: layout.lineHeight || 1.45,
+        ...cssVarStyle,
+    };
+
     const scaledW = A4_W * scale;
-    const scaledH = totalH * scale;
 
     return (
-        <div ref={wrapperRef} className="w-full flex justify-center overflow-x-hidden pb-10">
-            <div style={{ position: "relative", width: scaledW, height: scaledH, flexShrink: 0 }}>
+        <div ref={wrapperRef} className="w-full flex flex-col items-center gap-3 pb-10">
 
-                {/* Scale wrapper */}
-                <div style={{
-                    position: "absolute", top: 0, left: 0,
-                    width: A4_W,
-                    transformOrigin: "top left",
-                    transform: `scale(${scale})`,
-                }}>
-                    {/* THE paper — single continuous, spacers live inside it */}
-                    <div
-                        ref={paperRef}
-                        className="paper-page"
-                        style={{
-                            width: A4_W,
-                            minHeight: A4_H,
-                            // If maxPages is set, clip overflow so user sees exactly N pages
-                            maxHeight: maxPages > 0 ? totalH : undefined,
-                            overflow: maxPages > 0 ? "hidden" : "visible",
-                            background: "#fff",
-                            boxSizing: "border-box",
-                            paddingTop: `${topMm}mm`,
-                            paddingBottom: `${botMm}mm`,
-                            paddingLeft: `${leftMm}mm`,
-                            paddingRight: `${rightMm}mm`,
-                            fontFamily: fontFam,
-                            textAlign: (layout.textAlign || "left") as any,
-                            lineHeight: layout.lineHeight || 1.45,
-                            boxShadow: "0 4px 32px rgba(0,0,0,0.13)",
-                            position: "relative",
-                            // CSS custom props for font sizes
-                            ["--resume-name-size" as string]: `${namePt}pt`,
-                            ["--resume-title-size" as string]: `${titlePt}pt`,
-                            ["--resume-heading-size" as string]: `${headingPt}pt`,
-                            ["--resume-body-size" as string]: `${bodyPt}pt`,
-                        }}
-                    >
-                        <Template data={displayData} />
-
-                        {/* Thin dashed page-break lines — purely visual, sit on top, don't block content */}
-                        {Array.from({ length: pageCount - 1 }).map((_, i) => (
-                            <div key={i} className="no-print" style={{
-                                position: "absolute",
-                                top: (i + 1) * A4_H,
-                                left: 0, right: 0,
-                                height: 1,
-                                zIndex: 20,
-                                pointerEvents: "none",
-                                background: "repeating-linear-gradient(90deg,#818cf8 0,#818cf8 6px,transparent 6px,transparent 14px)",
-                            }} />
-                        ))}
-                    </div>
+            {/* ── Hidden full-scale paper: runs spacers, NEVER visible ── */}
+            <div style={{ position: "fixed", top: 0, left: -(A4_W + 40), width: A4_W, pointerEvents: "none", zIndex: -1 }}>
+                <div ref={hiddenRef} style={paperStyle}>
+                    <Template data={displayData} />
                 </div>
+            </div>
 
-                {/* Page number labels shown to the right */}
-                {Array.from({ length: pageCount }).map((_, i) => (
-                    <div key={i} className="no-print" style={{
-                        position: "absolute",
-                        top: i * scaledH / pageCount + 6,
-                        left: scaledW + 8,
-                        fontSize: 10, color: "#a8a29e",
+            {/* ── Hidden PDF capture target (used by downloadPDF) ── */}
+            <div style={{ position: "fixed", top: 0, left: -(A4_W + 40 + A4_W + 40), width: A4_W, pointerEvents: "none", zIndex: -1 }}>
+                <div
+                    ref={pdfRef}
+                    className="paper-page"
+                    style={paperStyle}
+                />
+            </div>
+
+            {/* ── Visible A4 pages: each shows a slice of the spacered HTML ── */}
+            {Array.from({ length: pageCount }).map((_, pageIdx) => (
+                <div key={pageIdx} style={{ position: "relative", flexShrink: 0 }}>
+                    {/* A4 clip box — exactly one page */}
+                    <div style={{
+                        width: scaledW,
+                        height: A4_H * scale,
+                        overflow: "hidden",
+                        boxShadow: "0 4px 24px rgba(0,0,0,0.14)",
+                        flexShrink: 0,
+                    }}>
+                        {/* Full paper content shifted to show this page's slice */}
+                        <div
+                            dangerouslySetInnerHTML={{ __html: paperHTML }}
+                            style={{
+                                ...paperStyle,
+                                transformOrigin: "top left",
+                                transform: `scale(${scale}) translateY(${-pageIdx * A4_H}px)`,
+                            }}
+                        />
+                    </div>
+
+                    {/* Page label */}
+                    <div className="no-print" style={{
+                        position: "absolute", top: 6, left: scaledW + 8,
+                        fontSize: 10, color: "#94a3b8",
                         fontWeight: 700, letterSpacing: "0.06em",
                         textTransform: "uppercase", whiteSpace: "nowrap",
                     }}>
-                        Page {i + 1}
+                        Page {pageIdx + 1}
                     </div>
-                ))}
-            </div>
+                </div>
+            ))}
         </div>
     );
 }
