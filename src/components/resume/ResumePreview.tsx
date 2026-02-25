@@ -231,11 +231,12 @@ export default function ResumePreview({
             {/* ── Visible A4 pages: each shows a slice of the spacered HTML ── */}
             {Array.from({ length: pageCount }).map((_, pageIdx) => (
                 <div key={pageIdx} style={{ position: "relative", flexShrink: 0 }}>
-                    {/* A4 clip box — exactly one page */}
+                    {/* A4 clip box — exactly one page, position:relative for overlays */}
                     <div style={{
                         width: scaledW,
                         height: A4_H * scale,
                         overflow: "hidden",
+                        position: "relative",
                         boxShadow: "0 4px 24px rgba(0,0,0,0.14)",
                         flexShrink: 0,
                     }}>
@@ -248,6 +249,34 @@ export default function ResumePreview({
                                 transform: `scale(${scale}) translateY(${-pageIdx * A4_H}px)`,
                             }}
                         />
+
+                        {/* ── White top margin overlay (pages 2+ only) ──
+                            Page 1 gets its top margin from paperStyle.paddingTop.
+                            Pages 2+ need a guaranteed visual top margin regardless
+                            of spacer precision. The spacer should have pushed
+                            content below this zone — this just makes it bulletproof. */}
+                        {pageIdx > 0 && (
+                            <div style={{
+                                position: "absolute", top: 0, left: 0, right: 0,
+                                height: topPx * scale,
+                                background: "#ffffff",
+                                zIndex: 10,
+                                pointerEvents: "none",
+                            }} />
+                        )}
+
+                        {/* ── White bottom margin overlay (every page) ──
+                            Covers the bottom botMm of every page with solid white,
+                            matching the margin setting from the Design panel.
+                            The spacer pushes content above this zone; the overlay
+                            is a safety net for a clean visual margin. */}
+                        <div style={{
+                            position: "absolute", bottom: 0, left: 0, right: 0,
+                            height: botPx * scale,
+                            background: "#ffffff",
+                            zIndex: 10,
+                            pointerEvents: "none",
+                        }} />
                     </div>
 
                     {/* Page label */}
