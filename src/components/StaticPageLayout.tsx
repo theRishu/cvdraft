@@ -54,7 +54,7 @@ export default function StaticPageLayout({
             <Link href="/contact-us" className="hover:text-primary transition-colors">Contact Us</Link>
             <Link href="/knowledge-center" className="hover:text-primary transition-colors">Knowledge Center</Link>
           </div>
-          <p className="font-medium tracking-wide">© {new Date().getFullYear()} CVdraft</p>
+          <p className="font-medium tracking-wide">© {new Date().getFullYear()} CVdraft · <span className="opacity-60">RISHU KUMAR PANDEY</span></p>
         </div>
       </footer>
     </div>

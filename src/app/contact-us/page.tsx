@@ -19,7 +19,7 @@ export default function ContactUs() {
                         <a href="mailto:support@cvdraft.space" className="font-bold text-indigo-600 hover:text-indigo-800 transition-colors text-lg">
                             support@cvdraft.space
                         </a>
-                        <p className="text-sm text-stone-400 mt-1">CVdraft Technologies</p>
+                        <p className="text-sm text-stone-400 mt-1">CVdraft Technologies · <span className="font-medium text-stone-500">RISHU KUMAR PANDEY</span></p>
                     </div>
                 </div>
 

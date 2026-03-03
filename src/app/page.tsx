@@ -203,7 +203,7 @@ export default async function Home() {
             <Link href="/contact-us" className="hover:text-base-content transition-colors font-medium">Contact Us</Link>
             <Link href="/knowledge-center" className="hover:text-base-content transition-colors font-medium">Knowledge Center</Link>
           </div>
-          <p className="font-medium tracking-wide">© {new Date().getFullYear()} CVdraft</p>
+          <p className="font-medium tracking-wide">© {new Date().getFullYear()} CVdraft · <span className="text-base-content/40">RISHU KUMAR PANDEY</span></p>
         </div>
       </footer>
     </div>
