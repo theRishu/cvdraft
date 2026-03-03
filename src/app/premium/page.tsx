@@ -11,8 +11,22 @@ import {
 
 declare global {
     interface Window {
-        Cashfree: (config: { mode: string }) => { checkout: (opts: any) => Promise<void> };
+        Cashfree: (config: { mode: string }) => {
+            checkout: (opts: { paymentSessionId: string; redirectTarget?: string }) => Promise<void>;
+        };
     }
+}
+
+/** Wait for Cashfree SDK to load (max ~5 seconds) */
+function waitForCashfree(maxMs = 5000): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (typeof window !== "undefined" && "Cashfree" in window) return resolve();
+        const start = Date.now();
+        const id = setInterval(() => {
+            if ("Cashfree" in window) { clearInterval(id); resolve(); }
+            else if (Date.now() - start > maxMs) { clearInterval(id); reject(new Error("Cashfree SDK did not load. Please refresh and try again.")); }
+        }, 100);
+    });
 }
 
 const FREE_FEATURES = [
@@ -50,21 +64,26 @@ export default function PremiumPage() {
         setError("");
 
         try {
+            // 0. Make sure the SDK is ready
+            await waitForCashfree();
+
             // 1. Create order on server
             const res = await fetch("/api/payment/create-order", { method: "POST" });
-            if (!res.ok) throw new Error("Could not create order. Check your Cashfree keys in .env.local.");
-            const { orderId, paymentSessionId } = await res.json();
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                throw new Error(body?.error || "Could not create order. Check your Cashfree keys in .env.local.");
+            }
+            const { paymentSessionId } = await res.json();
 
-            // 2. Open Cashfree checkout (loaded via CDN <Script> tag)
-            const cashfree = window.Cashfree({
-                mode: (process.env.NEXT_PUBLIC_CASHFREE_MODE as "sandbox" | "production") || "sandbox",
-            });
-            cashfree.checkout({
+            // 2. Open Cashfree checkout
+            const mode = (process.env.NEXT_PUBLIC_CASHFREE_MODE as "sandbox" | "production") || "sandbox";
+            const cashfree = window.Cashfree({ mode });
+            await cashfree.checkout({
                 paymentSessionId,
                 redirectTarget: "_self",
             });
         } catch (e: any) {
-            console.error(e);
+            console.error("[Cashfree checkout error]", e);
             setError(e.message || "Something went wrong. Please try again.");
             setPaying(false);
         }
@@ -80,8 +99,8 @@ export default function PremiumPage() {
 
     return (
         <div className="min-h-screen bg-[#fdf9f6] flex flex-col">
-            {/* Load Cashfree JS from CDN */}
-            <Script src="https://sdk.cashfree.com/js/v3/cashfree.js" strategy="lazyOnload" />
+            {/* Load Cashfree JS from CDN — afterInteractive ensures it loads before user clicks */}
+            <Script src="https://sdk.cashfree.com/js/v3/cashfree.js" strategy="afterInteractive" />
 
             {/* Header */}
             <header className="border-b border-stone-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">

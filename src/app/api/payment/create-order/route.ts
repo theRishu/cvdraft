@@ -7,7 +7,7 @@ const CASHFREE_BASE =
         : "https://sandbox.cashfree.com/pg";
 
 // ₹299 one-time Pro price
-const PRO_PRICE_INR = 999;
+const PRO_PRICE_INR = 299;
 
 export async function POST() {
     try {
@@ -50,9 +50,12 @@ export async function POST() {
         });
 
         if (!resp.ok) {
-            const err = await resp.json();
-            console.error("[CREATE_ORDER]", err);
-            return new NextResponse("Failed to create order", { status: 500 });
+            const err = await resp.json().catch(() => ({}));
+            console.error("[CREATE_ORDER] Cashfree error:", JSON.stringify(err));
+            return new NextResponse(
+                JSON.stringify({ error: err?.message || "Failed to create order", details: err }),
+                { status: 500, headers: { "Content-Type": "application/json" } }
+            );
         }
 
         const data = await resp.json();
