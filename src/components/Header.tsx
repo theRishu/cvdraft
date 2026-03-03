@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
 import NewResumeModal from "./dashboard/NewResumeModal";
@@ -50,7 +51,7 @@ const TIPS = [
     },
 ];
 
-export default function Header() {
+export default function Header({ isPro }: { isPro?: boolean }) {
     const pathname = usePathname();
     const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -288,6 +289,17 @@ export default function Header() {
                             </kbd>
                         )}
                     </form>
+
+                    {/* ─── Upgrade button ────────────────────────── */}
+                    {!isPro && (
+                        <Link
+                            href="/premium"
+                            className="hidden lg:flex items-center gap-2 px-4 py-2 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition-all shadow-sm mr-1"
+                        >
+                            <Sparkles className="w-3.5 h-3.5" />
+                            Upgrade
+                        </Link>
+                    )}
 
                     {/* ─── New Resume ─────────────────────────────── */}
                     <NewResumeModal
@@ -589,6 +601,30 @@ export default function Header() {
                                 </a>
                             );
                         })}
+
+                        {!isPro && (
+                            <a
+                                href="/premium"
+                                onClick={() => setMobileOpen(false)}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 10,
+                                    padding: "10px 12px",
+                                    borderRadius: 12,
+                                    fontSize: 14,
+                                    fontWeight: 700,
+                                    color: "#d97706",
+                                    background: "#fffbeb",
+                                    border: "1px solid #fef3c7",
+                                    textDecoration: "none",
+                                    marginTop: 4,
+                                }}
+                            >
+                                <Sparkles size={18} />
+                                Upgrade to Pro
+                            </a>
+                        )}
 
                         {/* Mobile new resume */}
                         <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #f5f5f4" }}>

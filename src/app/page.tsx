@@ -196,10 +196,12 @@ export default async function Home() {
             <div className="w-6 h-6 rounded bg-base-content text-base-100 flex items-center justify-center font-bold text-[10px]">CV</div>
             <span className="font-bold tracking-tight text-base-content">Draft</span>
           </Link>
-          <div className="flex gap-8">
-            <Link href="#" className="hover:text-base-content transition-colors font-medium">Privacy</Link>
-            <Link href="#" className="hover:text-base-content transition-colors font-medium">Terms</Link>
-            <Link href="#" className="hover:text-base-content transition-colors font-medium">Contact</Link>
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
+            <Link href="/privacy-policy" className="hover:text-base-content transition-colors font-medium">Privacy Policy</Link>
+            <Link href="/terms-and-conditions" className="hover:text-base-content transition-colors font-medium">Terms & Conditions</Link>
+            <Link href="/refund-and-cancellation" className="hover:text-base-content transition-colors font-medium">Refund Policy</Link>
+            <Link href="/contact-us" className="hover:text-base-content transition-colors font-medium">Contact Us</Link>
+            <Link href="/knowledge-center" className="hover:text-base-content transition-colors font-medium">Knowledge Center</Link>
           </div>
           <p className="font-medium tracking-wide">© {new Date().getFullYear()} CVdraft</p>
         </div>

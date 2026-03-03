@@ -1,11 +1,13 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IUser extends Document {
-    userId: string; // Clerk ID
+    userId: string;
     email: string;
     resumeCount: number;
     isPro: boolean;
     stripeCustomerId?: string;
+    razorpayPaymentId?: string;
+    razorpayOrderId?: string;
     aiKeys?: {
         gemini?: string;
         openai?: string;
@@ -21,6 +23,8 @@ const UserSchema = new Schema<IUser>({
     resumeCount: { type: Number, default: 0 },
     isPro: { type: Boolean, default: false },
     stripeCustomerId: { type: String },
+    razorpayPaymentId: { type: String },
+    razorpayOrderId: { type: String },
     aiKeys: {
         gemini: { type: String },
         openai: { type: String },

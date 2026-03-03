@@ -173,7 +173,8 @@ export default function NewResumeModal({ trigger, className }: Props) {
                                 <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
                                     <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
                                     <p className="text-xs text-amber-700 font-medium">
-                                        You have {resumes.length} / {FREE_LIMIT} free resumes. Delete an existing one to create or import a new one.
+                                        You have {resumes.length} / {FREE_LIMIT} free resumes.{" "}
+                                        <a href="/premium" className="text-amber-900 underline font-bold decoration-amber-300 decoration-2 underline-offset-2">Upgrade to Pro</a> for unlimited access.
                                     </p>
                                 </div>
                             )}

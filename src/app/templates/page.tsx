@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import {
@@ -31,6 +31,14 @@ export default function TemplatesPage() {
     const [filter, setFilter] = useState("All");
     const [creating, setCreating] = useState<string | null>(null);
     const [error, setError] = useState("");
+    const [isPro, setIsPro] = useState(false);
+
+    useEffect(() => {
+        fetch("/api/user")
+            .then(r => r.json())
+            .then(d => setIsPro(d.isPro || false))
+            .catch(console.error);
+    }, []);
 
     const filtered = filter === "All" ? TEMPLATES : TEMPLATES.filter(t => t.category === filter);
 
@@ -65,7 +73,7 @@ export default function TemplatesPage() {
 
     return (
         <div className="min-h-screen bg-[#fdf9f6]">
-            <Header />
+            <Header isPro={isPro} />
 
             <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
                 {/* Page header */}

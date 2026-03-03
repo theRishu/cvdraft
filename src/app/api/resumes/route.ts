@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         if (!dbUser) {
             dbUser = await User.create({
                 userId,
-                email: user.emailAddresses[0].emailAddress,
+                email: user.emailAddresses[0]?.emailAddress || "user@example.com",
             });
         }
 
@@ -62,8 +62,8 @@ export async function POST(req: Request) {
                 title: title || "Software Engineer Resume",
                 templateId: templateId || "singlecolumn",
                 personalInfo: {
-                    fullName: user.firstName + " " + user.lastName,
-                    email: user.emailAddresses[0].emailAddress || "john.doe@example.com",
+                    fullName: [user.firstName, user.lastName].filter(Boolean).join(" ") || "CVdraft User",
+                    email: user.emailAddresses[0]?.emailAddress || "user@example.com",
                     title: "Senior Software Engineer",
                     phone: "+1 (555) 123-4567",
                     address: "123 Tech Lane, San Francisco, CA 94105",
@@ -143,11 +143,6 @@ export async function POST(req: Request) {
         }
 
         const newResume = await Resume.create(initialData);
-
-        // Update user count
-        dbUser.resumeCount = resumeCount + 1;
-        await dbUser.save();
-
         return NextResponse.json(newResume);
 
     } catch (error) {
