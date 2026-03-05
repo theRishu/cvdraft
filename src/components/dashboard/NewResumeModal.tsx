@@ -133,7 +133,7 @@ export default function NewResumeModal({ trigger, className }: Props) {
             {/* Trigger */}
             <div onClick={() => setOpen(true)} className={className} style={{ cursor: "pointer" }}>
                 {trigger ?? (
-                    <button className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all active:scale-95 shadow-sm">
+                    <button className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all active:scale-95 shadow-sm">
                         <Plus className="w-4 h-4" /> New resume
                     </button>
                 )}
@@ -229,14 +229,14 @@ export default function NewResumeModal({ trigger, className }: Props) {
                                     <button
                                         onClick={handleCreateBlank}
                                         disabled={creating || importing}
-                                        className="w-full flex items-center gap-4 px-4 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl transition-all active:scale-95 disabled:opacity-60 text-left"
+                                        className="w-full flex items-center gap-4 px-4 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition-all active:scale-95 disabled:opacity-60 text-left"
                                     >
                                         <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
                                             {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileText className="w-5 h-5" />}
                                         </div>
                                         <div>
                                             <p className="text-sm font-bold">{creating ? "Creating…" : "Start blank resume"}</p>
-                                            <p className="text-xs text-indigo-200">Start from scratch with a clean, blank resume</p>
+                                            <p className="text-xs text-emerald-200">Start from scratch with a clean, blank resume</p>
                                         </div>
                                         {!creating && <ArrowRight className="w-4 h-4 ml-auto shrink-0" />}
                                     </button>
@@ -255,7 +255,7 @@ export default function NewResumeModal({ trigger, className }: Props) {
                                         className="w-full flex items-center gap-4 px-4 py-4 bg-stone-50 hover:bg-stone-100 border border-stone-200 text-stone-800 rounded-2xl transition-all active:scale-95 disabled:opacity-60 text-left"
                                     >
                                         <div className="w-10 h-10 bg-white border border-stone-200 rounded-xl flex items-center justify-center shrink-0">
-                                            {importing ? <Loader2 className="w-5 h-5 animate-spin text-indigo-500" /> : <Upload className="w-5 h-5 text-indigo-500" />}
+                                            {importing ? <Loader2 className="w-5 h-5 animate-spin text-emerald-500" /> : <Upload className="w-5 h-5 text-emerald-500" />}
                                         </div>
                                         <div>
                                             <p className="text-sm font-bold">{importing ? "Importing…" : "Import from file"}</p>

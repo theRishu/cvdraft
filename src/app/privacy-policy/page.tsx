@@ -9,14 +9,14 @@ export default function PrivacyPolicy() {
             content: `When you register and use CVdraft, we collect:
       • Account information: name, email address, and profile data provided via Clerk (our authentication provider).
       • Resume content: professional details (work history, skills, education) you enter into the editor.
-      • Payment information: order ID and payment status from Cashfree. We do not store card or bank account details on our servers.
+      • Payment information: order ID and payment status from our payment processor. We do not store card or bank account details on our servers.
       • Usage data: logs, IP addresses, browser type, and pages visited for analytics and security purposes.`,
         },
         {
             title: "2. How We Use Your Information",
             content: `We use the data we collect to:
       • Provide and improve the CVdraft service.
-      • Process and verify payments through Cashfree.
+      • Process and verify payments through our secure payment gateway.
       • Send transactional emails (receipts, account alerts).
       • Respond to support requests.
       • Comply with legal obligations.
@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
             title: "3. Data Sharing",
             content: `We share your data only with trusted third-party service providers necessary for operating the platform:
       • Clerk (authentication & user management) — clerkinc.com
-      • Cashfree Payments (payment processing) — cashfree.com
+      • Secure Payment Gateway (payment processing)
       • Google AI / OpenAI (AI writing assistance — only processes the text you submit, not stored) 
       • MongoDB Atlas (database hosting)
       All third-party providers are required to comply with applicable data protection laws.`,
@@ -78,18 +78,18 @@ export default function PrivacyPolicy() {
     return (
         <StaticPageLayout title="Privacy Policy">
             <div className="space-y-1 mb-8">
-                <p className="text-sm text-stone-400">
+                <p className="text-sm text-slate-400">
                     Last updated: {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
                 </p>
                 <p>
-                    This Privacy Policy explains how CVdraft Technologies collects, uses, and protects your personal information
-                    when you use cvdraft.in. By using CVdraft, you consent to the practices described here.
+                    This Privacy Policy explains how <strong>Rishu Kumar Pandey</strong> (the developer of CVdraft) collects, uses, and protects your personal information
+                    when you use cvdraft.space. By using CVdraft, you consent to the practices described here.
                 </p>
             </div>
             <div className="space-y-8">
                 {sections.map((s, i) => (
                     <section key={i}>
-                        <h2 className="text-lg font-bold text-stone-900 mb-2">{s.title}</h2>
+                        <h2 className="text-lg font-bold text-slate-900 mb-2">{s.title}</h2>
                         <p className="leading-relaxed whitespace-pre-line">{s.content}</p>
                     </section>
                 ))}

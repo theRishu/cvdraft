@@ -182,63 +182,24 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
             const html2canvasPro = (await import("html2canvas-pro")).default;
             const { jsPDF } = await import("jspdf");
 
-            const paper = document.querySelector('.paper-page') as HTMLElement;
-            if (!paper) throw new Error("Preview not found");
-
-            // paper-page is fixed off-screen; just capture it directly at 2x retina
-            await new Promise(r => setTimeout(r, 80));
-
-            const canvas = await html2canvasPro(paper, {
-                scale: 2,
-                useCORS: true,
-                width: 794,
-                windowWidth: 794,
-                scrollX: 0,
-                scrollY: 0,
-            });
-
-            // Slice canvas into A4 pages with correct margins
-            const A4_W_MM = 210;
-            const A4_H_MM = 297;
-            const MM_PER_PX = A4_W_MM / canvas.width;
-            const A4_H_PX = Math.round(A4_H_MM / MM_PER_PX);
-
-            const topMm = resumeData.layout?.topMargin ?? 15;
-            const botMm = resumeData.layout?.bottomMargin ?? 15;
+            const pages = document.querySelectorAll('.preview-page-container');
+            if (!pages.length) throw new Error("No pages found to capture");
 
             const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-            let offsetPX = 0;
-            let pageIdx = 0;
 
-            while (offsetPX < canvas.height) {
-                if (pageIdx > 0) pdf.addPage();
-                const remainingPX = canvas.height - offsetPX;
-                if (remainingPX < Math.round(10 / MM_PER_PX)) break;
+            for (let i = 0; i < pages.length; i++) {
+                if (i > 0) pdf.addPage();
 
-                const sliceH = Math.min(A4_H_PX, remainingPX);
-                const sliceCanvas = document.createElement('canvas');
-                sliceCanvas.width = canvas.width;
-                sliceCanvas.height = sliceH;
-                const ctx = sliceCanvas.getContext('2d')!;
-                ctx.drawImage(canvas, 0, offsetPX, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+                const canvas = await html2canvasPro(pages[i] as HTMLElement, {
+                    scale: 3, // High quality capture
+                    useCORS: true,
+                    backgroundColor: "#ffffff",
+                    logging: false,
+                });
 
-                const img = sliceCanvas.toDataURL('image/jpeg', 0.98);
-                const sliceHMM = sliceH * MM_PER_PX;
-
-                if (pageIdx === 0) {
-                    // Page 1: template already has paddingTop, place at y=0
-                    pdf.addImage(img, 'JPEG', 0, 0, A4_W_MM, sliceHMM);
-                } else {
-                    // Page 2+: add white top margin, place image below it
-                    pdf.setFillColor(255, 255, 255);
-                    pdf.rect(0, 0, A4_W_MM, topMm, 'F');
-                    pdf.addImage(img, 'JPEG', 0, topMm, A4_W_MM, Math.min(sliceHMM, A4_H_MM - topMm - botMm));
-                    // White bottom margin
-                    pdf.rect(0, A4_H_MM - botMm, A4_W_MM, botMm, 'F');
-                }
-
-                offsetPX += A4_H_PX;
-                pageIdx++;
+                const img = canvas.toDataURL('image/jpeg', 0.98);
+                // The container is already clipped to exactly one A4 page's content
+                pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
             }
 
             const safeTitle = (resumeData.title || "Resume").replace(/[^a-zA-Z0-9.\-_]/g, '_');
@@ -471,9 +432,9 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
                         className="flex items-center gap-2 h-9 px-4 rounded-xl font-bold text-xs text-white shrink-0 ml-2 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed select-none"
                         style={{
                             background: isDownloading
-                                ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
-                                : 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-                            boxShadow: isDownloading ? 'none' : '0 0 16px rgba(99,102,241,0.55), 0 2px 8px rgba(0,0,0,0.18)',
+                                ? 'linear-gradient(135deg, #10b981, #14b8a6)'
+                                : 'linear-gradient(135deg, #059669, #0d9488)',
+                            boxShadow: isDownloading ? 'none' : '0 0 16px rgba(16,185,129,0.55), 0 2px 8px rgba(0,0,0,0.18)',
                         }}
                     >
                         {isDownloading
@@ -495,7 +456,7 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
                         return (
                             <button key={s.id} title={s.label} onClick={() => setActiveSection(s.id)}
                                 className={`relative w-12 h-12 flex flex-col items-center justify-center rounded-2xl transition-all duration-300 group ${activeSection === s.id
-                                    ? "bg-primary/20 ring-1 ring-primary/50 scale-105 text-primary shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+                                    ? "bg-primary/20 ring-1 ring-primary/50 scale-105 text-primary shadow-[0_0_15px_rgba(16,185,129,0.3)]"
                                     : hidden
                                         ? "text-base-content/30 hover:text-base-content/50"
                                         : "text-base-content/50 hover:bg-base-content/10 hover:text-base-content"
@@ -542,7 +503,7 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
                         {ALL_SECTIONS.map(s => (
                             <button key={s.id} onClick={() => setActiveSection(s.id)}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${activeSection === s.id
-                                    ? "bg-primary text-primary-content border-primary shadow-[0_0_10px_rgba(139,92,246,0.3)]"
+                                    ? "bg-primary text-primary-content border-primary shadow-[0_0_10px_rgba(16,185,129,0.3)]"
                                     : "bg-base-200 text-base-content/70 border-base-content/10 hover:border-primary/50"}`}>
                                 <s.icon className="w-3.5 h-3.5" />
                                 {s.label}
@@ -605,7 +566,7 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
                 {SECTIONS.slice(0, 4).map(s => (
                     <button key={s.id} onClick={() => { setActiveSection(s.id); setMobileView("editor"); }}
                         className={`flex flex-col items-center justify-center gap-1 h-full transition-all ${activeSection === s.id && mobileView === "editor" ? "text-primary" : "text-base-content/50"}`}>
-                        <div className={`p-1.5 rounded-lg transition-all ${activeSection === s.id && mobileView === "editor" ? "bg-primary/20 shadow-[0_0_10px_rgba(139,92,246,0.3)]" : ""}`}>
+                        <div className={`p-1.5 rounded-lg transition-all ${activeSection === s.id && mobileView === "editor" ? "bg-primary/20 shadow-[0_0_10px_rgba(16,185,129,0.3)]" : ""}`}>
                             <s.icon className="w-5 h-5" />
                         </div>
                         <span className="text-[8px] font-black uppercase tracking-wider">{s.label.split(' ')[0]}</span>
@@ -614,7 +575,7 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
 
                 <button onClick={() => setMobileView(mobileView === "preview" ? "editor" : "preview")}
                     className={`flex flex-col items-center justify-center gap-1 h-full transition-all ${mobileView === "preview" ? "text-primary" : "text-base-content/50"}`}>
-                    <div className={`p-1.5 rounded-lg transition-all ${mobileView === "preview" ? "bg-primary/20 shadow-[0_0_10px_rgba(139,92,246,0.3)]" : ""}`}>
+                    <div className={`p-1.5 rounded-lg transition-all ${mobileView === "preview" ? "bg-primary/20 shadow-[0_0_10px_rgba(16,185,129,0.3)]" : ""}`}>
                         <Eye className="w-5 h-5" />
                     </div>
                     <span className="text-[8px] font-black uppercase tracking-wider">Preview</span>
@@ -655,7 +616,7 @@ export default function ResumeEditor({ resume, userId }: { resume: any; userId: 
                             </div>
                         </div>
                         <button onClick={() => setShowScore(false)}
-                            className="w-full py-4 bg-base-content text-base-100 text-sm font-bold rounded-2xl hover:bg-primary hover:text-white transition-all hover:shadow-[0_0_20px_rgba(139,92,246,0.4)]">
+                            className="w-full py-4 bg-base-content text-base-100 text-sm font-bold rounded-2xl hover:bg-primary hover:text-white transition-all hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]">
                             Got it
                         </button>
                     </div>

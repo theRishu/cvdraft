@@ -1,4 +1,4 @@
-import { RichText } from "@/lib/richText";
+import { RichText, DescriptionText } from "@/lib/richText";
 import React from "react";
 import { Mail, Phone, MapPin, Globe, Linkedin, Github } from "lucide-react";
 
@@ -251,9 +251,10 @@ export default function SingleColumnTemplate({ data }: SingleColumnTemplateProps
                                         {exp.address && <span>{exp.address}</span>}
                                     </div>
                                     {exp.description && (
-                                        <p className="text-stone-700 leading-relaxed text-[0.95em] whitespace-pre-line text-justify">
-                                            <RichText text={exp.description || ""} />
-                                        </p>
+                                        <DescriptionText
+                                            text={exp.description}
+                                            className="text-slate-700 leading-normal text-[0.92em] text-justify space-y-1.5"
+                                        />
                                     )}
                                 </div>
                             ))}
@@ -286,9 +287,10 @@ export default function SingleColumnTemplate({ data }: SingleColumnTemplateProps
                                         <span>{edu.schoolName}</span>
                                     </div>
                                     {edu.description && (
-                                        <p className="text-stone-700 leading-relaxed text-[0.95em] whitespace-pre-line mt-1.5">
-                                            <RichText text={edu.description || ""} />
-                                        </p>
+                                        <DescriptionText
+                                            text={edu.description}
+                                            className="text-slate-700 leading-normal text-[0.92em] mt-1.5 space-y-1"
+                                        />
                                     )}
                                 </div>
                             ))}
@@ -328,9 +330,10 @@ export default function SingleColumnTemplate({ data }: SingleColumnTemplateProps
                                         </div>
                                     )}
                                     {proj.description && (
-                                        <p className="text-stone-700 leading-relaxed text-[0.95em] whitespace-pre-line text-justify">
-                                            <RichText text={proj.description || ""} />
-                                        </p>
+                                        <DescriptionText
+                                            text={proj.description}
+                                            className="text-slate-700 leading-normal text-[0.92em] text-justify space-y-1.5"
+                                        />
                                     )}
                                 </div>
                             ))}
@@ -425,9 +428,10 @@ export default function SingleColumnTemplate({ data }: SingleColumnTemplateProps
                                     </div>
                                     {item.subtitle && <div className="text-[0.95em] font-medium text-stone-600 mb-1.5">{item.subtitle}</div>}
                                     {item.description && (
-                                        <p className="text-stone-700 leading-relaxed text-[0.95em] whitespace-pre-line text-justify">
-                                            {item.description}
-                                        </p>
+                                        <DescriptionText
+                                            text={item.description}
+                                            className="text-slate-700 leading-normal text-[0.92em] text-justify space-y-1"
+                                        />
                                     )}
                                 </div>
                             ))}

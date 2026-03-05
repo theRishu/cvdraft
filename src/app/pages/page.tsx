@@ -10,7 +10,7 @@ const pages = [
             { href: "/", label: "Home", icon: Home, desc: "Landing page" },
             { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, desc: "Your resumes" },
             { href: "/templates", label: "Templates", icon: FileText, desc: "Browse resume templates" },
-            { href: "/premium", label: "Buy Premium", icon: Crown, desc: "Upgrade to Pro — ₹299" },
+            { href: "/premium", label: "Buy Premium", icon: Crown, desc: "Upgrade to Pro — from ₹79/week" },
         ]
     },
     {
@@ -25,7 +25,7 @@ const pages = [
         ]
     },
     {
-        section: "Policies (RBI / Cashfree)", items: [
+        section: "Policies", items: [
             { href: "/contact-us", label: "Contact Us", icon: Phone, desc: "Business details & grievance officer" },
             { href: "/terms-and-conditions", label: "Terms & Conditions", icon: FileText, desc: "Service terms, governing law" },
             { href: "/refund-and-cancellation", label: "Refund Policy", icon: ReceiptText, desc: "Eligibility, timelines, process" },
@@ -40,7 +40,7 @@ export default function PagesIndex() {
         <div className="min-h-screen bg-[#fdf9f6] px-6 py-16">
             <div className="max-w-3xl mx-auto">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xs">CV</div>
+                    <div className="w-9 h-9 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-black text-xs">CV</div>
                     <span className="font-black text-stone-900 text-xl">Draft</span>
                 </div>
                 <h1 className="text-3xl font-black text-stone-900 mt-6 mb-2">All Pages</h1>
@@ -55,16 +55,16 @@ export default function PagesIndex() {
                                     <Link
                                         key={href}
                                         href={href}
-                                        className="flex items-center gap-4 p-4 bg-white border border-stone-100 rounded-2xl hover:border-indigo-200 hover:shadow-sm transition-all group"
+                                        className="flex items-center gap-4 p-4 bg-white border border-stone-100 rounded-2xl hover:border-emerald-200 hover:shadow-sm transition-all group"
                                     >
-                                        <div className="w-10 h-10 bg-stone-50 group-hover:bg-indigo-50 border border-stone-100 group-hover:border-indigo-100 rounded-xl flex items-center justify-center shrink-0 transition-colors">
-                                            <Icon className="w-5 h-5 text-stone-400 group-hover:text-indigo-500 transition-colors" />
+                                        <div className="w-10 h-10 bg-stone-50 group-hover:bg-emerald-50 border border-stone-100 group-hover:border-emerald-100 rounded-xl flex items-center justify-center shrink-0 transition-colors">
+                                            <Icon className="w-5 h-5 text-stone-400 group-hover:text-emerald-500 transition-colors" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-bold text-stone-900 text-sm">{label}</p>
                                             <p className="text-xs text-stone-400 truncate">{desc}</p>
                                         </div>
-                                        <code className="text-xs text-stone-300 group-hover:text-indigo-400 font-mono transition-colors shrink-0">{href}</code>
+                                        <code className="text-xs text-stone-300 group-hover:text-emerald-400 font-mono transition-colors shrink-0">{href}</code>
                                     </Link>
                                 ))}
                             </div>

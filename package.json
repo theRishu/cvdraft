@@ -17,6 +17,7 @@
     "daisyui": "^5.5.19",
     "html2canvas-pro": "^2.0.1",
     "html2pdf.js": "^0.14.0",
+    "jspdf": "^4.2.0",
     "lucide-react": "^0.574.0",
     "mongoose": "^9.2.1",
     "next": "16.1.6",

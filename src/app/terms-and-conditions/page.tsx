@@ -6,7 +6,7 @@ export default function TermsAndConditions() {
     const sections = [
         {
             title: "1. Service Description",
-            content: `CVdraft ("we", "us", "our") is a Software-as-a-Service (SaaS) resume builder available at cvdraft.in. 
+            content: `CVdraft ("we", "us", "our") is a professional Software-as-a-Service (SaaS) resume builder developed by Rishu Kumar Pandey and available at cvdraft.space. 
       The platform allows registered users to create, edit, and export professional resumes using AI-powered tools and curated templates. 
       By accessing our platform, you agree to these Terms and Conditions in full.`,
         },
@@ -24,13 +24,18 @@ export default function TermsAndConditions() {
         },
         {
             title: "4. Payment Terms",
-            content: `CVdraft offers a free tier (limited to 2 resumes) and a one-time Pro plan priced at ₹299 (INR). 
-      Payment is processed via Cashfree Payments and is subject to their terms. All charges are in Indian Rupees (INR) and are inclusive of applicable taxes. 
+            content: `CVdraft offers a free tier (limited to 2 resumes) and a Pro subscription available in the following plans (all prices in INR, inclusive of applicable taxes):
+      • Weekly — ₹79
+      • Monthly — ₹299
+      • 3 Months — ₹699
+      • 6 Months — ₹1,199
+      • 12 Months — ₹1,999
+      Payment is processed via our secure payment gateway and is subject to their terms.
       Payment must be completed in full before Pro features are activated. We do not store card details on our servers.`,
         },
         {
             title: "5. Intellectual Property",
-            content: `All content, templates, designs, and technology on CVdraft are the intellectual property of CVdraft Technologies. 
+            content: `All content, templates, designs, and technology on CVdraft are the intellectual property of the developer, Rishu Kumar Pandey. 
       You are granted a limited, non-exclusive, non-transferable licence to use the platform solely for personal or professional resume creation. 
       You may not copy, modify, distribute, sell, or lease any part of our services without our written consent.`,
         },
@@ -47,7 +52,7 @@ export default function TermsAndConditions() {
         },
         {
             title: "8. Limitation of Liability",
-            content: `To the maximum extent permitted by applicable law, CVdraft Technologies shall not be liable for any indirect, incidental, special, 
+            content: `To the maximum extent permitted by applicable law, Rishu Kumar Pandey shall not be liable for any indirect, incidental, special, 
       consequential, or punitive damages arising out of your use of, or inability to use, the service. Our total cumulative liability shall not exceed 
       the amount paid by you in the 12 months preceding the claim.`,
         },
@@ -55,12 +60,12 @@ export default function TermsAndConditions() {
             title: "9. Dispute Resolution",
             content: `Any dispute arising out of these Terms shall first be attempted to be resolved amicably through mutual discussion. 
       If unresolved within 30 days, disputes shall be subject to arbitration under the Arbitration and Conciliation Act, 1996, with a sole arbitrator 
-      appointed by mutual agreement. The seat of arbitration shall be [Your City], India.`,
+      appointed by mutual agreement. The seat of arbitration shall be India.`,
         },
         {
             title: "10. Governing Law",
             content: `These Terms are governed by and construed in accordance with the laws of the Republic of India. 
-      Any legal proceedings shall be subject to the exclusive jurisdiction of courts located in [Your City], India.`,
+      Any legal proceedings shall be subject to the exclusive jurisdiction of courts located in India.`,
         },
         {
             title: "11. Changes to Terms",
@@ -76,7 +81,7 @@ export default function TermsAndConditions() {
     return (
         <StaticPageLayout title="Terms & Conditions">
             <div className="space-y-1 mb-8">
-                <p className="text-sm text-stone-400">
+                <p className="text-sm text-slate-400">
                     Last updated: {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
                 </p>
                 <p>
@@ -86,8 +91,8 @@ export default function TermsAndConditions() {
             <div className="space-y-8">
                 {sections.map((s, i) => (
                     <section key={i}>
-                        <h2 className="text-lg font-bold text-stone-900 mb-2">{s.title}</h2>
-                        <p className="leading-relaxed">{s.content}</p>
+                        <h2 className="text-lg font-bold text-slate-900 mb-2">{s.title}</h2>
+                        <p className="leading-relaxed whitespace-pre-line">{s.content}</p>
                     </section>
                 ))}
             </div>

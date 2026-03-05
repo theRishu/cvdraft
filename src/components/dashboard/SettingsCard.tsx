@@ -139,27 +139,27 @@ export default function SettingsCard({ user }: { user: any }) {
     const hasKey = (id: Provider) => !!states[id].key.trim();
 
     return (
-        <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden">
+        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-5 border-b border-stone-100 flex items-center gap-3">
-                <div className="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-indigo-500" />
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+                <div className="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-emerald-500" />
                 </div>
                 <div>
-                    <h3 className="font-bold text-stone-900">AI Provider Settings</h3>
-                    <p className="text-xs text-stone-400 mt-0.5">
+                    <h3 className="font-bold text-slate-900">AI Provider Settings</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
                         Add keys for one or more providers. If one runs out of quota, the editor will automatically try the next available key.
                     </p>
                 </div>
             </div>
 
             {/* Provider Tabs */}
-            <div className="flex border-b border-stone-100 bg-stone-50">
+            <div className="flex border-b border-slate-100 bg-slate-50">
                 {PROVIDERS.map(p => (
                     <button
                         key={p.id}
                         onClick={() => setActiveTab(p.id)}
-                        className={`flex-1 flex flex-col items-center gap-0.5 py-3.5 px-2 text-xs font-semibold transition-all relative ${activeTab === p.id ? "bg-white text-stone-900 shadow-sm" : "text-stone-400 hover:text-stone-600 hover:bg-white/50"
+                        className={`flex-1 flex flex-col items-center gap-0.5 py-3.5 px-2 text-xs font-semibold transition-all relative ${activeTab === p.id ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
                             }`}
                     >
                         <span className="text-lg leading-none">{p.logo}</span>
@@ -180,46 +180,46 @@ export default function SettingsCard({ user }: { user: any }) {
                 {/* Key input */}
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                        <label className="text-sm font-semibold text-stone-700 flex items-center gap-1.5">
+                        <label className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
                             <span>{cfg.logo}</span> {cfg.label} API Key
                         </label>
                         <a href={cfg.keyUrl} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 transition-colors">
+                            className="text-xs text-emerald-600 hover:text-emerald-800 flex items-center gap-1 transition-colors">
                             Get a free key <ExternalLink className="w-3 h-3" />
                         </a>
                     </div>
                     <div className="relative">
-                        <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                        <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
                             type={s.showKey ? "text" : "password"}
                             value={s.key}
                             onChange={e => patch(activeTab, { key: e.target.value, testStatus: "idle" })}
                             placeholder={cfg.placeholder}
-                            className="w-full bg-stone-50 border border-stone-200 focus:border-indigo-400 focus:bg-white rounded-xl pl-10 pr-10 py-3 text-sm outline-none transition-all font-mono placeholder:font-sans placeholder:text-stone-300"
+                            className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-400 focus:bg-white rounded-xl pl-10 pr-10 py-3 text-sm outline-none transition-all font-mono placeholder:font-sans placeholder:text-slate-300"
                         />
                         <button
                             type="button"
                             onClick={() => patch(activeTab, { showKey: !s.showKey })}
-                            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-600 transition-colors"
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors"
                             title={s.showKey ? "Hide key" : "Reveal key"}
                         >
                             {s.showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                     </div>
-                    <p className="text-xs text-stone-400">
-                        Uses model: <span className="font-mono text-stone-500">{cfg.model}</span> · Stored securely, never shared.
+                    <p className="text-xs text-slate-400">
+                        Uses model: <span className="font-mono text-slate-500">{cfg.model}</span> · Stored securely, never shared.
                     </p>
                 </div>
 
                 {/* Action buttons */}
                 <div className="flex flex-wrap items-center gap-3">
                     <button onClick={() => handleTest(activeTab)} disabled={s.isTesting || s.isSaving || !s.key.trim()}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-semibold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                         {s.isTesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
                         {s.isTesting ? "Testing…" : "Test Key"}
                     </button>
                     <button onClick={() => handleSave(activeTab)} disabled={s.isSaving || !s.key.trim()}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                         {s.isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         {s.isSaving ? "Saving…" : "Save Key"}
                     </button>
@@ -272,14 +272,14 @@ export default function SettingsCard({ user }: { user: any }) {
                 )}
 
                 {/* Connected providers summary */}
-                <div className="pt-3 border-t border-stone-100">
-                    <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Connected Providers</p>
+                <div className="pt-3 border-t border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Connected Providers</p>
                     <div className="flex flex-wrap gap-2">
                         {PROVIDERS.map(p => (
                             <div key={p.id}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${hasKey(p.id)
                                     ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                    : "bg-stone-50 border-stone-200 text-stone-400"
+                                    : "bg-slate-50 border-slate-200 text-slate-400"
                                     }`}>
                                 <span>{p.logo}</span>
                                 <span className="hidden sm:inline">{p.label}</span>
@@ -290,7 +290,7 @@ export default function SettingsCard({ user }: { user: any }) {
                     </div>
                     {/* Multiple Providers Text... */}
                     {[hasKey("gemini"), hasKey("openai")].filter(Boolean).length > 1 && (
-                        <p className="text-xs text-indigo-600 font-medium mt-2">
+                        <p className="text-xs text-emerald-600 font-medium mt-2">
                             ✨ Multiple providers connected — the editor will auto-switch if one runs out of quota.
                         </p>
                     )}

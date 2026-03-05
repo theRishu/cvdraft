@@ -6,13 +6,13 @@
 
 @layer base {
   :root {
-    --bg: #fdf9f6;
-    --foreground: #1c1917;
+    --bg: #ffffff;
+    --foreground: #0f172a;
     --card: #ffffff;
-    --border: #e7e5e4;
-    --muted: #78716c;
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
+    --border: #f1f5f9;
+    --muted: #64748b;
+    --primary: #10b981;
+    --primary-hover: #059669;
     --radius: 0.75rem;
   }
 
@@ -22,6 +22,11 @@
     font-family: Inter, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  html {
+    overflow-x: hidden;
   }
 
   * {
@@ -207,12 +212,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d6d3d1;
+  background: #e2e8f0;
   border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e;
+  background: #cbd5e1;
 }
 
 /* Print / PDF */

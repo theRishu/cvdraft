@@ -160,7 +160,7 @@ export default function ResumePreview({
                 const top = s.top + shift;
                 const page = Math.floor(top / A4_H);
                 const pageEnd = (page + 1) * A4_H;
-                const usableBot = pageEnd - botPx;
+                const usableBot = pageEnd - botPx - 4; // 4px cushion to prevent line clipping
                 const bot = top + s.height;
 
                 // Push if bottom crosses the usable area AND element fits on next page
@@ -223,6 +223,7 @@ export default function ResumePreview({
             <div style={{ position: "fixed", top: 0, left: -(A4_W + 40 + A4_W + 40), width: A4_W, pointerEvents: "none", zIndex: -1 }}>
                 <div
                     ref={pdfRef}
+                    id="resume-pdf-target"
                     className="paper-page"
                     style={paperStyle}
                 />
@@ -232,14 +233,17 @@ export default function ResumePreview({
             {Array.from({ length: pageCount }).map((_, pageIdx) => (
                 <div key={pageIdx} style={{ position: "relative", flexShrink: 0 }}>
                     {/* A4 clip box — exactly one page, position:relative for overlays */}
-                    <div style={{
-                        width: scaledW,
-                        height: A4_H * scale,
-                        overflow: "hidden",
-                        position: "relative",
-                        boxShadow: "0 4px 24px rgba(0,0,0,0.14)",
-                        flexShrink: 0,
-                    }}>
+                    <div
+                        className="preview-page-container"
+                        style={{
+                            width: scaledW,
+                            height: A4_H * scale,
+                            overflow: "hidden",
+                            position: "relative",
+                            boxShadow: "0 4px 24px rgba(0,0,0,0.14)",
+                            flexShrink: 0,
+                        }}
+                    >
                         {/* Full paper content shifted to show this page's slice */}
                         <div
                             dangerouslySetInnerHTML={{ __html: paperHTML }}

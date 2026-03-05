@@ -1,4 +1,4 @@
-import { RichText } from "@/lib/richText";
+import { RichText, DescriptionText } from "@/lib/richText";
 import React from "react";
 import { Mail, Phone, MapPin, Globe, Linkedin, Github } from "lucide-react";
 
@@ -110,10 +110,10 @@ export default function ExecutiveTemplate({ data }: { data: any }) {
     );
 
     return (
-        <div className={`flex flex-col bg-white text-stone-800 leading-relaxed`} style={{ 
-                fontFamily: fontFamily, 
-                fontSize: typeof fontSize === 'number' ? `${fontSize}pt` : fontSize || "10pt"
-            }}>
+        <div className={`flex flex-col bg-white text-slate-800 leading-relaxed`} style={{
+            fontFamily: fontFamily,
+            fontSize: typeof fontSize === 'number' ? `${fontSize}pt` : fontSize || "10pt"
+        }}>
 
             {/* Header */}
             <div className={`flex flex-col ${style.headerAlign === 'center' ? 'items-center text-center' : style.headerAlign === 'right' ? 'items-end text-right' : 'items-start text-left'} pb-5 mb-6 ${variant === 'academic' ? 'border-b-4 border-double' : variant === 'minimalist' ? '' : 'border-b'} border-stone-200`}>
@@ -177,9 +177,10 @@ export default function ExecutiveTemplate({ data }: { data: any }) {
                                         {exp.address && <span>{exp.address}</span>}
                                     </div>
                                     {exp.description && (
-                                        <p className={`text-stone-700 text-[0.95em] whitespace-pre-line ${variant === 'academic' || variant === 'classic' ? 'text-justify leading-loose' : 'leading-relaxed'} ${variant === 'modern' ? 'pl-3 border-l-2 border-stone-100' : ''}`}>
-                                            <RichText text={exp.description || ""} />
-                                        </p>
+                                        <DescriptionText
+                                            text={exp.description}
+                                            className={`text-slate-700 text-[0.95em] ${variant === 'academic' || variant === 'classic' ? 'text-justify leading-loose' : 'leading-relaxed'} ${variant === 'modern' ? 'pl-3 border-l-2 border-slate-100' : ''} space-y-1.5`}
+                                        />
                                     )}
                                 </div>
                             ))}
@@ -203,7 +204,10 @@ export default function ExecutiveTemplate({ data }: { data: any }) {
                                         <span className={variant === 'corporate' ? 'font-bold text-stone-800' : 'italic'}>{edu.schoolName}</span>
                                     </div>
                                     {edu.description && (
-                                        <p className="text-stone-700 text-[0.95em] mt-1"><RichText text={edu.description || ""} /></p>
+                                        <DescriptionText
+                                            text={edu.description}
+                                            className="text-slate-700 text-[0.95em] mt-1 space-y-1"
+                                        />
                                     )}
                                 </div>
                             ))}
@@ -246,9 +250,10 @@ export default function ExecutiveTemplate({ data }: { data: any }) {
                                         </div>
                                     )}
                                     {proj.description && (
-                                        <p className="text-stone-700 text-[0.95em] whitespace-pre-line leading-relaxed">
-                                            <RichText text={proj.description || ""} />
-                                        </p>
+                                        <DescriptionText
+                                            text={proj.description}
+                                            className="text-slate-700 text-[0.95em] leading-relaxed space-y-1.5"
+                                        />
                                     )}
                                 </div>
                             ))}
