@@ -46,8 +46,9 @@ export function parseResponse(raw: string): Record<string, string> {
     raw.split("&").forEach((pair) => {
         const idx = pair.indexOf("=");
         if (idx !== -1) {
-            const val = pair.slice(idx + 1).replace(/\+/g, " ");
-            result[pair.slice(0, idx)] = decodeURIComponent(val);
+            const key = pair.slice(0, idx).trim();
+            const val = pair.slice(idx + 1).replace(/\+/g, " ").trim();
+            result[key] = decodeURIComponent(val);
         }
     });
     return result;

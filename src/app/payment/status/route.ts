@@ -15,9 +15,12 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
         const encResp = formData.get("encResp")?.toString();
 
-        const base = process.env.NEXT_PUBLIC_APP_URL || "https://cvdraft.space";
+        const host = req.headers.get("host") || "cvdraft.space";
+        const protocol = host.includes("localhost") ? "http" : "https";
+        const base = `${protocol}://${host}`;
 
         if (!encResp) {
+            console.error("[CCAVENUE_STATUS] Missing encResp in POST");
             return NextResponse.redirect(`${base}/payment/result?status=failed`, 303);
         }
 
@@ -25,35 +28,48 @@ export async function POST(req: NextRequest) {
         const plainText = decrypt(encResp, workingKey);
         const data = parseResponse(plainText);
 
-        const isPaid = data["order_status"] === "Success";
+        console.log("[CCAVENUE_STATUS] Decrypted Data:", data);
+
+        const orderStatus = (data["order_status"] || "").toLowerCase();
+        const isPaid = orderStatus === "success";
         const orderId = data["order_id"] || "";
 
         if (isPaid) {
-            // Priority: extract userId from merchant_param1 which we passed in create-order
-            let targetUserId = data["merchant_param1"];
+            // Get userId from merchant_param1 (our custom data) or fall back to current session
+            const merchantUserId = data["merchant_param1"];
+            let finalUserId: string | null = null;
 
-            if (!targetUserId) {
+            if (merchantUserId && typeof merchantUserId === "string") {
+                finalUserId = merchantUserId;
+            } else {
                 try {
-                    const { userId } = await auth();
-                    targetUserId = userId;
-                } catch (e) { }
+                    const authSession = await auth();
+                    finalUserId = authSession.userId;
+                } catch (e) {
+                    console.error("[CCAVENUE_STATUS] auth() failed:", e);
+                }
             }
 
-            if (targetUserId && typeof targetUserId === 'string') {
+            if (finalUserId) {
+                console.log("[CCAVENUE_STATUS] Upgrading user:", finalUserId);
                 await connectToDatabase();
                 await User.findOneAndUpdate(
-                    { userId: targetUserId as string },
+                    { userId: finalUserId },
                     { $set: { isPro: true, ccavenueOrderId: orderId } },
                     { upsert: false }
                 );
+            } else {
+                console.error("[CCAVENUE_STATUS] Paid but no finalUserId found");
             }
         }
 
         const statusParam = isPaid ? "success" : "failed";
         return NextResponse.redirect(`${base}/payment/result?status=${statusParam}`, 303);
     } catch (err) {
-        console.error("[CCAVENUE_STATUS_POST]", err);
-        const base = process.env.NEXT_PUBLIC_APP_URL || "https://cvdraft.space";
+        console.error("[CCAVENUE_STATUS_POST] Error:", err);
+        const host = req.headers.get("host") || "cvdraft.space";
+        const protocol = host.includes("localhost") ? "http" : "https";
+        const base = `${protocol}://${host}`;
         return NextResponse.redirect(`${base}/payment/result?status=failed`, 303);
     }
 }

@@ -21,12 +21,17 @@ export async function POST(req: NextRequest) {
         const plainText = decrypt(encResp, workingKey);
         const data = parseResponse(plainText);
 
-        const isPaid = data["order_status"] === "Success";
+        console.log("[CCAVENUE_WEBHOOK] Decrypted Data:", data);
+
+        const orderStatus = (data["order_status"] || "").toLowerCase();
+        const isPaid = orderStatus === "success";
         const orderId = data["order_id"];
 
         if (isPaid && orderId) {
             // Extract userId from merchant_param1
             const userId = data["merchant_param1"];
+
+            console.log("[CCAVENUE_WEBHOOK] Success for order:", orderId, "User:", userId);
 
             if (userId) {
                 await connectToDatabase();

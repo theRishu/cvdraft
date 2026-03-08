@@ -30,10 +30,23 @@ export async function POST(req: NextRequest) {
         const customerName =
             [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || "CVdraft User";
 
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cvdraft.space";
-        const workingKey = process.env.CCAVENUE_WORKING_KEY!;
-        const accessCode = process.env.CCAVENUE_ACCESS_CODE!;
-        const merchantId = process.env.CCAVENUE_MERCHANT_ID!;
+        const host = req.headers.get("host") || "cvdraft.space";
+        const protocol = host.includes("localhost") ? "http" : "https";
+        const appUrl = `${protocol}://${host}`;
+
+        const workingKey = process.env.CCAVENUE_WORKING_KEY;
+        const accessCode = process.env.CCAVENUE_ACCESS_CODE;
+        const merchantId = process.env.CCAVENUE_MERCHANT_ID;
+
+        if (!workingKey || !accessCode || !merchantId) {
+            console.error("[CCAVENUE_CREATE] Missing configuration:", {
+                hasKey: !!workingKey,
+                hasCode: !!accessCode,
+                hasMerchant: !!merchantId
+            });
+            throw new Error("Payment configuration is missing on the server.");
+        }
+
         const ccavenueUrl =
             process.env.CCAVENUE_URL ||
             "https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
@@ -55,7 +68,7 @@ export async function POST(req: NextRequest) {
             merchant_param2: plan,    // Store plan here
         }).toString();
 
-        console.log("[CCAVENUE_CREATE] Order:", orderId, "User:", userId);
+        console.log("[CCAVENUE_CREATE] Order:", orderId, "Target URL:", appUrl);
         const encRequest = encrypt(params, workingKey);
 
         return NextResponse.json({ encRequest, accessCode, actionUrl: ccavenueUrl, orderId, merchantId });
