@@ -8,6 +8,7 @@ export interface IUser extends Document {
     stripeCustomerId?: string;
     razorpayPaymentId?: string;
     razorpayOrderId?: string;
+    ccavenueOrderId?: string;
     aiKeys?: {
         gemini?: string;
         openai?: string;
@@ -25,6 +26,7 @@ const UserSchema = new Schema<IUser>({
     stripeCustomerId: { type: String },
     razorpayPaymentId: { type: String },
     razorpayOrderId: { type: String },
+    ccavenueOrderId: { type: String },
     aiKeys: {
         gemini: { type: String },
         openai: { type: String },

@@ -1,34 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Script from "next/script";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
 import {
     Check, Sparkles, Zap, Shield, Rocket,
-    ArrowRight, Star, Loader2, Crown, Tag,
+    ArrowRight, Star, Loader2, Crown,
 } from "lucide-react";
-
-declare global {
-    interface Window {
-        Cashfree: (config: { mode: string }) => {
-            checkout: (opts: { paymentSessionId: string; redirectTarget?: string }) => Promise<void>;
-        };
-    }
-}
-
-function waitForCashfree(maxMs = 5000): Promise<void> {
-    return new Promise((resolve, reject) => {
-        if (typeof window !== "undefined" && "Cashfree" in window) return resolve();
-        const start = Date.now();
-        const id = setInterval(() => {
-            if ("Cashfree" in window) { clearInterval(id); resolve(); }
-            else if (Date.now() - start > maxMs) { clearInterval(id); reject(new Error("Payment SDK did not load. Please refresh and try again.")); }
-        }, 100);
-    });
-}
 
 const PLANS = [
     {
@@ -121,28 +101,45 @@ export default function PremiumPage() {
         setError("");
 
         try {
-            await waitForCashfree();
-
             const res = await fetch("/api/payment/create-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ plan: selectedPlan }),
             });
-            if (!res.ok) {
-                const body = await res.json().catch(() => ({}));
-                throw new Error(body?.error || "Could not create order. Please try again or contact support.");
-            }
-            const { paymentSessionId } = await res.json();
 
-            const mode = (process.env.NEXT_PUBLIC_CASHFREE_MODE as "sandbox" | "production") || "sandbox";
-            const cashfree = window.Cashfree({ mode });
-            await cashfree.checkout({
-                paymentSessionId,
-                redirectTarget: "_self",
-            });
-        } catch (e: any) {
-            console.error("[Cashfree checkout error]", e);
-            setError(e.message || "Something went wrong. Please try again.");
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok) {
+                throw new Error(data?.error || "Could not create order. Please try again or contact support.");
+            }
+
+            const { encRequest, accessCode, actionUrl } = data;
+
+            // CCAvenue requires a form POST — create and submit it programmatically
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = actionUrl;
+
+            // encRequest (Required)
+            const encInput = document.createElement("input");
+            encInput.type = "hidden";
+            encInput.name = "encRequest";
+            encInput.value = encRequest;
+            form.appendChild(encInput);
+
+            // access_code (Required)
+            const accessInput = document.createElement("input");
+            accessInput.type = "hidden";
+            accessInput.name = "access_code";
+            accessInput.value = accessCode;
+            form.appendChild(accessInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : "Something went wrong. Please try again.";
+            console.error("[CCAvenue checkout error]", e);
+            setError(msg);
             setPaying(false);
         }
     };
@@ -159,8 +156,6 @@ export default function PremiumPage() {
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
-            <Script src="https://sdk.cashfree.com/js/v3/cashfree.js" strategy="afterInteractive" />
-
             {/* Header */}
             <header className="border-b border-slate-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -283,19 +278,19 @@ export default function PremiumPage() {
                                     ))}
                                 </ul>
                                 <button
-                                    id="cashfree-upgrade-btn"
+                                    id="ccavenue-upgrade-btn"
                                     onClick={handleUpgrade}
                                     disabled={paying}
                                     className="w-full flex items-center justify-center gap-2 py-4 bg-white text-emerald-600 font-black text-base rounded-2xl hover:bg-emerald-50 transition-all active:scale-95 disabled:opacity-60 shadow-lg"
                                 >
                                     {paying ? (
-                                        <><Loader2 className="w-5 h-5 animate-spin" /> Preparing checkout…</>
+                                        <><Loader2 className="w-5 h-5 animate-spin" /> Redirecting to payment…</>
                                     ) : (
                                         <><Rocket className="w-5 h-5" /> Get Pro — ₹{activePlan.price.toLocaleString("en-IN")} / {activePlan.label.toLowerCase()}</>
                                     )}
                                 </button>
                                 <p className="text-center text-emerald-200 text-xs mt-4">
-                                    Secured by 256-bit SSL encryption
+                                    Secured by CCAvenue · 256-bit SSL encryption
                                 </p>
                             </div>
                         </div>
