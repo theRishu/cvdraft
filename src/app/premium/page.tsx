@@ -96,7 +96,7 @@ export default function PremiumPage() {
             .catch(() => setLoading(false));
     }, []);
 
-    const handleUpgrade = async () => {
+    const handleUpgrade = async (paymentOption?: string) => {
         setPaying(true);
         setError("");
 
@@ -104,7 +104,10 @@ export default function PremiumPage() {
             const res = await fetch("/api/payment/create-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plan: selectedPlan }),
+                body: JSON.stringify({
+                    plan: selectedPlan,
+                    paymentOption: paymentOption
+                }),
             });
 
             const data = await res.json().catch(() => ({}));
@@ -277,18 +280,32 @@ export default function PremiumPage() {
                                         </li>
                                     ))}
                                 </ul>
-                                <button
-                                    id="ccavenue-upgrade-btn"
-                                    onClick={handleUpgrade}
-                                    disabled={paying}
-                                    className="w-full flex items-center justify-center gap-2 py-4 bg-white text-emerald-600 font-black text-base rounded-2xl hover:bg-emerald-50 transition-all active:scale-95 disabled:opacity-60 shadow-lg"
-                                >
-                                    {paying ? (
-                                        <><Loader2 className="w-5 h-5 animate-spin" /> Redirecting to payment…</>
-                                    ) : (
-                                        <><Rocket className="w-5 h-5" /> Get Pro — ₹{activePlan.price.toLocaleString("en-IN")} / {activePlan.label.toLowerCase()}</>
-                                    )}
-                                </button>
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <button
+                                        id="ccavenue-upgrade-btn"
+                                        onClick={() => handleUpgrade()}
+                                        disabled={paying}
+                                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-white text-emerald-600 font-black text-base rounded-2xl hover:bg-emerald-50 transition-all active:scale-95 disabled:opacity-60 shadow-lg"
+                                    >
+                                        {paying ? (
+                                            <><Loader2 className="w-5 h-5 animate-spin" /></>
+                                        ) : (
+                                            <><Rocket className="w-5 h-5" /> All Methods</>
+                                        )}
+                                    </button>
+                                    <button
+                                        id="ccavenue-upi-btn"
+                                        onClick={() => handleUpgrade("OPTUPI")}
+                                        disabled={paying}
+                                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-emerald-700 text-white font-black text-base rounded-2xl hover:bg-emerald-800 transition-all active:scale-95 disabled:opacity-60 shadow-lg border border-emerald-500"
+                                    >
+                                        {paying ? (
+                                            <><Loader2 className="w-5 h-5 animate-spin" /></>
+                                        ) : (
+                                            <>Pay with UPI</>
+                                        )}
+                                    </button>
+                                </div>
                                 <p className="text-center text-emerald-200 text-xs mt-4">
                                     Secured by CCAvenue · 256-bit SSL encryption
                                 </p>

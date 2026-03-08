@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
 
         const body = await req.json().catch(() => ({}));
         const plan: string = body?.plan && PLAN_PRICES[body.plan] ? body.plan : "monthly";
+        const paymentOption: string | undefined = body?.paymentOption; // e.g. "OPTUPI"
         const amount = PLAN_PRICES[plan];
 
         // Simple alphanumeric orderId (some gateways 
@@ -51,11 +52,15 @@ export async function POST(req: NextRequest) {
             process.env.CCAVENUE_URL ||
             "https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
 
+        const customerPhone = clerkUser.phoneNumbers?.[0]?.phoneNumber || "";
+        const tid = Date.now().toString();
+
         // Build the parameter string
         // We use merchant_param1 and 2 to pass our internal metadata safely
-        const params = new URLSearchParams({
+        const paramsObj: Record<string, string> = {
             merchant_id: merchantId,
             order_id: orderId,
+            tid: tid,
             currency: "INR",
             amount: amount.toFixed(2),
             redirect_url: `${appUrl}/payment/status`,
@@ -63,15 +68,22 @@ export async function POST(req: NextRequest) {
             language: "EN",
             billing_name: customerName,
             billing_email: customerEmail,
+            billing_tel: customerPhone,
             billing_country: "India",
-            merchant_param1: userId,  // Store userId here
-            merchant_param2: plan,    // Store plan here
-        }).toString();
+            merchant_param1: userId,
+            merchant_param2: plan,
+        };
 
-        console.log("[CCAVENUE_CREATE] Order:", orderId, "Target URL:", appUrl);
+        if (paymentOption) {
+            paramsObj.payment_option = paymentOption;
+        }
+
+        const params = new URLSearchParams(paramsObj).toString();
+
+        console.log("[CCAVENUE_CREATE] Order:", orderId, "Target URL:", appUrl, "Option:", paymentOption || "Default");
         const encRequest = encrypt(params, workingKey);
 
-        return NextResponse.json({ encRequest, accessCode, actionUrl: ccavenueUrl, orderId, merchantId });
+        return NextResponse.json({ encRequest, accessCode, actionUrl: ccavenueUrl, orderId, merchantId, tid });
     } catch (err) {
         console.error("[CREATE_ORDER_CCAVENUE]", err);
         return new NextResponse(
