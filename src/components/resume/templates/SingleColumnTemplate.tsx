@@ -374,7 +374,7 @@ export default function SingleColumnTemplate({ data }: SingleColumnTemplateProps
                                 {certifications.map((cert: any, idx: number) => (
                                     <div key={cert.id || `cert-${idx}`}>
                                         <div className="flex justify-between items-baseline mb-0.5">
-                                            <h4 className="font-bold text-[0.95em] text-stone-900">{cert.title}</h4>
+                                            <h4 className="font-bold text-[0.95em] text-stone-900">{cert.name}</h4>
                                             {cert.date && <span className="text-[0.85em] text-stone-500 whitespace-nowrap ml-2">{cert.date}</span>}
                                         </div>
                                         {cert.issuer && <div className="text-[0.9em] text-stone-600">{cert.issuer}</div>}

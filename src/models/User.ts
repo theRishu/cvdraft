@@ -12,6 +12,7 @@ export interface IUser extends Document {
     aiKeys?: {
         gemini?: string;
         openai?: string;
+        anthropic?: string;
     };
     preferredProvider?: string;
     createdAt: Date;
@@ -30,8 +31,9 @@ const UserSchema = new Schema<IUser>({
     aiKeys: {
         gemini: { type: String },
         openai: { type: String },
+        anthropic: { type: String },
     },
-    preferredProvider: { type: String, enum: ['gemini', 'openai'] },
+    preferredProvider: { type: String, enum: ['gemini', 'openai', 'anthropic'] },
 }, { timestamps: true });
 
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

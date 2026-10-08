@@ -6,6 +6,10 @@ const isProtectedRoute = createRouteMatcher([
     '/resume(.*)',
     '/api/resumes(.*)',
     '/api/user(.*)',
+    '/api/payment/create-order(.*)',
+    '/api/payment/verify(.*)',
+    // NOTE: /api/payment/webhook is intentionally excluded — CCAvenue calls it
+    // server-to-server without a Clerk session.
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

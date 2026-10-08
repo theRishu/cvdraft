@@ -1,13 +1,19 @@
 /**
  * Shared AI provider abstraction.
- * Supports: Google Gemini, OpenAI GPT
+ * Supports: Google Gemini, OpenAI GPT, Anthropic Claude
  */
 
-export type AIProvider = "gemini" | "openai";
+// Type-only import — erased at compile time, doesn't affect the lazy
+// runtime `await import(...)` used below to avoid bundling every provider
+// SDK into every serverless function.
+import type AnthropicSDK from "@anthropic-ai/sdk";
+
+export type AIProvider = "gemini" | "openai" | "anthropic";
 
 export interface AIKeys {
     gemini?: string;
     openai?: string;
+    anthropic?: string;
 }
 
 export interface AIResult {
@@ -20,6 +26,7 @@ export function detectProvider(keys: AIKeys, preferred?: AIProvider): AIProvider
     if (preferred && keys[preferred]) return preferred;
     if (keys.gemini) return "gemini";
     if (keys.openai) return "openai";
+    if (keys.anthropic) return "anthropic";
     return null;
 }
 
@@ -58,6 +65,23 @@ export async function generateWithProvider(
         }
         const data = await res.json();
         return data.choices?.[0]?.message?.content || "";
+    }
+
+    if (provider === "anthropic") {
+        const { default: Anthropic } = await import("@anthropic-ai/sdk");
+        const client = new Anthropic({ apiKey });
+        const response = await client.messages.create({
+            model: "claude-opus-5",
+            max_tokens: 16000,
+            // jsonMode has no dedicated API flag here — same as the Gemini branch,
+            // the prompt itself already instructs "Return ONLY valid JSON" and the
+            // caller (generate/route.ts) regex-extracts the JSON block from the text.
+            messages: [{ role: "user", content: prompt }],
+        });
+        const textBlock = response.content.find(
+            (block): block is AnthropicSDK.TextBlock => block.type === "text"
+        );
+        return textBlock?.text ?? "";
     }
 
     throw new Error(`Unknown provider: ${provider}`);
@@ -106,6 +130,30 @@ export async function validateProviderKey(
             return { valid: true };
         } catch (e: any) {
             return { valid: false, error: e.message || "Could not reach OpenAI." };
+        }
+    }
+
+    if (provider === "anthropic") {
+        const { default: Anthropic } = await import("@anthropic-ai/sdk");
+        const client = new Anthropic({ apiKey });
+        try {
+            await client.messages.create({
+                model: "claude-opus-5",
+                max_tokens: 1,
+                messages: [{ role: "user", content: "Say OK" }],
+            });
+            return { valid: true };
+        } catch (err: unknown) {
+            if (err instanceof Anthropic.AuthenticationError) {
+                return { valid: false, error: "Invalid Anthropic API key." };
+            }
+            if (err instanceof Anthropic.RateLimitError) {
+                return { valid: true, quotaExhausted: true, warning: "Key valid but Anthropic quota or rate limit exceeded." };
+            }
+            if (err instanceof Anthropic.APIError) {
+                return { valid: false, error: `Anthropic error: ${err.status}` };
+            }
+            return { valid: false, error: err instanceof Error ? err.message : "Could not reach Anthropic." };
         }
     }
 

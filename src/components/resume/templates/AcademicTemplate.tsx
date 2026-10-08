@@ -264,7 +264,7 @@ export default function AcademicTemplate({ data }: { data: any }) {
                                 {certifications.map((cert: any, certIdx: number) => (
                                     <div key={cert.id ?? certIdx}>
                                         <div className="flex justify-between items-baseline">
-                                            <h4 className={`font-bold text-[0.95em] text-stone-900 ${variant === 'corporate' ? 'uppercase tracking-wide text-[0.8em]' : ''}`}>{cert.title}</h4>
+                                            <h4 className={`font-bold text-[0.95em] text-stone-900 ${variant === 'corporate' ? 'uppercase tracking-wide text-[0.8em]' : ''}`}>{cert.name}</h4>
                                             {cert.date && <span className={`text-[0.85em] text-stone-500 ml-2 shrink-0 ${variant === 'corporate' ? 'font-bold' : ''}`}>{cert.date}</span>}
                                         </div>
                                         {cert.issuer && <div className={`text-[0.9em] text-stone-600 ${variant === 'corporate' ? 'font-bold text-stone-800' : 'italic'}`}>{cert.issuer}</div>}

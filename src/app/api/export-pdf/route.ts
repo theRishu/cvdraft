@@ -66,6 +66,37 @@ export async function POST(req: Request) {
         // Set the content and wait for network/fonts to finish loading
         await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
 
+        // --- Fit everything onto a single A4 page ---
+        // A4 is 297mm tall; convert to CSS px (96 px/inch, 25.4mm/inch) and
+        // subtract the configured top/bottom print margins to get the
+        // usable content height, then shrink the whole page proportionally
+        // with CSS `zoom` (not `transform: scale` — zoom reflows layout so
+        // width tracks the shrink instead of leaving dead space) until the
+        // rendered content fits within it.
+        const A4_HEIGHT_MM = 297;
+        const MM_TO_PX = 96 / 25.4;
+        // The 0.9 safety factor accounts for `page.evaluate` measuring the
+        // default screen viewport, while `page.pdf()` renders through
+        // Chromium's separate print pipeline — the two aren't pixel-
+        // identical, so an exact-fit calculation left content spilling
+        // onto a second page in testing (e.g. content that should fit at
+        // scale 0.582 still needed a 2nd page without this margin).
+        const usableHeightPx = (A4_HEIGHT_MM - topMargin - bottomMargin) * MM_TO_PX * 0.9;
+
+        const contentHeightPx = await page.evaluate(
+            () => document.querySelector<HTMLElement>(".paper-page")?.scrollHeight || 0
+        );
+
+        if (contentHeightPx > usableHeightPx) {
+            // Floor the shrink at 55% — past that the text becomes
+            // illegible, so a resume with genuinely too much content still
+            // spills onto a second page rather than becoming unreadable.
+            const scale = Math.max(0.55, usableHeightPx / contentHeightPx);
+            await page.evaluate((z: string) => {
+                document.querySelector<HTMLElement>(".paper-page")?.style.setProperty("zoom", z);
+            }, String(scale));
+        }
+
         // Generate PDF
         const pdfBuffer = await page.pdf({
             format: 'A4',

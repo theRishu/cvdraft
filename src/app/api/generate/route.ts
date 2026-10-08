@@ -15,6 +15,7 @@ function buildProviderList(providerParam: string, user: any): ProviderEntry[] {
     const all: ProviderEntry[] = [
         { provider: "gemini" as AIProvider, apiKey: aiKeys.gemini || process.env.GOOGLE_GENERATIVE_AI_API_KEY || "" },
         { provider: "openai" as AIProvider, apiKey: aiKeys.openai || process.env.OPENAI_API_KEY || "" },
+        { provider: "anthropic" as AIProvider, apiKey: aiKeys.anthropic || process.env.ANTHROPIC_API_KEY || "" },
     ].filter(e => !!e.apiKey) as ProviderEntry[];
 
     // Sort: preferred provider first

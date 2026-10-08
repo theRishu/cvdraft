@@ -21,6 +21,7 @@ export async function POST(req: Request) {
     const providers = [
       { provider: "gemini" as AIProvider, apiKey: aiKeys.gemini || "" },
       { provider: "openai" as AIProvider, apiKey: aiKeys.openai || "" },
+      { provider: "anthropic" as AIProvider, apiKey: aiKeys.anthropic || "" },
     ].filter(e => !!e.apiKey);
 
     if (preferredProvider) {
